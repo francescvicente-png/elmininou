@@ -1,0 +1,174 @@
+---
+/**
+ * Full-bleed editorial hero for /menu — typographic block + hero food photography
+ * (AI illustrative) and dual CTAs. Tuned to Playfair + Karla restaurant shell.
+ */
+import { Picture } from 'astro:assets';
+import Container from '../Container.astro';
+import Button from '../Button.astro';
+import { Icon } from 'astro-icon/components';
+import type { Lang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import { business } from '../../data/business';
+import { getBookingCta } from '../../data/site';
+import { MENU_PAGE_HERO_IMAGE } from '../../data/menu-illustrations';
+
+interface Props {
+	lang: Lang;
+	menuAnchorId?: string;
+}
+
+const { lang, menuAnchorId = 'menu-dishes-start' } = Astro.props;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waMessage = t('services.heroWhatsAppMessage');
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+
+const menuJumpHref = `#${menuAnchorId}`;
+---
+
+<section class="menu-page-hero relative overflow-hidden border-b border-border" aria-labelledby="menu-page-hero-title">
+	<div class="pointer-events-none absolute inset-0 opacity-90" aria-hidden="true">
+		<div
+			class="menu-page-hero-noise absolute inset-0"
+		>
+		</div>
+		<div
+			class="absolute left-1/2 top-[18%] h-[min(420px,55vw)] w-[min(520px,85vw)] -translate-x-1/2 rounded-full blur-3xl lg:left-[8%] lg:translate-x-0"
+			style="background: radial-gradient(circle at 42% 42%, oklch(72% 0.18 54 / 0.14), transparent 62%);"
+		>
+		</div>
+	</div>
+
+	<Container class="relative grid gap-10 py-12 md:gap-12 md:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-14 lg:py-20">
+		<div class="max-w-xl lg:max-w-none">
+			<p class="menu-page-hero-eyebrow">{t('services.heroEyebrow')}</p>
+			<h1 id="menu-page-hero-title" class="menu-page-hero-title">
+				{t('services.heroTitle')}
+			</h1>
+			<p class="menu-page-hero-lead">{t('services.heroLead')}</p>
+
+			<ul class="mt-6 flex flex-wrap gap-x-6 gap-y-2 font-body text-xs font-medium uppercase tracking-[0.14em] text-muted">
+				<li class="inline-flex items-center gap-2">
+					<Icon name="tabler:flame" class="size-4 text-primary shrink-0" aria-hidden="true" />
+					{t('services.menuHeroChipBrasa')}
+				</li>
+				<li class="inline-flex items-center gap-2">
+					<Icon name="tabler:leaf" class="size-4 text-primary shrink-0" aria-hidden="true" />
+					{t('services.menuHeroChipFresh')}
+				</li>
+				<li class="inline-flex items-center gap-2">
+					<Icon name="tabler:info-circle" class="size-4 text-primary shrink-0" aria-hidden="true" />
+					{t('services.menuHeroChipAllergens')}
+				</li>
+			</ul>
+
+			<div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+				<Button
+					as="a"
+					href={booking.href}
+					external={booking.external}
+					variant="primary"
+					size="lg"
+					class="w-full justify-center sm:w-auto shadow-md"
+				>
+					{t('cta.callToBook')}
+				</Button>
+				<Button
+					as="a"
+					href={waUrl}
+					external={true}
+					variant="secondary"
+					size="lg"
+					class="w-full justify-center sm:w-auto border-primary/35 hover:border-primary/55"
+				>
+					{t('services.heroCtaWhatsApp')}
+					<Icon
+						slot="icon-trailing"
+						name="tabler:brand-whatsapp"
+						class="size-4 shrink-0"
+						aria-hidden="true"
+					/>
+				</Button>
+				<a
+					class="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-4 py-3 font-body text-sm font-semibold text-primary underline-offset-4 transition-colors hover:bg-primary/8 hover:underline sm:py-3"
+					href={menuJumpHref}
+				>
+					{t('services.menuHeroScrollCta')}
+					<Icon name="tabler:chevron-down" class="size-4" aria-hidden="true" />
+				</a>
+			</div>
+		</div>
+
+		<figure class="menu-page-hero-visual group relative mx-auto w-full max-w-2xl lg:mx-0 lg:max-w-none">
+			<div
+				class="relative overflow-hidden rounded-[1.35rem] shadow-[0_24px_56px_-28px_oklch(22%_0.08_42/0.55)] ring-1 ring-black/10"
+			>
+				<div class="aspect-[21/9] min-h-[168px] md:aspect-[16/9] lg:aspect-auto lg:max-h-[min(52vh,420px)] lg:min-h-[280px]">
+					<Picture
+						src={MENU_PAGE_HERO_IMAGE}
+						alt={t('services.menuHeroImageAlt')}
+						formats={['avif', 'webp']}
+						class="absolute inset-0 size-full object-cover transition-transform duration-[480ms] motion-safe:group-hover:scale-[1.02]"
+						loading="eager"
+						decoding="async"
+						fetchpriority="high"
+						sizes="(min-width: 1024px) 48vw, 100vw"
+					/>
+				</div>
+				<div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent" aria-hidden="true">
+				</div>
+				<figcaption
+					class="pointer-events-none absolute bottom-3 left-4 right-4 font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-white/88 drop-shadow-sm md:bottom-4 md:left-6"
+				>
+					{t('services.menuHeroAiCaption')}
+				</figcaption>
+			</div>
+		</figure>
+	</Container>
+</section>
+
+<style>
+	.menu-page-hero-noise {
+		opacity: 0.04;
+		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+	}
+
+	.menu-page-hero-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0 0 0.85rem;
+	}
+
+	.menu-page-hero-title {
+		font-family: var(--font-display), Georgia, serif;
+		font-size: clamp(2.5rem, 4.5vw + 0.5rem, 4.85rem);
+		line-height: 1.03;
+		letter-spacing: -0.02em;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: balance;
+		max-width: 12ch;
+	}
+
+	.menu-page-hero-lead {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: clamp(1.05rem, 0.42vw + 0.94rem, 1.38rem);
+		line-height: 1.62;
+		color: var(--color-muted);
+		margin: 1.05rem 0 0;
+		max-width: 44rem;
+		text-wrap: pretty;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.menu-page-hero-visual :global(picture img) {
+			transition: none;
+		}
+	}
+</style>

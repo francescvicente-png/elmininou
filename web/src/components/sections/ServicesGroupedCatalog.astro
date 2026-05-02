@@ -59,8 +59,8 @@ const categoryLabelKey: Record<ServiceCategoryKey, string> = {
 					id={sectionId}
 					aria-labelledby={headingId}
 				>
-					<header class="mb-6 md:mb-8">
-						<Heading as="h2" size="h3" class="!font-display tracking-tight" id={headingId}>
+					<header class="menu-catalog-section-heading mb-7 md:mb-9 md:border-l-[4px] md:border-primary md:pl-6">
+						<Heading as="h2" size="h3" class="menu-catalog-title !font-display tracking-tight" id={headingId}>
 							{t(categoryLabelKey[group.category] as UIKey)}
 						</Heading>
 					</header>
@@ -112,7 +112,22 @@ const categoryLabelKey: Record<ServiceCategoryKey, string> = {
 	}
 	@media (min-width: 768px) {
 		.services-cat-section + .services-cat-section {
-			margin-top: 3.75rem;
+			margin-top: 4rem;
+		}
+	}
+	.menu-catalog-title {
+		position: relative;
+		padding-bottom: 0.35rem;
+	}
+	@media (max-width: 767px) {
+		.menu-catalog-section-heading .menu-catalog-title::after {
+			content: '';
+			display: block;
+			margin-top: 0.5rem;
+			height: 2px;
+			width: min(100%, 3.5rem);
+			border-radius: 999px;
+			background: color-mix(in oklch, var(--color-primary) 92%, transparent);
 		}
 	}
 </style>

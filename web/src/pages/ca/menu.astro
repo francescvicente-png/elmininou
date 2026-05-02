@@ -4,11 +4,12 @@ import Container from '../../components/Container.astro';
 import Text from '../../components/Text.astro';
 import CtaBanner from '../../components/CtaBanner.astro';
 import FadeInOnScroll from '../../components/animations/FadeInOnScroll.astro';
-import ServicesPageHero from '../../components/sections/ServicesPageHero.astro';
+import MenuPageHero from '../../components/menu/MenuPageHero.astro';
 import ServicesCategoryNav from '../../components/sections/ServicesCategoryNav.astro';
 import ServicesGroupedCatalog from '../../components/sections/ServicesGroupedCatalog.astro';
 import { Icon } from 'astro-icon/components';
 import { getServicesGrouped } from '../../data/services';
+import { MENU_PAGE_HERO_IMAGE } from '../../data/menu-illustrations';
 import { business } from '../../data/business';
 import { getBookingCta } from '../../data/site';
 import { useTranslations } from '../../i18n/utils';
@@ -36,17 +37,23 @@ const firstIllustratedServiceId = grouped
 		{ name: 'Inici', url: '/ca/' },
 		{ name: 'Carta', url: '/ca/menu/' },
 	]}
+	preloadImage={MENU_PAGE_HERO_IMAGE}
 >
-	<ServicesPageHero lang={lang} />
+	<MenuPageHero lang={lang} />
 
-	<FadeInOnScroll delay={100}>
-		<Container as="section" class="pb-6 pt-4 md:pb-10 md:pt-6">
-			<ServicesCategoryNav lang={lang} groups={grouped} />
-		</Container>
+	<FadeInOnScroll delay={80} instant>
+		<section
+			id="menu-dishes-start"
+			class="sticky top-20 z-30 border-y border-[color-mix(in_oklch,var(--color-border)_88%,transparent)] bg-[color-mix(in_oklch,var(--color-card)_93%,transparent)] py-4 shadow-[0_10px_42px_-26px_oklch(26%_0.06_52/0.38)] backdrop-blur-xl supports-[backdrop-filter]:bg-[color-mix(in_oklch,var(--color-card)_80%,transparent)]"
+		>
+			<Container>
+				<ServicesCategoryNav lang={lang} groups={grouped} />
+			</Container>
+		</section>
 	</FadeInOnScroll>
 
-	<FadeInOnScroll delay={100}>
-		<Container as="section" class="pb-16 md:pb-24" aria-labelledby="menu-catalog-visual">
+	<FadeInOnScroll delay={100} instant>
+		<Container as="section" class="pb-16 pt-8 md:pb-24 md:pt-10" aria-labelledby="menu-catalog-visual">
 			<p id="menu-catalog-visual" class="sr-only">
 				{t('services.dividerSub')}
 			</p>
@@ -58,7 +65,7 @@ const firstIllustratedServiceId = grouped
 		</Container>
 	</FadeInOnScroll>
 
-	<FadeInOnScroll delay={100}>
+	<FadeInOnScroll delay={100} instant>
 		<section
 			class="bg-card py-16 md:py-20"
 			aria-labelledby="menu-allergens-policy"
@@ -91,7 +98,7 @@ const firstIllustratedServiceId = grouped
 		</section>
 	</FadeInOnScroll>
 
-	<FadeInOnScroll delay={100}>
+	<FadeInOnScroll delay={100} instant>
 		<CtaBanner
 			title={t('cta.bannerTitle')}
 			ctaLabel={t('cta.callToBook')}

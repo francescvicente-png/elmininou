@@ -219,5 +219,47 @@
     "source": "Google Gemini image API — nano-banana model 2, bridal hairstyle reference prompt, 02/05/2026",
     "altDescription": "Bridal gallery — sleek high ballerina bun with pearl ornament, modern minimal back view (AI)",
     "usage": "BridalLanding editorial gallery wide tile"
+  },
+  "menu-hero": {
+    "file": "menu-generated/menu-hero.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, editorial Catalan grill bar mood, 2026-05-03",
+    "altDescription": "/menu hero — illustrative grill and embers scene (AI; not El mini nou interior photography)",
+    "usage": "MenuPageHero CA+ES"
+  },
+  "menu-dish-amanida-el-mini": {
+    "file": "menu-generated/dish-amanida-el-mini.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, food editorial, 2026-05-03",
+    "altDescription": "Illustrative salad bowl — menu card thumbnail (AI)",
+    "usage": "Featured ServiceCard amanida-el-mini"
+  },
+  "menu-dish-entranya": {
+    "file": "menu-generated/dish-entranya.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, food editorial, 2026-05-03",
+    "altDescription": "Illustrative grilled skirt steak — menu card thumbnail (AI)",
+    "usage": "Featured ServiceCard entranya"
+  },
+  "menu-dish-espaguetis": {
+    "file": "menu-generated/dish-espaguetis.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, food editorial, 2026-05-03",
+    "altDescription": "Illustrative spaghetti bolognese — menu card thumbnail (AI)",
+    "usage": "Featured ServiceCard espaguetis"
+  },
+  "menu-dish-grand-slam": {
+    "file": "menu-generated/dish-grand-slam.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, food editorial, 2026-05-03",
+    "altDescription": "Illustrative cheeseburger and fries — menu card thumbnail (AI)",
+    "usage": "Featured ServiceCard grand-slam"
+  },
+  "menu-dish-sandwich-botifarra": {
+    "file": "menu-generated/dish-sandwich-botifarra.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, food editorial, 2026-05-03",
+    "altDescription": "Illustrative Catalan butifarra sandwich — menu card thumbnail (AI)",
+    "usage": "Featured ServiceCard sandwich-botifarra"
+  },
+  "menu-dish-tapas-olives": {
+    "file": "menu-generated/dish-tapas-olives.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, food editorial, 2026-05-03",
+    "altDescription": "Illustrative marinated olives ramekin — menu card thumbnail (AI)",
+    "usage": "Featured ServiceCard tapas-olives"
   }
 }

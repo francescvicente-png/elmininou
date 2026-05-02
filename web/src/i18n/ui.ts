@@ -182,7 +182,7 @@ export const ui = {
 		'bridal.pageSubtitle':
 			'Mantenim aquest apartat compatible amb futures propostes de menús tancats o celebracions sempre coordinades amb setmanes vista per telèfon o WhatsApp.',
 		'bridal.placeholderBanner':
-			"Sense packs de bellesa o perruqueria: mentre la web se centri en carta i brasa de bar, els volums grans es pacten presencialment amb l'equip d'El mini nou.",
+			"Mentre el focus sigui la carta i la brasa del bar, els volums especials es concerten presencialment amb l'equip d'El mini nou.",
 		'bridal.sectionPlaceholderHeading': 'Espai opcional grup',
 		'bridal.sectionPlaceholderBody':
 			'Només apareixeran packs reals quan decidim publicitar celebracions empresa aniversaris família etc segons temporada.',
@@ -309,6 +309,13 @@ export const ui = {
 		'services.heroWhatsAppMessage':
 			"Hola, volia consultar disponibilitat o algun plat de la carta d’El mini nou. Gràcies.",
 		'services.heroCtaCatalog': 'Veure la carta',
+		'services.menuHeroImageAlt':
+			'Ambient de brasa i cuina inspiracional — imatge generada amb IA, només orientativa.',
+		'services.menuHeroAiCaption': 'Fotografia orientativa IA',
+		'services.menuHeroChipBrasa': 'Brasa i combinats',
+		'services.menuHeroChipFresh': 'Entrants i tapes',
+		'services.menuHeroChipAllergens': 'Al·lèrgens: sempre al servei',
+		'services.menuHeroScrollCta': 'Explorar plats',
 		'services.jumpNavAria': 'Saltar a una secció de la carta',
 		'services.categoryStarters': 'Per començar',
 		'services.categoryGrills': 'Les brases · amb patates fregides',
@@ -645,6 +652,13 @@ export const ui = {
 		'services.heroWhatsAppMessage':
 			'Hola, quería consultar disponibilidad o algún plato de la carta de El mini nou. Gracias.',
 		'services.heroCtaCatalog': 'Ver carta',
+		'services.menuHeroImageAlt':
+			'Ambiente de brasa y cocina inspiracional — imagen IA solo orientativa.',
+		'services.menuHeroAiCaption': 'Foto orientativa IA',
+		'services.menuHeroChipBrasa': 'Brasa y combinados',
+		'services.menuHeroChipFresh': 'Entrantes y tapas',
+		'services.menuHeroChipAllergens': 'Alérgenos: siempre en sala',
+		'services.menuHeroScrollCta': 'Explorar platos',
 		'services.jumpNavAria': 'Ir a una sección de la carta',
 		'services.categoryStarters': 'Para empezar',
 		'services.categoryGrills': 'Brasas · con patatas fritas',

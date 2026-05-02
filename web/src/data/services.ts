@@ -2,8 +2,9 @@
  * Restaurant menu — source aligned with ../../docs/MENU_CA_SOURCE.md in the parent repo.
  * Prices in EUR where known; allergens called out textually per handoff accessibility rules.
  */
-
+import type { ImageMetadata } from 'astro';
 import type { Lang } from '../i18n/config';
+import { MENU_DISH_ILLUSTRATIONS } from './menu-illustrations';
 
 export type ServiceCategoryKey =
 	| 'starters'
@@ -34,6 +35,8 @@ export interface Service {
 	category: ServiceCategoryKey;
 	featured?: boolean;
 	pendingConfirmation?: boolean;
+	/** Optional thumbnail for menu cards (featured dishes). */
+	illustration?: ImageMetadata;
 	name: Record<Lang, string>;
 	description: Record<Lang, string>;
 }
@@ -796,12 +799,19 @@ export function getServicesGrouped(): ReadonlyArray<ServiceGroup> {
 	for (const category of SERVICE_CATEGORY_ORDER) {
 		const items = byCategory.get(category);
 		if (!items?.length) continue;
-		const sorted = [...items].sort((a, b) => {
-			const af = a.featured ? 1 : 0;
-			const bf = b.featured ? 1 : 0;
-			if (af !== bf) return bf - af;
-			return services.indexOf(a) - services.indexOf(b);
-		});
+		const sorted = [...items]
+			.sort((a, b) => {
+				const af = a.featured ? 1 : 0;
+				const bf = b.featured ? 1 : 0;
+				if (af !== bf) return bf - af;
+				return services.indexOf(a) - services.indexOf(b);
+			})
+			.map((service) => {
+				const generated = MENU_DISH_ILLUSTRATIONS[service.id];
+				return generated === undefined
+					? service
+					: { ...service, illustration: generated };
+			});
 		result.push({ category, items: sorted });
 	}
 	return result;

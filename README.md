@@ -1,23 +1,27 @@
 # El mini nou — projecte web
 
-Repositori **dedicat** al restaurant **El mini nou** (L’Ametlla del Vallès): briefing, carta en text i (més endavant) codi del lloc.
+Repositori dedicat al restaurant **El mini nou** (L’Ametlla del Vallès).
 
-## Contingut actual
+## Contingut
 
-| Fitxer | Descripció |
-|--------|------------|
-| [`docs/HANDOFF_EL_MINI_NOU.md`](./docs/HANDOFF_EL_MINI_NOU.md) | Handoff per al proper agent: plantilla, stack, dades NAP, horari, schema, checklist. |
-| [`docs/MENU_CA_SOURCE.md`](./docs/MENU_CA_SOURCE.md) | Transcripció de la carta (CA) des de les captures. |
-| [`docs/reference/`](./docs/reference/) | Col·loca aquí les **captures PDF/PNG** de la carta (veure handoff). |
+| Fitxer / carpeta | Descripció |
+|------------------|-------------|
+| [`docs/HANDOFF_EL_MINI_NOU.md`](./docs/HANDOFF_EL_MINI_NOU.md) | Handoff: stack, NAP, schema, checklist |
+| [`docs/MENU_CA_SOURCE.md`](./docs/MENU_CA_SOURCE.md) | Transcripció canònica de la carta |
+| [`docs/reference/`](./docs/reference/) | Captures PDF/PNG del menú |
+| **`web/`** | **Codi Astro 6** (plantilla Klip’s adaptada): home, `/ca/menu/`, `/es/menu/`, galeria, FAQ, legal |
 
-## Plantilla tècnica (codi)
+## Desenvolupament local (`web/`)
 
-El lloc es generarà **basant-se en** el repo Astro de referència (instància Klip’s), no dins d’aquest repositori fins que s’hi integri el codi:
+```sh
+cd web
+pnpm install
+pnpm dev    # http://localhost:4321/
+pnpm build
+```
 
-- **Plantilla:** [francescvicente-png/klips-estilistes-web](https://github.com/francescvicente-png/klips-estilistes-web) — fitxer [`TEMPLATE_USAGE.md`](https://github.com/francescvicente-png/klips-estilistes-web/blob/main/TEMPLATE_USAGE.md).
+**URL pública prevista:** `https://elmininou.pages.dev` (configurable a `web/src/data/site.ts` i `web/astro.config.mjs`).
 
-Quan el codi existeixi, es pot afegir com a subcarpeta `web/` o com a repositori separat; mantenir aquest repo com a **font de veritat** de negoci + carta.
+## Instagram
 
-## Llocs
-
-- **Instagram:** [@elmininou](https://www.instagram.com/elmininou/)
+[@elmininou](https://www.instagram.com/elmininou/)

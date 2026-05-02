@@ -26,7 +26,7 @@
 import { HOME_PAGE_CANVAS_COLOR } from '../config/home-page-canvas';
 
 /** Stable public `/brand/` URL (see scripts/copy-brand-logo.mjs). */
-const BRAND_LOGO_PATH = '/brand/el-mini-nou-logo.jpg';
+const BRAND_LOGO_PATH = '/brand/el-mini-nou-logo.png';
 
 interface RouteMapEntry {
 	ca: string;

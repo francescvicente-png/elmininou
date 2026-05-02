@@ -1,1 +1,12 @@
 .DS_Store
+
+# Astro (subproject web/)
+web/node_modules/
+web/dist/
+web/.astro/
+
+# Local IDE skill/plugin copies (do not commit)
+.claude/skills/impeccable/
+.kiro/skills/impeccable/
+.windsurf/skills/impeccable/
+skills-lock.json

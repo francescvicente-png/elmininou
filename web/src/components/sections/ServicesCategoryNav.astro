@@ -41,7 +41,7 @@ const categoryLabelKey: Record<ServiceCategoryKey, UIKey> = {
 			groups.map(({ category }) => (
 				<li>
 					<a
-						class="services-cat-nav-link inline-flex items-center rounded-full border border-border bg-card px-3.5 py-2 font-body text-xs font-medium uppercase tracking-[0.12em] text-foreground/88 transition-colors hover:border-primary/45 hover:bg-backgroundAlt hover:text-foreground"
+						class="services-cat-nav-link inline-flex items-center rounded-full border border-border/95 bg-card/95 px-3.5 py-2 font-body text-xs font-semibold uppercase tracking-[0.13em] text-foreground shadow-sm transition-[transform,background-color,border-color,box-shadow] duration-normal ease-standard hover:border-primary/50 hover:bg-backgroundAlt hover:shadow-[0_6px_20px_-8px_oklch(40%_0.12_52/0.45)] hover:-translate-y-px motion-reduce:transform-none motion-reduce:transition-none active:translate-y-0 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
 						href={`#${serviceCategoryAnchorId(category)}`}
 					>
 						{t(categoryLabelKey[category])}
@@ -56,6 +56,11 @@ const categoryLabelKey: Record<ServiceCategoryKey, UIKey> = {
 	@media (prefers-reduced-motion: reduce) {
 		.services-cat-nav-link {
 			transition: none;
+		}
+
+		.services-cat-nav-link:hover,
+		.services-cat-nav-link:active {
+			transform: none;
 		}
 	}
 </style>
