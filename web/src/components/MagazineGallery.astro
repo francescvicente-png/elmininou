@@ -1,0 +1,245 @@
+---
+/**
+ * MagazineGallery
+ *
+ * Editorial alternative to GalleryGrid. Where GalleryGrid renders a
+ * uniform grid (1 / sm:2 / lg:N columns), MagazineGallery uses a
+ * fixed 12-column grid on desktop with HAND-CHOSEN spans per item,
+ * mixed aspect ratios, an editorial pull-quote / chapter card
+ * interleaved between images, and small numbered captions.
+ *
+ *   ┌─────────────────────┬───────────┐
+ *   │  01 — full bleed    │ 02 small  │
+ *   │  (8 cols)           │ (4 cols)  │
+ *   ├──────────┬──────────┴───────────┤
+ *   │ "PULL    │ 03 medium            │
+ *   │  QUOTE"  │ (8 cols)             │
+ *   ├──────────┴──────────┬───────────┤
+ *   │  04 medium          │ 05 small  │
+ *   │  (7 cols)           │ (5 cols)  │
+ *   ├──────────┬──────────┴───────────┤
+ *   │ 06 small │   …                  │
+ *   └──────────┴──────────────────────┘
+ *
+ * Mobile (< 768 px): everything stacks 1-col with the original
+ * aspect ratios kept; the pull-quote becomes a normal block
+ * between two images.
+ *
+ * The component takes the same image list shape as GalleryGrid for
+ * compatibility, plus an optional `pullQuote` prop that renders
+ * the editorial chapter card. Lightbox + filter still work — each
+ * image carries the same data attributes.
+ */
+import type { ImageMetadata } from 'astro';
+import type { PhotoLicense } from '../types/photo-license';
+import DemoImage from './DemoImage.astro';
+
+export interface MagazineGalleryImage {
+	src: ImageMetadata;
+	alt: string;
+	photographer: string;
+	photoLicense?: PhotoLicense;
+	categories?: ReadonlyArray<string>;
+}
+
+interface PullQuote {
+	eyebrow: string;
+	body: string;
+	attribution?: string;
+}
+
+interface Props {
+	images: ReadonlyArray<MagazineGalleryImage>;
+	pullQuote?: PullQuote;
+	lightbox?: boolean;
+	filterable?: boolean;
+	class?: string;
+}
+
+const {
+	images,
+	pullQuote,
+	lightbox = false,
+	filterable = false,
+	class: className,
+} = Astro.props;
+
+// Hand-chosen layout per slot (item index). Each tuple is
+// [colSpan, aspectRatio]. `colSpan` is in a 12-col grid; mobile
+// stacks always 1-col so the value is ignored there. Aspect ratios
+// alternate between landscape and portrait to keep the rhythm.
+//
+// The pull-quote card occupies a fixed slot (index 2 in the layout
+// pattern) and "shifts" the indices of items 2..N by one. We keep
+// the layout flexible: any number of images works; we just cycle
+// the pattern.
+const pattern: ReadonlyArray<[number, string]> = [
+	[8, '4/3'], // 01 wide
+	[4, '4/5'], // 02 portrait
+	[7, '3/4'], // 03 portrait
+	[5, '4/5'], // 04 portrait
+	[6, '4/3'], // 05 landscape
+	[6, '4/5'], // 06 portrait
+	[8, '16/9'], // 07 cinema
+	[4, '1/1'], // 08 square
+];
+
+// Tailwind 4 needs the literal class names in the source for JIT
+// detection. Dynamic template strings like `md:col-span-${n}` are
+// invisible to the scanner, so we map every span we use through a
+// literal map.
+const colSpanClass: Record<number, string> = {
+	4: 'md:col-span-4',
+	5: 'md:col-span-5',
+	6: 'md:col-span-6',
+	7: 'md:col-span-7',
+	8: 'md:col-span-8',
+};
+---
+
+<div
+	class:list={['magazine-gallery', className]}
+	{...(filterable ? { 'data-gallery-grid': '' } : {})}
+>
+	<div class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5">
+		{
+			images.map((img, idx) => {
+				const [colSpan, aspect] = pattern[idx % pattern.length];
+				const colClass = colSpanClass[colSpan] ?? 'md:col-span-6';
+				const cells: any[] = [];
+
+				cells.push(
+					<figure class:list={[colClass, 'mg-cell']}>
+						<DemoImage
+							src={img.src}
+							alt={img.alt}
+							photographer={img.photographer}
+							photoLicense={img.photoLicense ?? 'own'}
+							aspectRatio={aspect}
+							sizes="(min-width: 1024px) 60vw, 100vw"
+							lightboxIndex={lightbox ? idx : undefined}
+							data-gallery-item={filterable ? '' : undefined}
+							data-categories={
+								filterable && img.categories
+									? img.categories.join(' ')
+									: undefined
+							}
+							class="fade-in-on-scroll"
+							style={`--fade-delay: ${(idx % 3) * 100}ms; --fade-duration: 700ms; --fade-y: 16px;`}
+						/>
+						<figcaption class="mg-caption">
+							<span class="mg-caption-num">
+								{String(idx + 1).padStart(2, '0')}
+							</span>
+							<span class="mg-caption-text">{img.alt}</span>
+						</figcaption>
+					</figure>,
+				);
+
+				// Insert the pull-quote between the 2nd and 3rd image so
+				// it lands roughly mid-fold on desktop.
+				if (idx === 1 && pullQuote) {
+					cells.push(
+						<aside class="md:col-span-12 mg-pullquote fade-in-on-scroll" style="--fade-delay: 100ms;">
+							<p class="mg-pullquote-eyebrow">{pullQuote.eyebrow}</p>
+							<blockquote class="mg-pullquote-body">
+								{pullQuote.body}
+							</blockquote>
+							{pullQuote.attribution && (
+								<p class="mg-pullquote-attribution">
+									— {pullQuote.attribution}
+								</p>
+							)}
+						</aside>,
+					);
+				}
+
+				return cells;
+			})
+		}
+	</div>
+</div>
+
+<style>
+	.magazine-gallery :global([data-gallery-item].is-filtered-out) {
+		display: none;
+	}
+
+	.mg-cell {
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	.mg-caption {
+		display: flex;
+		gap: 0.85rem;
+		align-items: baseline;
+		font-family: var(--font-body), system-ui, sans-serif;
+	}
+
+	.mg-caption-num {
+		font-size: 0.7rem;
+		font-weight: 600;
+		letter-spacing: 0.18em;
+		color: var(--color-primary);
+		font-variant-numeric: tabular-nums;
+	}
+
+	.mg-caption-text {
+		font-size: 0.78rem;
+		line-height: 1.5;
+		color: var(--color-muted);
+		max-width: 36ch;
+	}
+
+	.mg-pullquote {
+		padding: 3rem 2rem;
+		border-top: 1px solid var(--color-border);
+		border-bottom: 1px solid var(--color-border);
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1.25rem;
+		align-items: start;
+	}
+
+	@media (min-width: 768px) {
+		.mg-pullquote {
+			padding: 4.5rem 3rem;
+			grid-template-columns: 1fr 4fr 1fr;
+			gap: 2rem;
+		}
+	}
+
+	.mg-pullquote-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-primary);
+		margin: 0;
+		align-self: start;
+	}
+
+	.mg-pullquote-body {
+		font-family: var(--font-display), Georgia, serif;
+		font-style: italic;
+		font-size: clamp(1.5rem, 2.6vw + 0.5rem, 2.75rem);
+		line-height: 1.25;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: balance;
+		max-width: 32ch;
+	}
+
+	.mg-pullquote-attribution {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-muted);
+		margin: 0;
+		align-self: end;
+	}
+</style>

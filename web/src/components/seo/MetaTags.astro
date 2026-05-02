@@ -1,0 +1,85 @@
+---
+import type { Lang } from '../../i18n/config';
+import { HOME_PAGE_CANVAS_COLOR } from '../../config/home-page-canvas';
+import { business } from '../../data/business';
+import { site } from '../../data/site';
+
+interface Props {
+	title: string;
+	description: string;
+	canonicalUrl: URL;
+	siblingUrl?: URL;
+	ogImage: string;
+	ogImageAlt: string;
+	ogType?: 'website' | 'article';
+	keywords?: ReadonlyArray<string>;
+	noindex?: boolean;
+	lang: Lang;
+}
+
+const {
+	title,
+	description,
+	canonicalUrl,
+	siblingUrl,
+	ogImage,
+	ogImageAlt,
+	ogType = 'website',
+	keywords,
+	noindex = false,
+	lang,
+} = Astro.props;
+
+const otherLang: Lang = lang === 'ca' ? 'es' : 'ca';
+const ogLocale = lang === 'ca' ? 'ca_ES' : 'es_ES';
+const ogLocaleAlternate = otherLang === 'ca' ? 'ca_ES' : 'es_ES';
+const xDefaultUrl = new URL('/', Astro.site).toString();
+---
+
+<title>{title}</title>
+<meta name="description" content={description} />
+{
+	keywords && keywords.length > 0 && (
+		<meta name="keywords" content={keywords.join(', ')} />
+	)
+}
+{noindex && <meta name="robots" content="noindex" />}
+
+{
+	site.features.onlineBooking && site.booking.provider === 'fresha' && (
+		<>
+			<link rel="preconnect" href="https://www.fresha.com" />
+			<link rel="dns-prefetch" href="https://www.fresha.com" />
+		</>
+	)
+}
+
+<link rel="canonical" href={canonicalUrl.toString()} />
+<link rel="alternate" hreflang={lang} href={canonicalUrl.toString()} />
+{
+	siblingUrl && (
+		<link rel="alternate" hreflang={otherLang} href={siblingUrl.toString()} />
+	)
+}
+<link rel="alternate" hreflang="x-default" href={xDefaultUrl} />
+
+<meta property="og:type" content={ogType} />
+<meta property="og:url" content={canonicalUrl.toString()} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content={description} />
+<meta property="og:image" content={ogImage} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={ogImageAlt} />
+<meta property="og:locale" content={ogLocale} />
+<meta property="og:locale:alternate" content={ogLocaleAlternate} />
+<meta property="og:site_name" content={business.name} />
+
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImage} />
+<meta name="twitter:image:alt" content={ogImageAlt} />
+
+<meta name="theme-color" content={HOME_PAGE_CANVAS_COLOR} />
+<meta name="format-detection" content="telephone=no" />

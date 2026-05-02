@@ -1,0 +1,103 @@
+---
+/**
+ * HighlightsBlock
+ *
+ * Three editorial differentiators rendered as a borderless 3-column
+ * grid: large primary-coloured icon → display title → muted lead
+ * paragraph. Stripe / Aesop-feel — no card boxes, lots of air.
+ *
+ * Highlights flagged `pendingConfirmation` get a small asterisk after
+ * the title and a muted footer note in the description, so the
+ * maintainer cannot ship copy that hasn't been validated with the
+ * business yet.
+ *
+ * Wrap this in <FadeInOnScroll> from the page that uses it.
+ */
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import { highlights, type HighlightIcon } from '../data/highlights';
+import { business } from '../data/business';
+import Heading from './Heading.astro';
+import Text from './Text.astro';
+
+interface Props {
+	lang: Lang;
+	class?: string;
+}
+
+const { lang, class: className } = Astro.props;
+const t = useTranslations(lang);
+
+// Map our internal HighlightIcon keys to the Tabler icon names.
+// Keeping this map here (instead of letting the data layer pick raw
+// names) means a future redesign can change icons without touching
+// content data.
+const tablerName: Record<HighlightIcon, string> = {
+	star: 'star-filled',
+	globe: 'world',
+	scissors: 'scissors',
+	award: 'award',
+	users: 'users',
+	heart: 'heart',
+	baby: 'mood-kid',
+	sparkles: 'sparkles',
+};
+---
+
+<section class:list={['space-y-12', className]} aria-labelledby="highlights-heading">
+	{/* Invisible heading anchors the section in the document outline so
+	    the leap from the Hero h1 to the per-highlight h3 doesn't trip
+	    the heading-order axe rule. */}
+	<h2 id="highlights-heading" class="sr-only">
+		{lang === 'ca' ? `Per què ${business.name}` : `Por qué ${business.name}`}
+	</h2>
+	<div class="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12">
+		{
+			highlights.map((highlight) => {
+				const title = lang === 'ca' ? highlight.titleCa : highlight.titleEs;
+				const description =
+					lang === 'ca' ? highlight.descriptionCa : highlight.descriptionEs;
+				return (
+					<div class="space-y-3">
+						<Icon
+							name={`tabler:${tablerName[highlight.iconKey]}`}
+							class="h-12 w-12 text-primary"
+							aria-hidden="true"
+						/>
+						<Heading as="h3" size="h3">
+							{highlight.counter && (
+								<span
+									class="tabular-nums"
+									data-counter
+									data-counter-target={highlight.counter.target.toString()}
+									data-counter-decimals={highlight.counter.decimals.toString()}
+									data-counter-duration="1500"
+								>
+									{(0).toLocaleString(lang === 'ca' ? 'ca-ES' : 'es-ES', {
+										minimumFractionDigits: highlight.counter.decimals,
+										maximumFractionDigits: highlight.counter.decimals,
+									})}
+								</span>
+							)}
+							{highlight.counter ? ' ' : ''}{title}
+							{highlight.pendingConfirmation && (
+								<span class="text-muted font-body text-base align-super" aria-hidden="true">
+									{' '}*
+								</span>
+							)}
+						</Heading>
+						<Text variant="lead" class="!text-base !leading-relaxed">
+							{description}
+						</Text>
+						{highlight.pendingConfirmation && (
+							<p class="text-xs text-muted italic">
+								* {t('highlights.pendingConfirmation')}
+							</p>
+						)}
+					</div>
+				);
+			})
+		}
+	</div>
+</section>

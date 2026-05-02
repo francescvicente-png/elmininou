@@ -1,0 +1,28 @@
+---
+/**
+ * HighlightsSection
+ *
+ * Wraps <HighlightsBlock> with the standard home section vertical
+ * rhythm so the modular home loop can render it like every other
+ * section.
+ */
+import Container from '../Container.astro';
+import HighlightsBlock from '../HighlightsBlock.astro';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<section class="py-12 md:py-16">
+	<Container>
+		<div
+			class="rounded-[2rem] border border-[color-mix(in_oklch,var(--color-border)_45%,transparent)] bg-[color-mix(in_oklch,var(--color-card)_88%,transparent)] p-8 shadow-lg backdrop-blur-md md:p-12 lg:p-14"
+		>
+			<HighlightsBlock lang={lang} />
+		</div>
+	</Container>
+</section>

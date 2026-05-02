@@ -1,0 +1,228 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import { legalEntity, serviceProvider, websiteOwner } from '../../data/legal';
+import { business } from '../../data/business';
+---
+
+<BaseLayout
+	title={`Política de privacitat · ${business.name}`}
+	description={`Política de privacitat de ${business.name}. Tractament de dades, drets de l'usuari i tercers que processen dades.`}
+	siblingPath="/es/politica-privacidad/"
+	breadcrumbs={[
+		{ name: 'Inici', url: '/ca/' },
+		{ name: 'Política de privacitat', url: '/ca/politica-privacitat/' },
+	]}
+>
+	<Container as="section" class="pt-16 pb-8 md:pt-24 md:pb-10 space-y-4 max-w-3xl">
+		<Heading as="h1">Política de privacitat</Heading>
+		<Text variant="lead">
+			Tractament de dades personals d'aquest lloc web, en compliment del
+			Reglament General de Protecció de Dades (RGPD) i la Llei orgànica
+			3/2018, de protecció de dades personals i garantia dels drets digitals
+			(LOPDGDD).
+		</Text>
+	</Container>
+
+	<Container as="section" class="pb-20 md:pb-24 space-y-10 max-w-3xl">
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">1. Responsable del tractament</Heading>
+			{!websiteOwner.isFinalOwner && (
+				<div class="rounded-md border border-border bg-card px-5 py-4 text-sm text-muted">
+					{websiteOwner.note}
+				</div>
+			)}
+			<Heading as="h3" size="h4">1.1. Quant a la navegació per aquest lloc web</Heading>
+			<Text variant="small" class="text-muted">
+				Tractament derivat de la publicació tècnica del domini i, si escau, de
+				dades agregades o cookies estrictament necessàries (vegeu la política de cookies).
+			</Text>
+			<ul class="space-y-1 text-base font-body text-foreground leading-relaxed">
+				<li><strong>Responsable:</strong> {serviceProvider.fullName}</li>
+				<li><strong>NIF:</strong> {serviceProvider.taxId}</li>
+				<li><strong>Adreça:</strong> {serviceProvider.addressLine}</li>
+				<li>
+					<strong>Correu electrònic:</strong>{' '}
+					<a href={`mailto:${serviceProvider.email}`} class="hover:text-primary transition-colors">{serviceProvider.email}</a>
+				</li>
+			</ul>
+			<Heading as="h3" size="h4" class="pt-2">1.2. Quant a la relació comercial amb el saló</Heading>
+			<Text variant="small" class="text-muted">
+				Per a exercir drets o consultes sobre dades que hàgiu facilitat al saló
+				en citar o contractar serveis presencials, telèfon o WhatsApp, adreceu-vos
+				al punt de contacte del negoci.
+			</Text>
+			<ul class="space-y-1 text-base font-body text-foreground leading-relaxed">
+				<li><strong>Nom comercial:</strong> {legalEntity.tradeName}</li>
+				<li><strong>Titular (nom legal):</strong> {legalEntity.legalName}</li>
+				<li><strong>Adreça del local:</strong> {legalEntity.address}</li>
+				<li>
+					<strong>Correu electrònic del saló:</strong>{' '}
+					{legalEntity.email.startsWith('TODO_') ? (
+						<span class="text-muted italic">[pendent]</span>
+					) : (
+						<a href={`mailto:${legalEntity.email}`} class="hover:text-primary transition-colors">{legalEntity.email}</a>
+					)}
+				</li>
+				<li><strong>Telèfon:</strong> {legalEntity.phone}</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">2. Quines dades recollim</Heading>
+			<Text>
+				<strong>Aquest lloc web no recull dades personals directament.</strong>{' '}
+				No hi ha formulari de contacte propi, no hi ha registre d'usuaris, i
+				no s'envia cap newsletter des d'aquest domini. Les úniques
+				interaccions disponibles són:
+			</Text>
+			<ul class="list-disc pl-6 space-y-2 text-base font-body text-foreground leading-relaxed">
+				<li>
+					<strong>Reservar cita:</strong> les reserves es gestionen per
+					telèfon o WhatsApp fora d'aquest domini. Les dades que hi
+					comuniquis en aquestes converses es tracten segons la política del teu
+					operador telefònic i, si escau, de Meta (WhatsApp).
+				</li>
+				<li>
+					<strong>Trucar:</strong> el botó "Trucar" inicia una trucada
+					telefònica fora del navegador. Aquesta acció no genera cap registre
+					a la web.
+				</li>
+				<li>
+					<strong>Veure ubicació:</strong> els botons d'ubicació obren Google
+					Maps i OpenStreetMap en una pestanya nova. El tractament de dades
+					queda a càrrec de cadascun d'aquests serveis.
+				</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">3. Tractament de dades agregades</Heading>
+			<Text>
+				El proveïdor d'allotjament (Cloudflare Pages) processa registres
+				tècnics agregats inherents a tot servei web — adreça IP truncada,
+				tipus de navegador, codi de resposta HTTP — amb finalitats de
+				seguretat i diagnòstic. Aquestes dades es conserven durant un
+				període breu (típicament 24 hores per als logs detallats) i no
+				s'utilitzen per identificar persones.
+			</Text>
+			<Text>
+				En el moment d'aquesta versió de la política, el lloc no té activat
+				cap servei addicional d'analítica. Si s'hi afegeix Cloudflare Web
+				Analytics, aquesta política indicarà clarament que es tracta d'un
+				servei sense cookies, sense seguiment individual i sense
+				identificadors persistents.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">4. Bases legals del tractament</Heading>
+			<Text>
+				El tractament dels registres tècnics descrit a l'apartat anterior es
+				fonamenta en l'<strong>interès legítim</strong> del titular i del
+				proveïdor d'hosting per garantir la seguretat, la disponibilitat i
+				la integritat del servei. Qualsevol cookie no estrictament tècnica
+				requerirà el <strong>consentiment exprés</strong> de l'usuari, que
+				es recull mitjançant el banner que apareix en accedir al lloc.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">5. Drets de l'usuari</Heading>
+			<Text>
+				Tens dret a sol·licitar al titular l'<strong>accés</strong>, la{' '}
+				<strong>rectificació</strong>, la <strong>supressió</strong>, la{' '}
+				<strong>limitació del tractament</strong>, l'<strong>oposició</strong>{' '}
+				i la <strong>portabilitat</strong> de les teves dades, així com a
+				retirar el consentiment en qualsevol moment.
+			</Text>
+			<Text>
+				Per exercir aquests drets, pots contactar al correu electrònic
+				indicat a l'apartat 1 d'aquesta política, adjuntant un document que
+				acrediti la teva identitat. La sol·licitud s'atendrà en el termini
+				legalment establert.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">6. Tercers que processen dades</Heading>
+			<Text>
+				El funcionament d'aquest lloc i els serveis associats implica les
+				següents entitats encarregades del tractament o destinatàries de
+				dades:
+			</Text>
+			<ul class="list-disc pl-6 space-y-2 text-base font-body text-foreground leading-relaxed">
+				<li>
+					<strong>Cloudflare, Inc.</strong> — proveïdor d'allotjament i
+					xarxa de distribució de continguts. Processa logs tècnics i, si
+					s'hi activa, dades agregades de Web Analytics sense cookies.
+				</li>
+				<li>
+					<strong>Meta Platforms Ireland Ltd. (WhatsApp)</strong> — en fer
+					clic a l'enllaç de WhatsApp accedeixes al seu servei; qualsevol dada
+					que hi comuniquis es tracta sota la seva política de privacitat.
+				</li>
+				<li>
+					<strong>Google Maps</strong> — utilitzat com a destí dels enllaços
+					d'ubicació. Tractament de dades regulat per la política de Google.
+				</li>
+				<li>
+					<strong>Google (Gemini API)</strong> — utilitzada puntualment per
+					generar imatges demostratives d&apos;ambient de restaurant (no
+					són el local real ni persones identificables). El material es
+					publica de forma estàtica en aquest allotjament; la generació ja
+					s&apos;ha produït fora de la teva visita a la pàgina.
+				</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">7. Transferències internacionals</Heading>
+			<Text>
+				Algun dels proveïdors esmentats — Cloudflare i Google de manera
+				notable — té matriu als Estats Units. Les transferències
+				internacionals de dades es fan a l'empara de mecanismes vàlids
+				reconeguts per la Comissió Europea, com el marc{' '}
+				<em>EU-U.S. Data Privacy Framework</em> i les clàusules contractuals
+				tipus.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">8. Conservació de les dades</Heading>
+			<Text>
+				Els registres tècnics descrits es conserven durant un període breu
+				(orientativament entre 24 hores i 30 dies, segons els paràmetres del
+				proveïdor) i s'agreguen o anonimitzen passat aquest termini. No
+				s'elabora cap perfil individual amb les dades del lloc web.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">9. Reclamacions a l'AEPD</Heading>
+			<Text>
+				Si consideres que el tractament de les teves dades vulnera la
+				normativa vigent, tens dret a presentar una reclamació davant
+				l'Agència Espanyola de Protecció de Dades (AEPD), accessible a{' '}
+				<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">www.aepd.es</a>.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">10. Modificacions</Heading>
+			<Text>
+				El titular es reserva el dret d'actualitzar aquesta política per
+				adaptar-la a canvis normatius o operatius. Les modificacions tindran
+				efecte des de la seva publicació en aquesta mateixa pàgina.
+			</Text>
+		</div>
+
+		<div class="pt-6 border-t border-border">
+			<Text variant="small" class="text-muted">
+				Última actualització: 27 d'abril de 2026.
+			</Text>
+		</div>
+	</Container>
+</BaseLayout>

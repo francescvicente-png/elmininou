@@ -1,0 +1,72 @@
+---
+/**
+ * FadeInOnScroll
+ *
+ * Wraps content in a `<div>` that starts at `opacity: 0`, translated `y`
+ * pixels down, and animates to its natural position when its scroll-reveal
+ * observer (see src/scripts/scroll-reveal.ts) adds the `.is-visible` class.
+ *
+ * Why a single wrapper per section, not one per card:
+ *   Wrapping each card in its own `<div>` would break grid/flex layouts
+ *   (the cards would no longer be direct children of the grid). One reveal
+ *   per section is also cheaper for IntersectionObserver and reads cleaner
+ *   (the section "materialises" as a unit, rather than items popping in
+ *   one by one — closer to the editorial Aesop / Le Labo feel).
+ *
+ * Reduced-motion: the @media block flattens opacity/transform/transition,
+ * so users with the OS preference set get content instantly.
+ *
+ * No JS available: <noscript> defines a fallback that shows everything
+ * straight away, so SSR/no-JS readers never see the empty state.
+ *
+ * `instant` prop: renders `.is-visible` from the server so the block is
+ * always opaque—use for commerce/catalog pages if scroll-reveal should not
+ * gate readability.
+ */
+
+interface Props {
+	/** Delay before the animation starts, in ms. */
+	delay?: number;
+	/** Animation duration in ms. */
+	duration?: number;
+	/** Initial Y offset in px (positive = comes from below, negative = from above). */
+	y?: number;
+	/** Optional extra class for the wrapper (e.g. `display: contents` for grid passthrough). */
+	class?: string;
+	/**
+	 * When true, SSR renders with `.is-visible` so content is readable
+	 * immediately (no reliance on scroll-reveal). Use for catalog /
+	 * commerce blocks where hiding items until scroll harms clarity or
+	 * fails if the observer never fires.
+	 */
+	instant?: boolean;
+}
+
+const { delay = 0, duration = 600, y = 24, class: className, instant = false } =
+	Astro.props;
+---
+
+<div
+	class:list={['fade-in-on-scroll', instant && 'is-visible', className]}
+	style={`--fade-y: ${y}px; --fade-duration: ${duration}ms; --fade-delay: ${delay}ms;`}
+>
+	<slot />
+</div>
+
+<noscript>
+	<style is:global>
+		.fade-in-on-scroll {
+			opacity: 1 !important;
+			transform: none !important;
+		}
+	</style>
+</noscript>
+
+<!--
+  The CSS rules for `.fade-in-on-scroll` live in src/styles/global.css.
+  They were initially scoped here, but session 3 introduces a cascade in
+  GalleryGrid that applies the class directly to <DemoImage> figures —
+  scoped styles wouldn't reach those elements. Keeping the rules global
+  also matches how .nav-link-underline is declared in this codebase.
+-->
+

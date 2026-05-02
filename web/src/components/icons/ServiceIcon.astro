@@ -1,0 +1,104 @@
+---
+/**
+ * ServiceIcon
+ *
+ * Maps a `service.icon` string to the right SVG. The mapping below
+ * is the single point where we decide which icon set (Lucide,
+ * Tabler) provides each visual — call sites only know the
+ * semantic name (`scissors`, `razor`, `mustache`, …).
+ *
+ * Sprint 3 switched from custom hand-drawn SVGs to Tabler Icons for
+ * sector realism; where Tabler lacks a glyph we keep inline SVGs.
+ * Earlier hand-drawn SVGs couldn't match in legibility at small
+ * sizes. The `scissors` and `sparkles` shapes still come from
+ * Lucide because the visual line weight is consistent with Tabler
+ * at our usage sizes (24–48 px).
+ *
+ * Adding a new icon for another business type:
+ *   1. Pick a name (e.g. `croissant`, `pizza`).
+ *   2. Add it to `astro.config.mjs → integrations.icon.include.tabler`
+ *      (or `lucide` — whichever set has the better glyph).
+ *   3. Add a row to the ICON_MAP below.
+ */
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	/** Icon identifier — semantic name from src/data/services.ts. */
+	name: string;
+	/** CSS class for the rendered icon (size, colour, margin…). */
+	class?: string;
+	/** Whether the icon is purely decorative (default: true). */
+	decorative?: boolean;
+	/** Accessible label when `decorative === false`. */
+	label?: string;
+}
+
+/**
+ * Single source of truth: every semantic icon name → fully-qualified
+ * iconify name (`<set>:<icon>`). All icons live in the Tabler set
+ * (single library = single visual voice — UI audit, April 2026).
+ * Names not present in any iconify set get a custom inline SVG
+ * (see CUSTOM_INLINE below).
+ */
+const ICON_MAP: Record<string, string> = {
+	scissors: 'tabler:scissors',
+	sparkles: 'tabler:sparkles',
+	star: 'tabler:star',
+	user: 'tabler:user',
+	heart: 'tabler:heart',
+	award: 'tabler:award',
+	razor: 'tabler:razor',
+	'razor-electric': 'tabler:razor-electric',
+	'mood-kid': 'tabler:mood-kid',
+};
+
+/**
+ * Names handled by an inline SVG below because neither Lucide nor
+ * Tabler ship them. Keep these visually consistent with Tabler
+ * (24×24, stroke 2, round caps, fill none).
+ */
+type CustomIconName = 'mustache';
+const customIconNames: ReadonlySet<string> = new Set<CustomIconName>(['mustache']);
+
+const {
+	name,
+	class: className,
+	decorative = true,
+	label,
+} = Astro.props;
+
+const isCustom = customIconNames.has(name);
+const fullName = isCustom ? null : (ICON_MAP[name] ?? `tabler:${name}`);
+
+const ariaProps = decorative
+	? { 'aria-hidden': 'true' as const }
+	: { 'aria-label': label ?? name, role: 'img' as const };
+---
+
+{
+	isCustom ? (
+		<svg
+			xmlns="http://www.w3.org/2000/svg"
+			viewBox="0 0 24 24"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			class={className}
+			{...ariaProps}
+		>
+			{name === 'mustache' && (
+				<>
+					{/* Symmetric handlebar mustache — two curls meeting at the
+					    top centre, drawn with two cubic Béziers. Reads as
+					    "facial hair" at 24px without needing fine details. */}
+					<path d="M12 11c-1 0-2 0.6-2.6 1.4-1.5 2-3.7 3.6-6.4 3.6 2 0 5-1 6-3" />
+					<path d="M12 11c1 0 2 0.6 2.6 1.4 1.5 2 3.7 3.6 6.4 3.6-2 0-5-1-6-3" />
+				</>
+			)}
+		</svg>
+	) : (
+		<Icon name={fullName!} class={className} {...ariaProps} />
+	)
+}

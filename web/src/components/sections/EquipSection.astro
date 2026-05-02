@@ -1,0 +1,262 @@
+---
+/**
+ * Team grid for salons — photo opens a native <dialog> with large portrait + full bio.
+ */
+import { Picture } from 'astro:assets';
+import Container from '../Container.astro';
+import Heading from '../Heading.astro';
+import Text from '../Text.astro';
+import { Icon } from 'astro-icon/components';
+import { equipProfiles } from '../../data/equip';
+import type { Lang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section id="home-section-equip" class="py-12 md:py-16">
+	<Container>
+		<div class="max-w-2xl space-y-3 mb-8 md:mb-12">
+			<p class="text-xs uppercase tracking-widest text-muted">
+				{t('equip.sectionEyebrow')}
+			</p>
+			<Heading as="h2" size="h2">{t('equip.sectionTitle')}</Heading>
+			<Text variant="lead">{t('equip.sectionIntro')}</Text>
+		</div>
+
+		<div
+			class="grid grid-cols-1 sm:grid-cols-2 gap-6 md:gap-8"
+			aria-label={t('equip.sectionTitle')}
+		>
+			{
+				equipProfiles.map((profile) => (
+					<article class="group flex flex-col rounded-xl border border-border bg-card overflow-hidden shadow-sm ring-1 ring-inset ring-[color-mix(in_oklch,var(--color-foreground)_6%,transparent)]">
+						<div class="aspect-[3/4] w-full overflow-hidden bg-border relative">
+							<button
+								type="button"
+								class="equip-photo-trigger absolute inset-0 block h-full w-full cursor-zoom-in border-0 bg-transparent p-0 text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
+								data-equip-profile-open
+								aria-controls={`equip-dialog-${profile.id}`}
+								aria-haspopup="dialog"
+								aria-label={`${t('equip.openPhotoProfile')}: ${profile.name[lang]}`}
+							>
+								<Picture
+									src={profile.image}
+									alt=""
+									formats={['avif', 'webp']}
+									class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.02] pointer-events-none"
+									loading="lazy"
+									decoding="async"
+									sizes="(min-width: 768px) 40vw, 100vw"
+								/>
+							</button>
+						</div>
+						<div class="p-5 md:p-6 flex flex-col gap-2 flex-1">
+							<Heading as="h3" size="h4">{profile.name[lang]}</Heading>
+							<p class="text-sm font-medium text-primary">{profile.role[lang]}</p>
+							<p class="text-sm text-muted leading-relaxed flex-1">
+								{profile.bio[lang]}
+							</p>
+						</div>
+
+						<dialog
+							class="equip-profile-dialog"
+							id={`equip-dialog-${profile.id}`}
+							aria-labelledby={`equip-dialog-title-${profile.id}`}
+						>
+							<div class="equip-profile-dialog-inner">
+								<form method="dialog" class="equip-profile-dialog-close-wrap">
+									<button
+										type="submit"
+										class="equip-profile-dialog-close"
+										aria-label={t('gallery.closeImage')}
+									>
+										<Icon name="tabler:x" class="h-5 w-5" aria-hidden="true" />
+									</button>
+								</form>
+								<div class="equip-profile-dialog-media">
+									<Picture
+										src={profile.image}
+										alt={profile.name[lang]}
+										formats={['avif', 'webp']}
+										class="equip-profile-dialog-img"
+										loading="lazy"
+										decoding="async"
+										sizes="(min-width: 768px) min(42rem, 85vw), 95vw"
+									/>
+								</div>
+								<div class="equip-profile-dialog-body">
+									<Heading as="h2" size="h3" id={`equip-dialog-title-${profile.id}`}>
+										{profile.name[lang]}
+									</Heading>
+									<p class="text-base font-medium text-primary">{profile.role[lang]}</p>
+									<p class="text-base text-muted leading-relaxed">{profile.bio[lang]}</p>
+								</div>
+							</div>
+						</dialog>
+					</article>
+				))
+			}
+		</div>
+	</Container>
+</section>
+
+<script>
+	import '../../scripts/equip-dialog.ts';
+</script>
+
+<style>
+	.equip-photo-trigger:focus-visible {
+		outline-offset: -4px;
+	}
+
+	/* margin: auto keeps <dialog showModal> centered; margin: 0 broke horizontal centering on wide viewports */
+	.equip-profile-dialog {
+		width: 100vw;
+		max-width: 100vw;
+		height: 100dvh;
+		max-height: 100dvh;
+		margin: auto;
+		padding: 0;
+		border: none;
+		border-radius: 0;
+		background: var(--color-background);
+		color: var(--color-foreground);
+		box-shadow: none;
+		overflow: hidden;
+	}
+
+	.equip-profile-dialog::backdrop {
+		background: oklch(10% 0.02 60 / 0.72);
+		backdrop-filter: blur(6px);
+	}
+
+	.equip-profile-dialog-inner {
+		display: flex;
+		flex-direction: column;
+		max-height: 100dvh;
+		height: 100%;
+		position: relative;
+	}
+
+	.equip-profile-dialog-close-wrap {
+		position: absolute;
+		top: 0.75rem;
+		right: 0.75rem;
+		z-index: 2;
+		margin: 0;
+		padding: 0;
+		border: 0;
+		background: transparent;
+	}
+
+	.equip-profile-dialog-close {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 9999px;
+		border: 0;
+		background: color-mix(in oklch, var(--color-foreground) 88%, transparent);
+		color: var(--color-background);
+		cursor: pointer;
+		transition: transform 0.15s ease, background-color 0.15s ease;
+	}
+
+	.equip-profile-dialog-close:hover {
+		background: var(--color-foreground);
+	}
+
+	.equip-profile-dialog-close:active {
+		transform: scale(0.96);
+	}
+
+	.equip-profile-dialog-media {
+		flex-shrink: 0;
+		background: var(--color-card);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: 0;
+		flex: 1 1 auto;
+		max-height: min(72dvh, 100%);
+		padding: 0.35rem;
+	}
+
+	.equip-profile-dialog-img {
+		max-height: min(70dvh, 70vh);
+		width: auto;
+		max-width: 100%;
+		object-fit: contain;
+		border-radius: 0.375rem;
+	}
+
+	.equip-profile-dialog-body {
+		padding: 1rem 1.25rem 1.25rem;
+		overflow-y: auto;
+		flex: 0 1 auto;
+		max-height: 38dvh;
+		min-height: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+	}
+
+	@media (min-width: 768px) {
+		.equip-profile-dialog {
+			width: min(96vw, 72rem);
+			max-width: min(96vw, 72rem);
+			height: min(96dvh, 56rem);
+			max-height: min(96dvh, 56rem);
+			border-radius: 1rem;
+			border: 1px solid var(--color-border);
+			box-shadow:
+				0 25px 50px -12px oklch(0% 0 0 / 0.35),
+				0 0 0 1px color-mix(in oklch, var(--color-foreground) 6%, transparent);
+		}
+
+		.equip-profile-dialog-inner {
+			flex-direction: row;
+			align-items: stretch;
+			max-height: min(96dvh, 56rem);
+		}
+
+		.equip-profile-dialog-media {
+			flex: 1 1 52%;
+			max-height: none;
+			min-height: 0;
+			padding: 0.75rem;
+			align-self: stretch;
+		}
+
+		.equip-profile-dialog-img {
+			max-height: min(92dvh, 92vh);
+			width: 100%;
+			height: auto;
+		}
+
+		.equip-profile-dialog-body {
+			flex: 1 1 48%;
+			max-height: none;
+			padding: 1.75rem 1.75rem 1.75rem 1rem;
+			justify-content: center;
+		}
+
+		.equip-profile-dialog-close-wrap {
+			right: 0.75rem;
+			left: auto;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.equip-profile-dialog-close {
+			transition: none;
+		}
+	}
+</style>

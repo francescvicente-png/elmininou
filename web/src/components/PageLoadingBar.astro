@@ -1,0 +1,63 @@
+---
+/**
+ * PageLoadingBar
+ *
+ * Thin top progress bar driven by Astro's View Transition lifecycle:
+ *   astro:before-preparation → 20% → 80% (work in progress)
+ *   astro:after-swap         → 100%
+ *   astro:page-load          → fade out and reset
+ *
+ * Rendered inside <body transition:persist> so it survives every
+ * navigation. The element is invisible by default (width:0; opacity:0)
+ * and the script (page-loading-bar.ts) drives the visual states.
+ *
+ * On `data-astro-reload` links (the language switcher) the View
+ * Transition events don't fire — the browser just reloads — so the bar
+ * stays hidden. That's the correct behaviour: a real page reload already
+ * shows the browser's own loading indicator.
+ */
+---
+
+<div class="page-loading-bar" aria-hidden="true"></div>
+
+<style>
+	.page-loading-bar {
+		position: fixed;
+		top: 0;
+		left: 0;
+		height: 3px;
+		width: 0;
+		background-color: var(--color-primary);
+		z-index: 10000;
+		pointer-events: none;
+		opacity: 0;
+		/* Slower width ramp so the bar is actually perceptible during the
+		   ~150–400 ms View Transition window. With the original 0.3s ramp
+		   the bar barely had time to leave the 20% point before being
+		   bumped to 100% — invisible to the eye. */
+		transition:
+			width 0.5s ease,
+			opacity 0.2s ease;
+	}
+
+	.page-loading-bar.is-loading {
+		opacity: 1;
+	}
+
+	.page-loading-bar.is-complete {
+		width: 100% !important;
+		opacity: 0;
+		/* Final width snap is fast (so 100% is reached) but the fade-out
+		   is delayed past the snap so the eye can register the full bar
+		   before it disappears. */
+		transition:
+			width 0.2s ease,
+			opacity 0.3s ease 0.3s;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.page-loading-bar {
+			display: none;
+		}
+	}
+</style>

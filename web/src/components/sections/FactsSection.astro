@@ -1,0 +1,211 @@
+---
+/**
+ * FactsSection ("El restaurant en xifres" / "El restaurante en cifras")
+ *
+ * Editorial board of 4 facts, each anchored on a big number rendered
+ * in the display serif (Cormorant Garamond). Layout is INTENTIONALLY asymmetric:
+ *
+ *   ┌─────────────────────────┬──────────────┐
+ *   │ 01 (large, top-left)    │ 02 (right)   │
+ *   ├──────────────┬──────────┴──────────────┤
+ *   │ 03 (left)    │ 04 (large, bottom-right)│
+ *   └──────────────┴─────────────────────────┘
+ *
+ * On mobile the four cells stack 1-col. The asymmetry on desktop
+ * is what gives the section a "magazine spread" feel rather than
+ * a generic "stats row".
+ *
+ * Numbers reuse the existing `data-counter` attribute so
+ * `number-counter.ts` animates them when they enter the viewport.
+ * Static text values (e.g. "2019", "01") are also passed through
+ * the counter — the script handles non-integer/short values
+ * gracefully (it just sets the text directly).
+ */
+import EditorialDivider from '../EditorialDivider.astro';
+import Container from '../Container.astro';
+import Badge from '../Badge.astro';
+import { facts } from '../../data/facts';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const copy = {
+	ca: {
+		eyebrow: 'El mini nou',
+		heading: 'El restaurant en xifres',
+		subheading:
+			"Quatre dades sobre el local, l'equip i la manera de treballar.",
+	},
+	es: {
+		eyebrow: 'El mini nou',
+		heading: 'El restaurante en cifras',
+		subheading:
+			'Cuatro datos sobre el local, el equipo y la forma de trabajar.',
+	},
+}[lang];
+
+// Asymmetric grid placement per fact id — each cell occupies a
+// rectangular tile inside a 6-col / 2-row grid.
+const placement: Record<string, string> = {
+	rating: 'md:col-span-4 md:row-span-1', // 0,0
+	languages: 'md:col-span-2 md:row-span-1', // 0,4
+	cuisineFocus: 'md:col-span-2 md:row-span-1', // 1,0
+	neighbourhood: 'md:col-span-4 md:row-span-1', // 1,2
+};
+
+// Whether a fact's value is suitable for the number-counter animation.
+// Values that contain a leading zero (e.g. "01") would lose it because
+// the counter parses the target as a Number, so we keep them static.
+function isCountable(value: string): { ok: boolean; decimals: number } {
+	if (/^\d+\.\d+$/.test(value)) return { ok: true, decimals: 1 };
+	if (/^[1-9]\d*$/.test(value)) return { ok: true, decimals: 0 };
+	return { ok: false, decimals: 0 };
+}
+---
+
+<section id="home-section-facts" class="facts-section scroll-mt-32">
+	<EditorialDivider
+		number="01"
+		total="05"
+		eyebrow={copy.eyebrow}
+		heading={copy.heading}
+		subheading={copy.subheading}
+		flushTop={false}
+	/>
+
+	<Container>
+		<div class="grid grid-cols-1 md:grid-cols-6 gap-px md:gap-px bg-border facts-grid">
+			{
+				facts.map((fact) => {
+					const { ok, decimals } = isCountable(fact.value);
+					return (
+						<article
+							class:list={[
+								'facts-cell',
+								placement[fact.id] ?? 'md:col-span-3',
+							]}
+						>
+						<div class="facts-value-row">
+							{ok ? (
+								<span
+									class="facts-value"
+									data-counter
+									data-counter-target={fact.value}
+									data-counter-decimals={decimals}
+									data-counter-duration="1600"
+								>
+									{decimals === 1 ? '0.0' : '0'}
+								</span>
+							) : (
+								<span class="facts-value">{fact.value}</span>
+							)}
+							{fact.unit && (
+								<span class="facts-unit">{fact.unit[lang]}</span>
+							)}
+						</div>
+						<p class="facts-label">{fact.label[lang]}</p>
+						{fact.note && (
+							<p class="facts-note">{fact.note[lang]}</p>
+						)}
+						{fact.pendingConfirmation && (
+							<div class="pt-2">
+								<Badge variant="outline">
+									{t('highlights.pendingConfirmation')}
+								</Badge>
+							</div>
+						)}
+						</article>
+					);
+				})
+			}
+		</div>
+	</Container>
+</section>
+
+<style>
+	.facts-section {
+		padding-bottom: 5rem;
+	}
+
+	@media (min-width: 768px) {
+		.facts-section {
+			padding-bottom: 7rem;
+		}
+	}
+
+	/* Grid uses `gap-px` + `bg-border` to render hairlines between
+	   cells without any extra CSS. The cells themselves get the
+	   actual background. This pattern is the editorial equivalent
+	   of "rules between paragraphs in a magazine column". */
+	.facts-grid {
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-xl);
+		overflow: hidden;
+	}
+
+	.facts-cell {
+		background-color: var(--color-card);
+		padding: 2.25rem 1.75rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.75rem;
+		min-height: 14rem;
+	}
+
+	@media (min-width: 768px) {
+		.facts-cell {
+			padding: 2.5rem 2.25rem;
+			min-height: 18rem;
+		}
+	}
+
+	.facts-value-row {
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+	}
+
+	.facts-value {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 400;
+		font-size: clamp(3.5rem, 6vw + 1rem, 7rem);
+		line-height: 0.95;
+		letter-spacing: -0.025em;
+		color: var(--color-foreground);
+		font-variant-numeric: tabular-nums lining-nums;
+	}
+
+	.facts-unit {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.85rem;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-muted);
+		align-self: flex-end;
+		margin-bottom: 1rem;
+	}
+
+	.facts-label {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-primary);
+		margin: 0;
+	}
+
+	.facts-note {
+		font-family: var(--font-body);
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--color-muted);
+		margin: 0;
+		max-width: 30ch;
+	}
+</style>

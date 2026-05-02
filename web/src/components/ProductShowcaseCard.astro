@@ -1,0 +1,154 @@
+---
+/**
+ * Editorial product row for the products landing: large portrait image,
+ * icon hint, copy and orientative price. Alternating layout on large screens.
+ */
+import { Picture } from 'astro:assets';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import type { Product } from '../data/products';
+import Badge from './Badge.astro';
+import DrawnBorder from './decorative/DrawnBorder.astro';
+import Heading from './Heading.astro';
+import ProductIcons from './icons/ProductIcons.astro';
+
+type HeadingLevel = 'h2' | 'h3' | 'h4';
+
+interface Props {
+	product: Product;
+	lang: Lang;
+	/** Alternate image left / right on large viewports. */
+	layoutFlip: boolean;
+	class?: string;
+	headingLevel?: HeadingLevel;
+	imageFetchPriority?: 'high' | 'auto';
+	/** First card in the document: eager-load image for LCP. */
+	imageLoading?: 'eager' | 'lazy';
+}
+
+const {
+	product,
+	lang,
+	layoutFlip,
+	class: className,
+	headingLevel = 'h3',
+	imageFetchPriority = 'auto',
+	imageLoading = 'lazy',
+} = Astro.props;
+const t = useTranslations(lang);
+
+const name = lang === 'ca' ? product.nameCa : product.nameEs;
+const description = lang === 'ca' ? product.descriptionCa : product.descriptionEs;
+
+const priceFormatter = new Intl.NumberFormat('es-ES', {
+	style: 'currency',
+	currency: 'EUR',
+	maximumFractionDigits: product.price % 1 === 0 ? 0 : 2,
+});
+---
+
+<article
+	class:list={[
+		'product-showcase group relative flex flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-[0_1px_0_0_oklch(98%_0.01_85_/_0.05)_inset,0_4px_24px_-8px_oklch(0%_0_0_/_0.4)] transition-[transform,box-shadow,border-color] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] will-change-transform lg:min-h-[min(320px,40vh)] lg:flex-row',
+		layoutFlip && 'lg:flex-row-reverse',
+		className,
+	]}
+>
+	<DrawnBorder />
+	<div
+		class:list={[
+			'relative aspect-[4/5] w-full shrink-0 overflow-hidden bg-[color-mix(in_oklch,var(--color-muted)_12%,var(--color-background))] lg:aspect-auto lg:w-[min(48%,420px)] lg:max-w-[46%]',
+		]}
+	>
+		<Picture
+			src={product.image}
+			alt={product.imageAlt[lang]}
+			formats={['avif', 'webp', 'png']}
+			class="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-[1.03]"
+			loading={imageLoading}
+			fetchpriority={imageFetchPriority}
+			decoding="async"
+			sizes="(min-width: 1024px) 420px, 100vw"
+		/>
+		<div
+			class="pointer-events-none absolute inset-0 bg-gradient-to-t from-[color-mix(in_oklch,var(--color-card)_55%,transparent)] via-transparent to-transparent lg:bg-gradient-to-r"
+			aria-hidden="true"
+		/>
+		{
+			product.isPlaceholder && (
+				<div class="absolute top-3 right-3 z-[1]">
+					<Badge variant="outline" class="bg-card/95 backdrop-blur-sm shadow-sm">
+						{t('products.exampleBadge')}
+					</Badge>
+				</div>
+			)
+		}
+	</div>
+
+	<div
+		class:list={[
+			'relative flex min-h-0 flex-1 flex-col justify-center gap-5 border-border px-6 py-8 md:px-10 md:py-10 lg:ms-px lg:border-s lg:border-border/70 lg:bg-card/40 lg:px-12 lg:py-12 xl:px-14',
+		]}
+	>
+		<div class="flex items-center gap-3">
+			<span
+				class="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-border/90 bg-backgroundAlt/90 text-primary shadow-sm"
+				aria-hidden="true"
+			>
+				<ProductIcons name={product.iconKey} class="h-5 w-5" />
+			</span>
+			<span class="font-body text-xs font-medium uppercase tracking-[0.18em] text-muted">
+				{t('products.priceLabel')}
+			</span>
+		</div>
+
+		<div class="space-y-3">
+			<Heading
+				as={headingLevel}
+				size="h3"
+				class="!font-display !text-[1.65rem] !leading-tight !tracking-tight md:!text-3xl"
+			>
+				{name}
+			</Heading>
+			<p class="max-w-[50ch] font-body text-base leading-relaxed text-muted">
+				{description}
+			</p>
+		</div>
+
+		<p class="m-0 font-display text-2xl font-semibold tabular-nums tracking-tight text-foreground md:text-3xl">
+			<span class="text-accent">{priceFormatter.format(product.price)}</span>
+		</p>
+	</div>
+</article>
+
+<style>
+	@media (hover: hover) and (pointer: fine) {
+		.product-showcase:hover {
+			transform: translateY(-4px);
+			box-shadow:
+				0 1px 0 0 oklch(98% 0.01 85 / 0.07) inset,
+				0 0 0 1px oklch(56% 0.11 320 / 0.18) inset,
+				0 22px 48px -14px oklch(30% 0.08 320 / 0.28);
+			border-color: color-mix(in oklch, var(--color-primary) 55%, var(--color-border));
+		}
+	}
+
+	.product-showcase:active {
+		transform: translateY(-1px) scale(0.995);
+		transition-duration: 120ms;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.product-showcase,
+		.product-showcase:hover,
+		.product-showcase:active {
+			transition: none;
+			transform: none;
+		}
+
+		.product-showcase :global(img) {
+			transition: none;
+			transform: none;
+		}
+	}
+</style>

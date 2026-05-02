@@ -1,0 +1,148 @@
+---
+/**
+ * EditorialDivider
+ *
+ * The minimal "magazine" header used at the top of every major
+ * section. Three typographic atoms:
+ *   - eyebrow label (mono uppercase)        e.g. "DIFERENCIALS"
+ *   - display heading (Cormorant Garamond)  e.g. "El que ens fa diferents"
+ *   - optional subheading (body)
+ * plus an animated hairline rule that draws in from left to right
+ * when the divider enters the viewport.
+ *
+ * The earlier iteration carried a numbered "01 / 05" column on the
+ * left, but the user found it noisy across the site. Removed in
+ * favour of an unnumbered, calmer header that still gives every
+ * section the same silhouette.
+ *
+ * The `number` and `total` props are accepted (for backwards
+ * compatibility with existing callers) but no longer rendered. They
+ * stay in the type so we don't have to touch every caller; the next
+ * sweep can drop them.
+ */
+import Container from './Container.astro';
+
+interface Props {
+	/** Deprecated: kept in the type so existing callers don't break.
+	 *  No longer rendered. Future cleanup will remove this prop from
+	 *  every page and from the interface. */
+	number?: string;
+	/** Deprecated alongside `number`. No longer rendered. */
+	total?: string;
+	eyebrow: string;
+	heading: string;
+	subheading?: string;
+	/** Heading level rendered for the title. Default 'h2'. Use 'h1'
+	 *  on top-of-page internal pages where this divider IS the
+	 *  page's main heading. Keeps the document outline correct. */
+	as?: 'h1' | 'h2';
+	/** Anchor id for the section, so header links can jump here. */
+	anchorId?: string;
+	/** Stable id on the main heading (for `aria-labelledby` on sibling sections). */
+	headingId?: string;
+	/** Tighter top padding when the divider sits flush against
+	 *  another visual element (e.g. right after a hero photo). */
+	flushTop?: boolean;
+	class?: string;
+}
+
+const {
+	eyebrow,
+	heading,
+	subheading,
+	as: HeadingTag = 'h2',
+	anchorId,
+	headingId,
+	flushTop = false,
+	class: className,
+} = Astro.props;
+---
+
+<Container
+	as="div"
+	class:list={[
+		'editorial-divider',
+		flushTop ? 'pt-10 md:pt-14' : 'pt-16 md:pt-20',
+		'pb-6 md:pb-8',
+		className,
+	]}
+	id={anchorId}
+>
+	<div class="space-y-3 md:space-y-4 max-w-4xl">
+		<p class="ed-eyebrow">{eyebrow}</p>
+		<HeadingTag
+			class="ed-heading"
+			data-magnetic-heading
+			id={headingId}
+		>
+			{heading}
+		</HeadingTag>
+		{subheading && <p class="ed-subheading">{subheading}</p>}
+	</div>
+
+	{/* Hairline rule that draws in left → right when visible */}
+	<div class="ed-rule mt-10 md:mt-12" aria-hidden="true">
+		<span class="ed-rule-line"></span>
+	</div>
+</Container>
+
+<style>
+	.ed-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.ed-heading {
+		font-family: var(--font-display), Georgia, serif;
+		font-size: clamp(2rem, 4vw + 0.5rem, 4.25rem);
+		line-height: 1.05;
+		letter-spacing: -0.015em;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: balance;
+		word-break: normal;
+		overflow-wrap: normal;
+		hyphens: none;
+	}
+
+	.ed-subheading {
+		font-family: var(--font-body);
+		font-size: clamp(1.05rem, 0.6vw + 0.85rem, 1.35rem);
+		line-height: 1.55;
+		color: var(--color-muted);
+		max-width: 48rem;
+		text-wrap: pretty;
+	}
+
+	.ed-rule {
+		position: relative;
+		height: 1px;
+		--fade-y: 0px;
+		--fade-duration: 1100ms;
+	}
+
+	.ed-rule-line {
+		display: block;
+		width: 100%;
+		height: 1px;
+		background-color: var(--color-border);
+		transform-origin: left center;
+		transform: scaleX(0);
+		transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1) 200ms;
+	}
+
+	.ed-rule.is-visible .ed-rule-line {
+		transform: scaleX(1);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.ed-rule-line {
+			transform: scaleX(1);
+			transition: none;
+		}
+	}
+</style>

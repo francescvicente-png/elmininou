@@ -1,0 +1,223 @@
+{
+  "hero": {
+    "file": "hero.jpg",
+    "id": "Xb_6OTCCnXo",
+    "photographer": "František Čaník",
+    "photographerUsername": "snipi",
+    "unsplashUrl": "https://unsplash.com/photos/a-wooden-table-topped-with-lots-of-different-types-of-scissors-Xb_6OTCCnXo",
+    "altDescription": "a wooden table topped with lots of different types of scissors",
+    "originalWidth": 4500,
+    "originalHeight": 3000,
+    "downloadedAt": "2026-04-26"
+  },
+  "gallery-1": {
+    "file": "gallery-1.jpg",
+    "id": "_H1XXY96pqw",
+    "photographer": "Chris Knight",
+    "photographerUsername": "chrisknight",
+    "unsplashUrl": "https://unsplash.com/photos/brown-barbers-chair-_H1XXY96pqw",
+    "altDescription": "brown barber's chair",
+    "originalWidth": 5184,
+    "originalHeight": 3456,
+    "downloadedAt": "2026-04-26"
+  },
+  "gallery-3": {
+    "file": "gallery-3.jpg",
+    "id": "foIZv9Oe1zw",
+    "photographer": "David Trinks",
+    "photographerUsername": "dtrinksrph",
+    "unsplashUrl": "https://unsplash.com/photos/shaving-brush-and-bowl-with-lather-and-razor-on-sink-foIZv9Oe1zw",
+    "altDescription": "Shaving brush and bowl with lather and razor on sink.",
+    "originalWidth": 3600,
+    "originalHeight": 2400,
+    "downloadedAt": "2026-04-26"
+  },
+  "gallery-4": {
+    "file": "gallery-4.jpg",
+    "id": "FvKpUZCbZ-s",
+    "photographer": "Josh Sorenson",
+    "photographerUsername": "joshsorenson",
+    "unsplashUrl": "https://unsplash.com/photos/black-straight-razor-beside-beige-ceramic-mug-and-shaving-cream-brush-FvKpUZCbZ-s",
+    "altDescription": "black straight razor beside beige ceramic mug and shaving cream brush",
+    "originalWidth": 5184,
+    "originalHeight": 3456,
+    "downloadedAt": "2026-04-26"
+  },
+  "gallery-5": {
+    "file": "gallery-5.jpg",
+    "id": "NF_Q9RQ6qRk",
+    "photographer": "Giorgio Trovato",
+    "photographerUsername": "giorgiotrovato",
+    "unsplashUrl": "https://unsplash.com/photos/a-room-with-two-round-mirrors-on-the-wall-NF_Q9RQ6qRk",
+    "altDescription": "a room with two round mirrors on the wall",
+    "originalWidth": 2880,
+    "originalHeight": 1920,
+    "downloadedAt": "2026-04-26"
+  },
+  "gallery-6": {
+    "file": "gallery-6.jpg",
+    "id": "o_wbRCgA9G8",
+    "photographer": "Haberdoedas",
+    "photographerUsername": "haberdoedas",
+    "unsplashUrl": "https://unsplash.com/photos/bottles-and-items-on-a-wooden-shelf-o_wbRCgA9G8",
+    "altDescription": "Bottles and items on a wooden shelf",
+    "originalWidth": 11648,
+    "originalHeight": 8736,
+    "downloadedAt": "2026-04-26"
+  },
+  "gallery-7": {
+    "file": "gallery-7.jpg",
+    "id": "lJZO8IJjNKQ",
+    "photographer": "Antoine Pouligny",
+    "photographerUsername": "gimmick",
+    "unsplashUrl": "https://unsplash.com/photos/view-through-a-window-of-a-barber-shop-at-night-lJZO8IJjNKQ",
+    "altDescription": "View through a window of a barber shop at night",
+    "originalWidth": 7728,
+    "originalHeight": 5152,
+    "downloadedAt": "2026-04-26"
+  },
+  "home-preview-salon-interior": {
+    "file": "generated/home-preview-salon-interior.jpg",
+    "source": "Google Gemini image API — gemini-3.1-flash-image-preview, generated 02/05/2026",
+    "altDescription": "Home GalleryPreview hero — illustrative dining-room interior (AI demo; not photographs of El mini nou)",
+    "usage": "home GalleryPreview hero only"
+  },
+  "home-preview-salon-chair": {
+    "file": "generated/home-preview-salon-chair.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, generated 02/05/2026",
+    "altDescription": "Home GalleryPreview satellite — table or seating detail (AI demo; not photographs of El mini nou)",
+    "usage": "home GalleryPreview satellite only"
+  },
+  "home-preview-salon-tools": {
+    "file": "generated/home-preview-salon-tools.jpg",
+    "source": "Google Gemini image API — gemini-3.1-flash-image-preview, generated 02/05/2026",
+    "altDescription": "Home GalleryPreview satellite — food-prep or tabletop flat lay (AI demo; not photographs of El mini nou)",
+    "usage": "home GalleryPreview satellite only"
+  },
+  "bridal-pack-trial-event": {
+    "file": "generated/bridal-pack-trial-event.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, editorial illustration prompt, 02/05/2026",
+    "altDescription": "Bridal package card — trial + wedding day (AI illustration)",
+    "usage": "BridalLanding /ca/nuvies /es/novias pricing grid"
+  },
+  "bridal-pack-bridesmaids": {
+    "file": "generated/bridal-pack-bridesmaids.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, editorial illustration prompt, 02/05/2026",
+    "altDescription": "Bridal package card — with bridesmaids (AI illustration)",
+    "usage": "BridalLanding pricing grid"
+  },
+  "bridal-pack-deluxe": {
+    "file": "generated/bridal-pack-deluxe.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, editorial illustration prompt, 02/05/2026",
+    "altDescription": "Bridal package card — deluxe (AI illustration)",
+    "usage": "BridalLanding pricing grid"
+  },
+  "product-shampoo-sulfate-free": {
+    "file": "generated/product-shampoo-sulfate-free.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, product photography prompt, 02/05/2026",
+    "altDescription": "ProductCard — sulfate-free shampoo bottle (AI packshot, not sold SKU)",
+    "usage": "/ca/productes /es/productos"
+  },
+  "product-repair-mask": {
+    "file": "generated/product-repair-mask.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, product photography prompt, 02/05/2026",
+    "altDescription": "ProductCard — hair repair mask jar (AI packshot)",
+    "usage": "/ca/productes /es/productos"
+  },
+  "product-serum-ends": {
+    "file": "generated/product-serum-ends.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, product photography prompt, 02/05/2026",
+    "altDescription": "ProductCard — hair ends serum dropper (AI packshot)",
+    "usage": "/ca/productes /es/productos"
+  },
+  "product-paddle-brush": {
+    "file": "generated/product-paddle-brush.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, product photography prompt, 02/05/2026",
+    "altDescription": "ProductCard — paddle brush (AI packshot)",
+    "usage": "/ca/productes /es/productos"
+  },
+  "product-texture-paste": {
+    "file": "generated/product-texture-paste.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, product photography prompt, 02/05/2026",
+    "altDescription": "ProductCard — texture styling paste (AI packshot)",
+    "usage": "/ca/productes /es/productos"
+  },
+  "product-wide-comb": {
+    "file": "generated/product-wide-comb.png",
+    "source": "Google Gemini image API — gemini-2.5-flash-image, product photography prompt, 02/05/2026",
+    "altDescription": "ProductCard — wide-tooth comb (AI packshot)",
+    "usage": "/ca/productes /es/productos"
+  },
+  "ejemplo-pelo-1": {
+    "file": "ejemplo-pelo-1.jpg",
+    "altDescription": "Demonstrative stock hairstyle sample — legacy gallery placeholder asset, not El mini nou food photography",
+    "addedAt": "2026-05-02",
+    "usage": "gallery MagazineGrid + lightbox + nav trail"
+  },
+  "ejemplo-pelo-2": {
+    "file": "ejemplo-pelo-2.jpg",
+    "altDescription": "Demonstrative stock hairstyle sample — legacy gallery placeholder asset, not El mini nou food photography",
+    "addedAt": "2026-05-02",
+    "usage": "gallery MagazineGrid + lightbox + nav trail"
+  },
+  "ejemplo-pelo-3": {
+    "file": "ejemplo-pelo-3.jpg",
+    "altDescription": "Demonstrative stock hairstyle sample — legacy gallery placeholder asset, not El mini nou food photography",
+    "addedAt": "2026-05-02",
+    "usage": "gallery MagazineGrid + lightbox + nav trail"
+  },
+  "modelo-para-web-hero-2": {
+    "file": "modelo-para-web-hero-2.png",
+    "altDescription": "Second full-viewport home background (crossfade after gallery island)",
+    "addedAt": "2026-05-02",
+    "usage": "PostGalleryHeroSection fixed layer; source was modelo para web_(2).jpg"
+  },
+  "bridal-hero-portrait": {
+    "file": "generated/bridal/bridal-hero-portrait.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, editorial bridal portrait prompt, 02/05/2026",
+    "altDescription": "Bridal landing hero — illustrative portrait (AI; not depicting El mini nou patrons or premises)",
+    "usage": "BridalLanding hero (/ca/nuvies, /es/novias)"
+  },
+  "bridal-detail-veil": {
+    "file": "generated/bridal/bridal-detail-veil.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, macro editorial detail prompt, 02/05/2026",
+    "altDescription": "Macro detail — hands placing tulle veil (AI illustrative; not real El mini nou clientele)",
+    "usage": "BridalLanding editorial intro composition"
+  },
+  "bridal-detail-flatlay": {
+    "file": "generated/bridal/bridal-detail-flatlay.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, editorial flat lay prompt, 02/05/2026",
+    "altDescription": "Editorial flat lay — combs, hair pins, ivory ribbon, dried flowers on charcoal fabric (AI)",
+    "usage": "BridalLanding editorial intro composition"
+  },
+  "bridal-gallery-1-braided-chignon": {
+    "file": "generated/bridal/bridal-gallery-1-braided-chignon.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, bridal hairstyle reference prompt, 02/05/2026",
+    "altDescription": "Bridal gallery — braided chignon hairstyle reference (AI illustrative; not real El mini nou clientele)",
+    "usage": "BridalLanding editorial gallery anchor tile"
+  },
+  "bridal-gallery-2-hollywood-wave": {
+    "file": "generated/bridal/bridal-gallery-2-hollywood-wave.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, bridal hairstyle reference prompt, 02/05/2026",
+    "altDescription": "Bridal gallery — glossy old-Hollywood wave, profile (AI)",
+    "usage": "BridalLanding editorial gallery"
+  },
+  "bridal-gallery-3-half-up": {
+    "file": "generated/bridal/bridal-gallery-3-half-up.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, bridal hairstyle reference prompt, 02/05/2026",
+    "altDescription": "Bridal gallery — natural half-up half-down with soft waves, three-quarter back view (AI)",
+    "usage": "BridalLanding editorial gallery"
+  },
+  "bridal-gallery-4-flowers": {
+    "file": "generated/bridal/bridal-gallery-4-flowers.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, macro editorial detail prompt, 02/05/2026",
+    "altDescription": "Bridal gallery — macro detail of small ivory flowers tucked into a soft braided crown (AI)",
+    "usage": "BridalLanding editorial gallery"
+  },
+  "bridal-gallery-5-high-bun": {
+    "file": "generated/bridal/bridal-gallery-5-high-bun.jpg",
+    "source": "Google Gemini image API — nano-banana model 2, bridal hairstyle reference prompt, 02/05/2026",
+    "altDescription": "Bridal gallery — sleek high ballerina bun with pearl ornament, modern minimal back view (AI)",
+    "usage": "BridalLanding editorial gallery wide tile"
+  }
+}

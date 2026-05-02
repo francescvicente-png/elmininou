@@ -1,0 +1,277 @@
+---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import { business } from '../data/business';
+import { getRoutePair } from '../i18n/routes';
+import { Icon } from 'astro-icon/components';
+import Heading from './Heading.astro';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const currentYear = new Date().getFullYear();
+
+const menuHref = getRoutePair('menu')[lang];
+const galleryHref = getRoutePair('gallery')[lang];
+const faqHref = getRoutePair('faq')[lang];
+const directionsHref = getRoutePair('directions')[lang];
+const legalNoticeHref = getRoutePair('legalNotice')[lang];
+const privacyHref = getRoutePair('privacyPolicy')[lang];
+const cookiesHref = getRoutePair('cookiesPolicy')[lang];
+
+/** Same stable asset as Header (scripts/copy-brand-logo.mjs). */
+const brandLogoSrc = '';
+---
+
+<footer transition:persist class="relative rounded-t-[2rem] border-t border-border/65 bg-[color-mix(in_oklch,var(--color-background)_65%,var(--color-page-canvas))]">
+	<div class="relative z-10 mx-auto max-w-6xl overflow-x-hidden px-6 md:px-8 py-12 md:py-16">
+		{/* Four columns on desktop, single stack on mobile. The grid
+		    uses `md:grid-cols-4` so each column has equal width on
+		    typical desktop widths. The previous 3-column layout
+		    grouped phone + hours into a single column which read as
+		    a heavy block; splitting it into named columns
+		    (Address, Contact, Business, Social) gives each block
+		    explicit context. */}
+		<div class="grid grid-cols-1 gap-10 md:grid-cols-4">
+			{/* Column 1: business identity + postal address. Logo to the
+			    left of the wordmark — same composition as the header so
+			    both corners of the page read consistently. The address
+			    underneath is wrapped in an <a> to Google Maps so a
+			    recurring visitor using the footer as quick reference
+			    can tap it without scrolling back to LocationBlock. */}
+			<div class="space-y-3">
+				<div class="flex items-center gap-3">
+					{
+						brandLogoSrc ? (
+							<img
+								data-brand-logo
+								src={brandLogoSrc}
+								alt={business.name}
+								width={1080}
+								height={1080}
+								class="h-12 w-auto object-contain shrink-0"
+								loading="lazy"
+								decoding="async"
+							/>
+						) : null
+					}
+					<Heading as="h3" size="h5">{business.name}</Heading>
+				</div>
+				<a
+					href={business.googleMapsUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="block text-sm text-muted hover:text-primary transition-colors"
+				>
+					<address class="not-italic leading-relaxed">
+						{business.address.street}<br />
+						{business.address.postalCode} {business.address.city}<br />
+						{business.address.region}
+					</address>
+				</a>
+			</div>
+
+			{/* Column 2: contact channels (phone + opening hours). */}
+			<div class="space-y-6">
+				<div class="space-y-2">
+					<Heading as="h3" size="h5">{t('footer.phone')}</Heading>
+					<a
+						href={`tel:${business.phoneTel}`}
+						class="block text-sm text-foreground hover:text-primary transition-colors"
+					>
+						{business.phone}
+					</a>
+				</div>
+				<div class="space-y-2">
+					<Heading as="h3" size="h5">{t('footer.hours')}</Heading>
+					<ul class="text-sm text-muted leading-relaxed space-y-1">
+						<li>{t('footer.hours.weekdays')}</li>
+						<li>{t('footer.hours.sunday')}</li>
+						<li>{t('footer.hours.closed')}</li>
+						<li class="text-xs italic">{t('footer.hours.note')}</li>
+					</ul>
+				</div>
+			</div>
+
+			{/* Column 3: internal navigation grouped under "Negoci /
+			    Negocio". Mirrors the public pages reachable from the
+			    header so the footer is also a complete site map. */}
+			<div class="space-y-3">
+				<Heading as="h3" size="h5">
+					{t('footer.businessSection')}
+				</Heading>
+				<ul class="text-sm space-y-2">
+					<li>
+						<a
+							href={menuHref}
+							class="text-foreground hover:text-primary transition-colors"
+						>
+							{t('nav.services')}
+						</a>
+					</li>
+					<li>
+						<a
+							href={galleryHref}
+							class="text-foreground hover:text-primary transition-colors"
+						>
+							{t('nav.gallery')}
+						</a>
+					</li>
+					<li>
+						<a
+							href={faqHref}
+							class="text-foreground hover:text-primary transition-colors"
+						>
+							{t('nav.faq')}
+						</a>
+					</li>
+					<li>
+						<a
+							href={directionsHref}
+							class="text-foreground hover:text-primary transition-colors"
+						>
+							{t('nav.directions')}
+						</a>
+					</li>
+				</ul>
+			</div>
+
+			{/* Column 4: external profiles (social + Google Maps). */}
+			<div class="space-y-3">
+				<Heading as="h3" size="h5">{t('footer.online')}</Heading>
+				<ul class="text-sm space-y-2">
+					{
+						business.socialLinks.instagram && (
+							<li>
+								<a
+									href={business.socialLinks.instagram}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+								>
+									<Icon name="tabler:brand-instagram" class="h-4 w-4" aria-hidden="true" />
+									Instagram
+								</a>
+							</li>
+						)
+					}
+					<li>
+						<a
+							href={business.googleMapsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+						>
+							<Icon name="tabler:map-pin" class="h-4 w-4" aria-hidden="true" />
+							Google Maps
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		{/* Bottom bar: copyright + the three legal pages inline,
+		    separated by middle dots — the standard "fineprint" row
+		    that reads as administrative, not promotional. */}
+		<div
+			class="mt-12 pt-8 border-t border-border flex flex-col gap-4 md:flex-row md:items-center md:justify-between text-xs text-muted"
+		>
+			<p>© {currentYear} {business.name}.</p>
+			<ul class="flex flex-wrap items-center gap-x-2 gap-y-2">
+				<li>
+					<a
+						href={legalNoticeHref}
+						class="nav-link-underline hover:text-primary transition-colors"
+					>
+						{t('footer.legal.notice')}
+					</a>
+				</li>
+				<li aria-hidden="true">·</li>
+				<li>
+					<a
+						href={privacyHref}
+						class="nav-link-underline hover:text-primary transition-colors"
+					>
+						{t('footer.legal.privacy')}
+					</a>
+				</li>
+				<li aria-hidden="true">·</li>
+				<li>
+					<a
+						href={cookiesHref}
+						class="nav-link-underline hover:text-primary transition-colors"
+					>
+						{t('footer.legal.cookies')}
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+
+	{/* Mega wordmark — flush with the bottom of the page (sign-off) while
+	    the span’s em-based padding + safe-area reserves ink for the stroke. */}
+	<div class="footer-mega-wordmark" aria-hidden="true">
+		<span class="footer-mega-text">{business.name.toUpperCase()}</span>
+	</div>
+</footer>
+
+<style>
+	/* Mega wordmark — sits at the document foot: minimal outer padding so it
+	   “kisses” the page end; outline ink is budgeted on `.footer-mega-text`. */
+	.footer-mega-wordmark {
+		position: relative;
+		display: flex;
+		justify-content: center;
+		align-items: flex-end;
+		padding-inline: clamp(0.75rem, 3vw, 2rem);
+		padding-top: 0.5rem;
+		/* Only safe-area + hairline: stroke overflow is absorbed by the span’s
+		   padding-bottom in `em`, not a tall band under the wordmark. */
+		padding-bottom: calc(env(safe-area-inset-bottom, 0px) + max(0.125rem, 2px));
+		pointer-events: none;
+		user-select: none;
+		overflow: visible;
+		z-index: 0;
+	}
+
+	.footer-mega-text {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 700;
+		display: inline-block;
+		/* Short wordmark — scale with viewport; cap high for drama without
+		   forcing horizontal scroll on typical laptop widths. */
+		font-size: clamp(3.25rem, 18vw, 10rem);
+		/* Tight line box sits low; em padding below carries stroke + descenders
+		   so the outer wrapper can stay almost flush with the viewport bottom. */
+		line-height: 1.02;
+		padding: 0.04em 0 0.22em;
+		letter-spacing: -0.04em;
+		color: transparent;
+		-webkit-text-stroke: max(1px, 0.04em) color-mix(
+			in oklch,
+			var(--color-canvas-text) 32%,
+			transparent
+		);
+		paint-order: stroke fill;
+		white-space: nowrap;
+		max-width: 100%;
+	}
+
+	@media (min-width: 768px) {
+		.footer-mega-text {
+			font-size: clamp(8rem, 26vw, 32rem);
+		}
+	}
+
+	/* Older browsers without -webkit-text-stroke get a low-contrast
+	   muted tint so the wordmark still feels like a watermark
+	   rather than a screaming block of green. */
+	@supports not (-webkit-text-stroke: 1px black) {
+		.footer-mega-text {
+			color: oklch(88% 0.015 70);
+		}
+	}
+</style>

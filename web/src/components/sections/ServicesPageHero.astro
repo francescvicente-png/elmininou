@@ -1,0 +1,117 @@
+---
+/**
+ * Above-the-fold hero for the dedicated services catalog: typographic
+ * headline, supporting copy, and booking CTAs (phone + WhatsApp).
+ */
+import Container from '../Container.astro';
+import Button from '../Button.astro';
+import { Icon } from 'astro-icon/components';
+import type { Lang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import { business } from '../../data/business';
+import { getBookingCta } from '../../data/site';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waMessage = t('services.heroWhatsAppMessage');
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+---
+
+<section
+	class="services-page-hero relative overflow-hidden border-b border-border bg-background"
+	aria-labelledby="services-page-title"
+>
+	<div
+		class="pointer-events-none absolute inset-0 opacity-[0.65]"
+		aria-hidden="true"
+	>
+		<div
+			class="absolute -left-[20%] top-[-30%] h-[min(70vw,520px)] w-[min(70vw,520px)] rounded-full blur-3xl"
+			style="background: radial-gradient(circle at 40% 40%, oklch(72% 0.085 80 / 0.14), transparent 62%);"
+		>
+		</div>
+		<div
+			class="absolute -right-[15%] bottom-[-35%] h-[min(55vw,420px)] w-[min(55vw,420px)] rounded-full blur-3xl"
+			style="background: radial-gradient(circle at 50% 50%, oklch(30% 0.075 320 / 0.12), transparent 65%);"
+		>
+		</div>
+	</div>
+
+	<Container class="relative py-14 md:py-20 lg:py-24">
+		<p class="sph-eyebrow">{t('services.heroEyebrow')}</p>
+		<h1 id="services-page-title" class="sph-title">
+			{t('services.heroTitle')}
+		</h1>
+		<p class="sph-lead">{t('services.heroLead')}</p>
+
+		<div
+			class="mt-8 flex flex-col gap-3 sm:mt-10 sm:flex-row sm:flex-wrap sm:items-center"
+		>
+			<Button
+				as="a"
+				href={booking.href}
+				external={booking.external}
+				variant="primary"
+				size="lg"
+				class="w-full justify-center sm:w-auto"
+			>
+				{t('cta.callToBook')}
+			</Button>
+			<Button
+				as="a"
+				href={waUrl}
+				external={true}
+				variant="secondary"
+				size="lg"
+				class="w-full justify-center sm:w-auto border-primary/35 hover:border-primary/55"
+			>
+				{t('services.heroCtaWhatsApp')}
+				<Icon
+					slot="icon-trailing"
+					name="tabler:brand-whatsapp"
+					class="h-4 w-4 shrink-0"
+					aria-hidden="true"
+				/>
+			</Button>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.sph-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0 0 0.75rem;
+	}
+
+	.sph-title {
+		font-family: var(--font-display), Georgia, serif;
+		font-size: clamp(2.25rem, 4vw + 0.75rem, 4.25rem);
+		line-height: 1.05;
+		letter-spacing: -0.018em;
+		color: var(--color-foreground);
+		margin: 0;
+		max-width: 14ch;
+		text-wrap: balance;
+	}
+
+	.sph-lead {
+		font-family: var(--font-body);
+		font-size: clamp(1.05rem, 0.5vw + 0.92rem, 1.35rem);
+		line-height: 1.58;
+		color: var(--color-muted);
+		margin: 1rem 0 0;
+		max-width: 46rem;
+		text-wrap: pretty;
+	}
+</style>

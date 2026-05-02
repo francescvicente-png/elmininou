@@ -1,0 +1,256 @@
+---
+/**
+ * ReviewCard
+ *
+ * One Google review rendered as a card. Inputs come from
+ * src/data/reviews.ts (real, public, attributed reviews — see the
+ * comment at the top of that file).
+ *
+ * Visual structure:
+ *   ┌─────────────────────────────────────┐
+ *   │ ⓀD  Dinora Fuentes        ★★★★★    │
+ *   │     Local Guide · 14 reseñas        │  ← optional row
+ *   │     fa 1 mes                        │
+ *   │                                     │
+ *   │ "Excelente su trabajo, muy amable…" │
+ *   │                                     │
+ *   │ — Reseña original en alemán,        │  ← optional translation note
+ *   │   traducida automáticamente.        │
+ *   │                                     │
+ *   │ ⓖ Reseña verificada en Google      │  ← always visible footer
+ *   └─────────────────────────────────────┘
+ */
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import type { Review } from '../data/reviews';
+
+interface Props {
+	review: Review;
+	lang: Lang;
+	class?: string;
+	/**
+	 * `onImage` — translucent card for text over full-bleed photography
+	 * (second home hero). Default surface is cream `bg-card` elsewhere.
+	 */
+	variant?: 'default' | 'onImage';
+	/** Tighter typography and padding when many cards stack (e.g. home hero grid). */
+	density?: 'default' | 'compact';
+}
+
+const { review, lang, class: className, variant = 'default', density = 'default' } = Astro.props;
+const t = useTranslations(lang);
+
+const text = review.pendingGoogleTranscript
+	? t('reviews.pendingGoogleTranscript')
+	: lang === 'ca' && review.textCa
+		? review.textCa
+		: review.textEs;
+const date = lang === 'ca' ? review.dateCa : review.dateEs;
+
+// Show a "translated from X" note when the original language differs
+// from what we're rendering. We render Catalan text when available,
+// otherwise we fall back to Spanish; the test below mirrors that.
+const renderedLanguage: 'ca' | 'es' = review.pendingGoogleTranscript
+	? lang
+	: lang === 'ca' && review.textCa
+		? 'ca'
+		: 'es';
+const isTranslated =
+	!review.pendingGoogleTranscript && review.language !== renderedLanguage;
+
+const translationNoteKey =
+	review.language === 'de'
+		? 'reviews.translatedFromDe'
+		: review.language === 'es'
+			? 'reviews.translatedFromEs'
+			: 'reviews.translatedFromCa';
+
+// Compact subtitle: "Local Guide · fa 1 mes". When the reviewer is a
+// Local Guide we show that label alongside the date; otherwise just
+// the date. The previous version included the absolute review count
+// ("14 ressenyes"), which would wrap on narrow card widths and break
+// the visual rhythm across the 3-card grid (one card taller than its
+// siblings). Dropping it keeps every card to the same compact 2-line
+// header — same authority signal (the "Local Guide" pill is what
+// matters), tighter layout.
+const subtitleParts: string[] = [];
+if (review.isLocalGuide) subtitleParts.push(t('reviews.localGuide'));
+subtitleParts.push(date);
+const subtitle = subtitleParts.join(' · ');
+
+const stars = [1, 2, 3, 4, 5];
+const isOnImage = variant === 'onImage';
+const isCompact = density === 'compact' && isOnImage;
+---
+
+<article
+	class:list={[
+		isOnImage
+			? isCompact
+				? 'review-card-on-image flex flex-col gap-2 rounded-xl border border-on-image/25 bg-black/45 p-3 backdrop-blur-md shadow-lg shadow-black/25 md:gap-2.5 md:p-3.5'
+				: 'review-card-on-image flex flex-col gap-3 rounded-xl border border-on-image/25 bg-black/45 p-4 backdrop-blur-md shadow-lg shadow-black/25 md:gap-4 md:p-5'
+			: 'review-card flex flex-col gap-4 rounded-xl border border-border bg-card p-6 md:p-7',
+		className,
+	]}
+	lang={renderedLanguage}
+>
+	<header class="flex items-start gap-3">
+		<div
+			class:list={[
+				'flex shrink-0 items-center justify-center rounded-full font-display',
+				isCompact ? 'h-9 w-9 text-sm' : 'h-10 w-10 text-base',
+				isOnImage ? 'bg-on-image/15 text-on-image' : 'bg-primary/15 text-primary',
+			]}
+			aria-hidden="true"
+		>
+			{review.authorInitial}
+		</div>
+		<div class="flex min-w-0 flex-1 flex-col gap-0.5">
+			<p
+				class:list={[
+					'font-body font-semibold leading-tight truncate',
+					isOnImage ? 'text-on-image' : 'text-foreground',
+				]}
+				title={review.authorName}
+			>
+				{review.authorName}
+			</p>
+			<p
+				class:list={[
+					'text-xs leading-tight truncate',
+					isOnImage ? 'text-on-image/80' : 'text-muted',
+				]}
+				title={subtitle}
+			>
+				{subtitle}
+			</p>
+		</div>
+		<div
+			class="flex shrink-0 gap-0.5"
+			role="img"
+			aria-label={t('reviews.starsAlt').replace(
+				'{rating}',
+				review.rating.toLocaleString(lang === 'ca' ? 'ca-ES' : 'es-ES', {
+					minimumFractionDigits: 0,
+					maximumFractionDigits: 1,
+				}),
+			)}
+		>
+			{
+				stars.map((s) => (
+					<Icon
+						name={s <= review.rating ? 'tabler:star-filled' : 'tabler:star'}
+						class:list={[
+							isCompact ? 'h-3.5 w-3.5' : 'h-4 w-4',
+							s <= review.rating
+								? isOnImage
+									? 'text-amber-300'
+									: 'text-rating'
+								: isOnImage
+									? 'text-on-image/35'
+									: 'text-muted',
+						]}
+						aria-hidden="true"
+					/>
+				))
+			}
+		</div>
+	</header>
+
+	<blockquote
+		class:list={[
+			isCompact
+				? 'text-xs font-body leading-snug md:text-sm'
+				: 'text-sm font-body leading-relaxed md:text-base',
+			isOnImage ? 'text-on-image/95' : 'text-foreground',
+		]}
+	>
+		<p>“{text}”</p>
+	</blockquote>
+
+	{
+		isTranslated && (
+			<p
+				class:list={[
+					'text-xs italic leading-relaxed',
+					isOnImage ? 'text-on-image/75' : 'text-muted',
+				]}
+			>
+				{t(translationNoteKey)}
+			</p>
+		)
+	}
+
+	<footer
+		class:list={[
+			'mt-auto flex items-center gap-2 border-t text-xs',
+			isCompact ? 'pt-2 md:pt-2.5' : 'pt-3 md:pt-4',
+			isOnImage
+				? 'border-on-image/20 text-on-image/80'
+				: 'border-border text-muted',
+		]}
+	>
+		{
+			review.pendingGoogleTranscript ? (
+				<span class="italic">{t('reviews.pendingVerificationFooter')}</span>
+			) : (
+				<>
+					<svg
+						viewBox="0 0 24 24"
+						class="h-3.5 w-3.5 shrink-0"
+						aria-hidden="true"
+					>
+						<path
+							d="M21.6 12.227c0-.682-.061-1.336-.176-1.964H12v3.713h5.385a4.6 4.6 0 0 1-1.997 3.022v2.51h3.232c1.892-1.744 2.98-4.31 2.98-7.281Zm-9.6 9.773c2.7 0 4.964-.895 6.62-2.421l-3.232-2.51c-.895.6-2.04.954-3.388.954-2.604 0-4.811-1.76-5.6-4.124H3.05v2.591A9.998 9.998 0 0 0 12 22Zm-5.6-7.105A6.01 6.01 0 0 1 6.087 12c0-1.005.176-1.982.49-2.895V6.514H3.05A9.998 9.998 0 0 0 2 12c0 1.617.387 3.146 1.05 4.486l3.35-1.59Zm5.6-9.345c1.469 0 2.788.505 3.825 1.495l2.866-2.866C16.96 2.69 14.696 1.8 11.997 1.8a9.998 9.998 0 0 0-8.948 5.514l3.428 2.591C7.189 7.541 9.395 5.78 12 5.78Z"
+							fill="currentColor"
+						/>
+					</svg>
+					<span>{t('reviews.verifiedBadge')}</span>
+				</>
+			)
+		}
+	</footer>
+</article>
+
+<style>
+	/* Default surface — hover lift shared with other cards. */
+	.review-card {
+		transition:
+			transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			border-color 400ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: transform;
+	}
+
+	.review-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 12px 32px -8px oklch(30% 0.075 320 / 0.18);
+		border-color: var(--color-primary);
+	}
+
+	.review-card-on-image {
+		transition:
+			transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			border-color 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			background-color 400ms ease;
+		will-change: transform;
+	}
+
+	.review-card-on-image:hover {
+		transform: translateY(-3px);
+		border-color: color-mix(in oklch, var(--color-on-image) 45%, transparent);
+		background-color: rgb(0 0 0 / 0.55);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.review-card,
+		.review-card:hover,
+		.review-card-on-image,
+		.review-card-on-image:hover {
+			transition: none;
+			transform: none;
+			box-shadow: none;
+		}
+	}
+</style>

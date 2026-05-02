@@ -1,0 +1,60 @@
+---
+/**
+ * HeroSection
+ *
+ * Bilingual wrapper around <Hero>. Picks the title + subtitle +
+ * booking CTA copy from the active language and forwards everything
+ * to Hero. Lives here so the home page is just a list of section
+ * components rather than carrying the hero copy inline.
+ */
+import Hero from '../Hero.astro';
+import { heroImage } from '../../data/gallery';
+import { getBookingCta } from '../../data/site';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+
+const copy = {
+	ca: {
+		eyebrow: "Brases i menú del dia · L'Ametlla",
+		title: "El mini nou — restaurant a L'Ametlla",
+		subtitle:
+			'Menú amb brases, entrepans i tapes ràpides. Truqueu o escriviu: us confirmem horari i taula.',
+		secondaryCtaLabel: 'Veure plats destacats',
+	},
+	es: {
+		eyebrow: 'Brasa y menú del día · La Ametlla',
+		title: 'El mini nou — restaurante en La Ametlla del Vallès',
+		subtitle:
+			'Menú con brasa, bocadillos y tapas rápidas. Llama o escribe: confirmamos mesa u horarios.',
+		secondaryCtaLabel: 'Ver platos destacados',
+	},
+}[lang];
+
+const secondaryCtaHref = lang === 'ca' ? '#carta-destacades' : '#carta-destacadas';
+---
+
+<Hero
+	eyebrow={copy.eyebrow}
+	title={copy.title}
+	subtitle={copy.subtitle}
+	ctaLabel={t('cta.callToBook')}
+	ctaHref={booking.href}
+	ctaExternal={booking.external}
+	secondaryCtaLabel={copy.secondaryCtaLabel}
+	secondaryCtaHref={secondaryCtaHref}
+	image={heroImage.src}
+	imageAlt={heroImage.alt[lang]}
+	imageCredit={heroImage.credit?.[lang]}
+	imageObjectPosition={heroImage.objectPosition}
+	fullViewport
+	preserveImageAppearance={false}
+	pageCanvasColor={heroImage.pageCanvasColor}
+/>

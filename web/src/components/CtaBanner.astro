@@ -1,0 +1,54 @@
+---
+import Container from './Container.astro';
+import Heading from './Heading.astro';
+import Button from './Button.astro';
+
+interface Props {
+	title: string;
+	ctaLabel: string;
+	ctaHref: string;
+	ctaExternal?: boolean;
+	variant?: 'primary' | 'subtle';
+	class?: string;
+}
+
+const {
+	title,
+	ctaLabel,
+	ctaHref,
+	ctaExternal = false,
+	variant = 'primary',
+	class: className,
+} = Astro.props;
+
+const isPrimary = variant === 'primary';
+---
+
+<section
+	class:list={[
+		'py-16 md:py-24',
+		isPrimary ? 'bg-primary' : 'bg-card',
+		className,
+	]}
+>
+	<Container class="text-center space-y-8">
+		<Heading
+			as="h2"
+			size="h2"
+			class={isPrimary ? 'text-primary-foreground' : 'text-foreground'}
+		>
+			{title}
+		</Heading>
+		<div>
+			<Button
+				as="a"
+				href={ctaHref}
+				external={ctaExternal}
+				variant={isPrimary ? 'inverse' : 'primary'}
+				size="lg"
+			>
+				{ctaLabel}
+			</Button>
+		</div>
+	</Container>
+</section>

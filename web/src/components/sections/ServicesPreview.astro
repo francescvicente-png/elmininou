@@ -1,0 +1,185 @@
+---
+/**
+ * ServicesPreview
+ *
+ * Magazine-style asymmetric mosaic of the 6 services. On the home
+ * page only — the dedicated /serveis/ page lists everything in a
+ * regular grid.
+ *
+ * Layout (lg+ breakpoint, 12-col grid):
+ *   row 1:  [── feature (cols 1-7) ──] [── md (8-12) ──]
+ *           (feature spans 2 rows)     [── md (8-12) ──]
+ *   row 2:  (feature continues)        (md fills row 2)
+ *   row 3:  [── sm 4 ──] [── sm 4 ──] [── sm 4 ──]
+ *
+ * Below lg: simple 2-column grid (md) and a 1-column stack (default).
+ *
+ * Why include all 6 instead of a hand-picked 3 like before:
+ *   The magazine layout reads as a layout statement only when there's
+ *   real variety — feature + supports. Three identical cards in a row
+ *   are just a list. Six in a magazine grid invite the eye to roam.
+ */
+import Container from '../Container.astro';
+import Heading from '../Heading.astro';
+import Text from '../Text.astro';
+import EditorialDivider from '../EditorialDivider.astro';
+import ServiceCard from '../ServiceCard.astro';
+import { Icon } from 'astro-icon/components';
+import {
+	services,
+	getServiceName,
+	getServiceDescription,
+} from '../../data/services';
+import type { Lang } from '../../i18n/config';
+import { getRoutePair } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/utils';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+// Mosaic order: picks from the restaurant menu for the home «carta» preview.
+const mosaicOrder: ReadonlyArray<{
+	id: string;
+	size: 'sm' | 'md' | 'lg';
+}> = [
+	{ id: 'amanida-el-mini', size: 'lg' },
+	{ id: 'entranya', size: 'md' },
+	{ id: 'grand-slam', size: 'md' },
+	{ id: 'espaguetis', size: 'sm' },
+	{ id: 'sandwich-botifarra', size: 'sm' },
+	{ id: 'tapas-olives', size: 'sm' },
+];
+const mosaic = mosaicOrder
+	.map((entry) => {
+		const service = services.find((s) => s.id === entry.id);
+		if (!service) return null;
+		return { service, size: entry.size };
+	})
+	.filter((m): m is NonNullable<typeof m> => m !== null);
+
+const menuHref = getRoutePair('menu')[lang];
+
+const copy = {
+	ca: {
+		anchorId: 'carta-destacades',
+		eyebrow: 'Carta',
+		heading: 'Plats destacats',
+		subtitle:
+			'Alguns exemples de la carta completa. Els preus i disponibilitat es confirmen al local; els allergens es detallen en text.',
+		viewAll: 'Veure carta completa',
+	},
+	es: {
+		anchorId: 'carta-destacadas',
+		eyebrow: 'Carta',
+		heading: 'Platos destacados',
+		subtitle:
+			'Algunos ejemplos de la carta completa. Precios y disponibilidad en el local; alérgenos en texto.',
+		viewAll: 'Ver carta completa',
+	},
+}[lang];
+---
+
+<section id={copy.anchorId} class="pb-12 md:pb-16 scroll-mt-32">
+	<EditorialDivider
+		number="02"
+		total="05"
+		eyebrow={copy.eyebrow}
+		heading={copy.heading}
+		subheading={copy.subtitle}
+		flushTop={false}
+	/>
+	<Container class="space-y-10">
+		<div class="services-mosaic">
+			{
+				mosaic.map(({ service, size }, index) => (
+					/* Wrapper in this component's Astro scope so the
+					   `.mosaic-cell-*` rules below actually apply.
+					   Putting the class directly on the ServiceCard
+					   `<article>` would land it in ServiceCard's own
+					   data-astro-cid scope and the layout rule would
+					   never match. The card inside fills the wrapper
+					   with `h-full`. */
+					<div class:list={['mosaic-cell', `mosaic-cell-${size}`]}>
+						<ServiceCard
+							name={getServiceName(service, lang)}
+							description={getServiceDescription(service, lang)}
+							duration={service.duration}
+							price={service.price}
+							icon={service.icon}
+							illustration={service.illustration}
+							illustrationAlt={
+								service.illustration
+									? t('services.cardIllustrationAlt').replace(
+											'{name}',
+											getServiceName(service, lang),
+										)
+									: undefined
+							}
+							imageFetchPriority={
+								index === 0 && service.illustration ? 'high' : 'auto'
+							}
+							featured={service.featured ?? false}
+							pendingConfirmation={service.pendingConfirmation ?? false}
+							size={size}
+							class="h-full"
+						/>
+					</div>
+				))
+			}
+		</div>
+		<div>
+			<a
+				href={menuHref}
+				class="font-body text-foreground hover:text-primary inline-flex min-h-11 items-center gap-1.5 py-2 pr-2 transition-colors duration-fast"
+			>
+				{copy.viewAll}
+				<Icon name="tabler:chevron-right" class="h-4 w-4" aria-hidden="true" />
+			</a>
+		</div>
+	</Container>
+</section>
+
+<style>
+	/* Default (mobile): everything stacks. */
+	.services-mosaic {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+	}
+
+	/* md: a 2-column grid is enough breathing room without going
+	   full magazine. The feature card spans both columns. */
+	@media (min-width: 768px) {
+		.services-mosaic {
+			grid-template-columns: 1fr 1fr;
+		}
+		.mosaic-cell-lg {
+			grid-column: span 2;
+		}
+	}
+
+	/* lg: the magazine layout proper. 12 columns, three rows. The
+	   feature occupies the left two-thirds for two rows; two `md`
+	   cards stack on the right; three `sm` cards fill the bottom. */
+	@media (min-width: 1024px) {
+		.services-mosaic {
+			grid-template-columns: repeat(12, 1fr);
+			grid-auto-rows: 1fr;
+			gap: 1rem;
+		}
+		.mosaic-cell-lg {
+			grid-column: span 7;
+			grid-row: span 2;
+		}
+		.mosaic-cell-md {
+			grid-column: span 5;
+		}
+		.mosaic-cell-sm {
+			grid-column: span 4;
+		}
+	}
+</style>

@@ -1,0 +1,52 @@
+---
+/**
+ * BridalLanding — composition of the redesigned /ca/nuvies and
+ * /es/novias landings.
+ *
+ * Replaces the previous generic landing (3-column pricing grid + small
+ * gallery + FAQ + CTA) with an 8-section editorial flow specifically
+ * choreographed for the bridal narrative:
+ *
+ *   1. BridalHero            — asymmetric split, portrait + display type
+ *   2. BridalEditorialIntro  — typographic statement + 2 detail photos
+ *   3. BridalProcess         — editorial timeline (4 steps, vertical hairline)
+ *   4. BridalPackages        — spotlight + 2 supporting (anti-3-equal-cards)
+ *   5. BridalGallery         — gapless asymmetric bento (5 images)
+ *   6. BridalTestimonial     — single oversized real Google quote
+ *   7. BridalFaqBlock        — eyebrow + headline + existing FaqList
+ *   8. BridalCtaClosing      — champagne accent banner, paired CTAs
+ *
+ * Design rationale lives inside each section component (header
+ * comments). The composition here only sequences them and keeps the
+ * spacing rhythm uniform — section components own their own padding.
+ *
+ * Why a composition file at all (not inline in the page route):
+ *   The two language pages (`/ca/nuvies/`, `/es/novias/`) need an
+ *   identical body — keeping the composition centralised here makes
+ *   sure they cannot drift apart.
+ */
+import type { Lang } from '../i18n/config';
+import BridalHero from './bridal/BridalHero.astro';
+import BridalEditorialIntro from './bridal/BridalEditorialIntro.astro';
+import BridalProcess from './bridal/BridalProcess.astro';
+import BridalPackages from './bridal/BridalPackages.astro';
+import BridalGallery from './bridal/BridalGallery.astro';
+import BridalTestimonial from './bridal/BridalTestimonial.astro';
+import BridalFaqBlock from './bridal/BridalFaqBlock.astro';
+import BridalCtaClosing from './bridal/BridalCtaClosing.astro';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<BridalHero lang={lang} />
+<BridalEditorialIntro lang={lang} />
+<BridalProcess lang={lang} />
+<BridalPackages lang={lang} />
+<BridalGallery lang={lang} />
+<BridalTestimonial lang={lang} />
+<BridalFaqBlock lang={lang} />
+<BridalCtaClosing lang={lang} />

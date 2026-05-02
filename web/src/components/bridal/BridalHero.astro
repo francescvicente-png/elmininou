@@ -1,0 +1,233 @@
+---
+/**
+ * BridalHero — opening scene of the bridal landing.
+ *
+ * Architecture (per `imagegen-frontend-web` + `soft-skill`):
+ *   Editorial Asymmetric Split. The hero ditches the centred-text-over-
+ *   dark-photo cliché and uses a 12-col grid: portrait image takes
+ *   col-span-7 on the right, typographic block sits in col-span-5 on
+ *   the left with massive negative space. On mobile it collapses to
+ *   image-then-text vertical.
+ *
+ * Why a custom hero (not the shared <Hero/>):
+ *   The shared Hero is built for full-width photographs with text
+ *   overlaid. The bridal page benefits from a side-by-side composition
+ *   where the photograph keeps its full editorial weight (no scrim, no
+ *   dark gradient blanket) and the typographic block sits on the page
+ *   canvas — the contrast then comes from layout tension, not from
+ *   black overlay strength.
+ *
+ * Skills enforced:
+ *   - taste-skill §3 Rule 3: anti-center bias, asymmetric layout
+ *   - soft-skill §4 A: Doppelrand wrapper around the photograph
+ *   - ui-ux-pro-max §1: alt text, focus rings, semantic h1
+ *   - redesign-skill: photograph carries the design (image-led hero)
+ *
+ * Reduced motion is respected via the inherited .fade-in-on-scroll CSS
+ * and the global @media (prefers-reduced-motion) declared in
+ * src/styles/global.css.
+ */
+import { Picture } from 'astro:assets';
+import Container from '../Container.astro';
+import Button from '../Button.astro';
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { business } from '../../data/business';
+import { getBookingCta } from '../../data/site';
+import { bridalHero } from '../../data/bridal';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waMessage = t('bridal.whatsappPrecitaMessage');
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+---
+
+<section
+	class="bridal-hero relative isolate overflow-hidden bg-background pt-24 md:pt-32 lg:pt-40 pb-16 md:pb-24"
+	aria-labelledby="bridal-hero-title"
+>
+	{/* Ambient warm glow at top-right — tinted, not pure black, never animates layout */}
+	<div
+		class="absolute -top-24 -right-32 -z-10 h-[36rem] w-[36rem] rounded-full opacity-50 blur-3xl pointer-events-none"
+		style="background: radial-gradient(circle, oklch(56% 0.11 320 / 0.18), transparent 70%);"
+		aria-hidden="true"
+	></div>
+
+	<Container>
+		<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-center">
+			{/* Typographic block — col-span-5 on lg+ */}
+			<div class="lg:col-span-5 lg:order-1 order-2 space-y-8 fade-in-on-scroll" style="--fade-delay: 80ms; --fade-duration: 700ms;">
+				<p class="bridal-eyebrow">{t('bridal.heroEyebrow')}</p>
+				<h1
+					id="bridal-hero-title"
+					class="bridal-hero-title font-display text-foreground"
+				>
+					{t('bridal.heroTitle')}
+				</h1>
+				<p class="bridal-hero-lead font-body text-muted max-w-md leading-relaxed">
+					{t('bridal.heroLead')}
+				</p>
+				<div class="flex flex-col sm:flex-row flex-wrap gap-3 pt-2">
+					<Button
+						as="a"
+						href={waUrl}
+						variant="primary"
+						size="lg"
+						external
+					>
+						{t('bridal.whatsappCta')}
+						<Icon
+							slot="icon-trailing"
+							name="tabler:brand-whatsapp"
+							class="h-5 w-5 shrink-0"
+							aria-hidden="true"
+						/>
+					</Button>
+					<Button
+						as="a"
+						href={booking.href}
+						variant="secondary"
+						size="lg"
+						external={booking.external}
+					>
+						{t('bridal.heroCallSecondary')}
+					</Button>
+				</div>
+				<div class="flex items-center gap-3 pt-6 border-t border-border/60">
+					<Icon
+						name="tabler:star-filled"
+						class="h-4 w-4 text-rating shrink-0"
+						aria-hidden="true"
+					/>
+					<p class="text-sm text-muted font-body">
+						<span class="text-foreground font-medium">{t('bridal.introTrustValue')}</span>
+					</p>
+				</div>
+			</div>
+
+			{/* Portrait — col-span-7 on lg+. Doppelrand: outer frame + inner image. */}
+			<figure
+				class="lg:col-span-7 lg:order-2 order-1 fade-in-on-scroll"
+				style="--fade-delay: 0ms; --fade-duration: 900ms; --fade-y: 32px;"
+			>
+				<div class="bridal-hero-frame">
+					<div class="bridal-hero-frame-inner">
+						<Picture
+							src={bridalHero.image}
+							alt={bridalHero.alt[lang]}
+							formats={['avif', 'webp']}
+							widths={[480, 720, 960, 1280]}
+							sizes="(min-width: 1024px) 56vw, 100vw"
+							loading="eager"
+							decoding="async"
+							fetchpriority="high"
+							class="bridal-hero-image"
+						/>
+					</div>
+				</div>
+				<figcaption class="bridal-hero-credit">
+					<Icon
+						name="tabler:sparkles"
+						class="h-3 w-3 shrink-0"
+						aria-hidden="true"
+					/>
+					{t('bridal.heroImageCredit')}
+				</figcaption>
+			</figure>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.bridal-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.bridal-hero-title {
+		font-size: clamp(2.5rem, 4.6vw + 0.5rem, 4.75rem);
+		line-height: 1.02;
+		letter-spacing: -0.02em;
+		text-wrap: balance;
+		word-break: normal;
+		overflow-wrap: normal;
+		hyphens: none;
+		margin: 0;
+		font-weight: 400;
+	}
+
+	.bridal-hero-lead {
+		font-size: clamp(1rem, 0.4vw + 0.85rem, 1.15rem);
+		text-wrap: pretty;
+	}
+
+	/* Doppelrand frame around the portrait — outer aluminium tray + inner glass.
+	   Concentric radii: outer 2.25rem, inner = outer minus padding = 2rem. */
+	.bridal-hero-frame {
+		position: relative;
+		padding: 0.5rem;
+		background: color-mix(in oklch, var(--color-foreground) 6%, transparent);
+		border: 1px solid color-mix(in oklch, var(--color-foreground) 8%, transparent);
+		border-radius: 2.25rem;
+		box-shadow:
+			0 30px 60px -25px oklch(0% 0 0 / 0.55),
+			inset 0 1px 0 0 color-mix(in oklch, var(--color-foreground) 10%, transparent);
+	}
+
+	.bridal-hero-frame-inner {
+		position: relative;
+		overflow: hidden;
+		border-radius: 1.85rem;
+		background: var(--color-card);
+		aspect-ratio: 4 / 5;
+	}
+
+	.bridal-hero-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		object-position: 50% 35%;
+		display: block;
+		transform: scale(1.02);
+		transition: transform 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	@media (hover: hover) {
+		.bridal-hero-frame:hover .bridal-hero-image {
+			transform: scale(1.045);
+		}
+	}
+
+	.bridal-hero-credit {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		margin-top: 0.85rem;
+		padding-left: 0.5rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: color-mix(in oklch, var(--color-muted) 80%, transparent);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bridal-hero-image,
+		.bridal-hero-frame:hover .bridal-hero-image {
+			transition: none;
+			transform: none;
+		}
+	}
+</style>

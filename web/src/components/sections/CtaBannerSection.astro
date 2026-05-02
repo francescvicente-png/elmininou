@@ -1,0 +1,31 @@
+---
+/**
+ * CtaBannerSection
+ *
+ * Wraps the existing <CtaBanner> with bilingual copy so the home
+ * pages don't have to translate it inline. The actual visual
+ * styling lives in CtaBanner.astro; this component only picks the
+ * right strings + the booking URL.
+ */
+import CtaBanner from '../CtaBanner.astro';
+import { getBookingCta } from '../../data/site';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+---
+
+<CtaBanner
+	title={t('cta.bannerTitle')}
+	ctaLabel={t('cta.callToBook')}
+	ctaHref={booking.href}
+	ctaExternal={booking.external}
+	variant="primary"
+	class="!py-6 md:!py-8"
+/>

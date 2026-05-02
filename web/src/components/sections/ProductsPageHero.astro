@@ -1,0 +1,171 @@
+---
+/**
+ * Above-the-fold hero for /productes/ and /productos/: editorial headline,
+ * trust chips, and CTAs aligned with ServicesPageHero.
+ */
+import Container from '../Container.astro';
+import Button from '../Button.astro';
+import { Icon } from 'astro-icon/components';
+import type { Lang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import { products } from '../../data/products';
+import { getBookingCta } from '../../data/site';
+import { business } from '../../data/business';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+const productCount = products.length;
+const statProducts = t('products.statProducts').replace(
+	'{count}',
+	String(productCount),
+);
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waMessage = t('products.heroWhatsAppMessage');
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+---
+
+<section
+	class="products-page-hero relative overflow-hidden border-b border-border bg-background"
+	aria-labelledby="products-page-title"
+>
+	<div
+		class="pointer-events-none absolute inset-0 opacity-[0.7]"
+		aria-hidden="true"
+	>
+		<div
+			class="absolute -left-[18%] top-[-28%] h-[min(68vw,500px)] w-[min(68vw,500px)] rounded-full blur-3xl"
+			style="background: radial-gradient(circle at 38% 42%, oklch(72% 0.085 80 / 0.16), transparent 62%);"
+		>
+		</div>
+		<div
+			class="absolute -right-[12%] bottom-[-32%] h-[min(52vw,400px)] w-[min(52vw,400px)] rounded-full blur-3xl"
+			style="background: radial-gradient(circle at 50% 50%, oklch(30% 0.075 320 / 0.14), transparent 65%);"
+		>
+		</div>
+	</div>
+
+	<Container class="relative py-14 md:py-20 lg:py-24">
+		<p class="pph-eyebrow">{t('products.heroEyebrow')}</p>
+		<h1 id="products-page-title" class="pph-title">
+			{t('products.heroTitle')}
+		</h1>
+		<p class="pph-lead">{t('products.heroLead')}</p>
+
+		<dl class="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+			<div
+				class="flex items-center gap-3 rounded-lg border border-border/80 bg-card/80 px-4 py-3 backdrop-blur-sm"
+			>
+				<Icon
+					name="tabler:shopping-bag"
+					class="h-5 w-5 shrink-0 text-accent"
+					aria-hidden="true"
+				/>
+				<div>
+					<dt class="sr-only">{t('products.statProducts')}</dt>
+					<dd class="m-0 font-body text-sm font-medium text-foreground">
+						{statProducts}
+					</dd>
+				</div>
+			</div>
+			<div
+				class="flex items-center gap-3 rounded-lg border border-border/80 bg-card/80 px-4 py-3 backdrop-blur-sm"
+			>
+				<Icon
+					name="tabler:message-circle"
+					class="h-5 w-5 shrink-0 text-primary"
+					aria-hidden="true"
+				/>
+				<div>
+					<dt class="sr-only">{t('products.statAdvice')}</dt>
+					<dd class="m-0 font-body text-sm font-medium text-foreground">
+						{t('products.statAdvice')}
+					</dd>
+				</div>
+			</div>
+			<div
+				class="flex items-center gap-3 rounded-lg border border-border/80 bg-card/80 px-4 py-3 backdrop-blur-sm"
+			>
+				<Icon
+					name="tabler:leaf"
+					class="h-5 w-5 shrink-0 text-primary"
+					aria-hidden="true"
+				/>
+				<div>
+					<dt class="sr-only">{t('products.statOrganic')}</dt>
+					<dd class="m-0 font-body text-sm font-medium text-foreground">
+						{t('products.statOrganic')}
+					</dd>
+				</div>
+			</div>
+		</dl>
+
+		<div
+			class="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center"
+		>
+			<Button
+				as="a"
+				href={waUrl}
+				external={true}
+				variant="primary"
+				size="lg"
+				class="w-full justify-center sm:w-auto"
+			>
+				{t('products.heroCtaWhatsapp')}
+				<Icon
+					slot="icon-trailing"
+					name="tabler:brand-whatsapp"
+					class="h-4 w-4"
+					aria-hidden="true"
+				/>
+			</Button>
+			<Button
+				as="a"
+				href={booking.href}
+				external={booking.external}
+				variant="ghost"
+				size="lg"
+				class="w-full justify-center sm:w-auto"
+			>
+				{t('cta.callToBook')}
+			</Button>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.pph-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0 0 0.75rem;
+	}
+
+	.pph-title {
+		font-family: var(--font-display), Georgia, serif;
+		font-size: clamp(2.1rem, 3.6vw + 0.85rem, 3.85rem);
+		line-height: 1.06;
+		letter-spacing: -0.02em;
+		color: var(--color-foreground);
+		margin: 0;
+		max-width: 15ch;
+		text-wrap: balance;
+	}
+
+	.pph-lead {
+		font-family: var(--font-body);
+		font-size: clamp(1.05rem, 0.45vw + 0.94rem, 1.32rem);
+		line-height: 1.58;
+		color: var(--color-muted);
+		margin: 1rem 0 0;
+		max-width: 44rem;
+		text-wrap: pretty;
+	}
+</style>

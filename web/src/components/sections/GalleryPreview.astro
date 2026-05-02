@@ -1,0 +1,167 @@
+---
+/**
+ * GalleryPreview
+ *
+ * Home showcase band — hero tile + satellites in an asymmetric grid.
+ * Visuals mix illustrative placeholders (Gemini); replace with premises
+ * photography when ready (see attributions.json).
+ */
+import { getImage } from 'astro:assets';
+import Container from '../Container.astro';
+import EditorialDivider from '../EditorialDivider.astro';
+import DemoImage from '../DemoImage.astro';
+import { Icon } from 'astro-icon/components';
+import { galleryImages } from '../../data/gallery';
+import { homeGalleryPreviewTiles } from '../../data/home-gallery-preview';
+import type { Lang } from '../../i18n/config';
+import { getRoutePair } from '../../i18n/routes';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const [heroTile, satelliteA, satelliteB] = homeGalleryPreviewTiles;
+
+const galleryHref = getRoutePair('gallery')[lang];
+
+const trailImageUrls = await Promise.all(
+	galleryImages.slice(0, 5).map(async (img) => {
+		const processed = await getImage({
+			src: img.src,
+			format: 'avif',
+			width: 200,
+		});
+		return processed.src;
+	}),
+);
+const trailImagesJson = JSON.stringify(trailImageUrls);
+
+const copy = {
+	ca: {
+		eyebrow: 'L’ambient',
+		heading: 'Foc, taules, detall',
+		subtitle:
+			"Matinada de brases amb olor de fum suau i taules per compartir tapes: aquest és l’ambient que volem que respireu abans de reservar.",
+		viewAll: 'Veure la galeria',
+	},
+	es: {
+		eyebrow: 'El ambiente',
+		heading: 'Fuego, mesas, detalle',
+		subtitle:
+			'Mañanas de brasa con humo suave y mesas para compartir tapas: ese es el clima que queremos antes de que reservéis mesa.',
+		viewAll: 'Ver la galería',
+	},
+}[lang];
+---
+
+<section id="home-section-gallery" class="scroll-mt-32 pb-12 md:pb-16 pt-4 md:pt-6">
+	<EditorialDivider
+		number="04"
+		total="05"
+		eyebrow={copy.eyebrow}
+		heading={copy.heading}
+		subheading={copy.subtitle}
+		flushTop={false}
+	/>
+	<Container>
+		<div
+			class="gallery-preview-island rounded-[2rem] bg-card p-5 md:p-8 lg:p-10 ring-1 ring-inset ring-[color-mix(in_oklch,var(--color-foreground)_6%,transparent)]"
+			style="box-shadow: 0 26px 64px -24px oklch(14% 0.06 42 / 0.42);"
+			data-gallery-reveal-mask
+		>
+			<div class="gallery-showcase">
+				<div class="gallery-showcase-hero">
+					<DemoImage
+						src={heroTile.src}
+						alt={heroTile.alt[lang]}
+						photographer={heroTile.photographer}
+						photoLicense={heroTile.photoLicense}
+						aspectRatio="3/4"
+						sizes="(min-width: 1024px) 52vw, 100vw"
+						loading="lazy"
+						class="!rounded-2xl h-full min-h-[220px] lg:min-h-[420px]"
+					/>
+				</div>
+				<div class="gallery-showcase-stack">
+					{
+						satelliteA && (
+							<DemoImage
+								src={satelliteA.src}
+								alt={satelliteA.alt[lang]}
+								photographer={satelliteA.photographer}
+								photoLicense={satelliteA.photoLicense}
+								aspectRatio="4/3"
+								sizes="(min-width: 1024px) 28vw, 100vw"
+								loading="lazy"
+								class="!rounded-2xl"
+							/>
+						)
+					}
+					{
+						satelliteB && (
+							<DemoImage
+								src={satelliteB.src}
+								alt={satelliteB.alt[lang]}
+								photographer={satelliteB.photographer}
+								photoLicense={satelliteB.photoLicense}
+								aspectRatio="4/3"
+								sizes="(min-width: 1024px) 28vw, 100vw"
+								loading="lazy"
+								class="!rounded-2xl"
+							/>
+						)
+					}
+				</div>
+			</div>
+			<div class="mt-10 md:mt-12">
+				<a
+					href={galleryHref}
+					class="font-body text-foreground hover:text-primary inline-flex items-center gap-2 text-base font-medium transition-[color,transform] duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:translate-x-0.5"
+					data-nav-trail
+					data-trail-images={trailImagesJson}
+				>
+					{copy.viewAll}
+					<Icon name="tabler:chevron-right" class="h-4 w-4" aria-hidden="true" />
+				</a>
+			</div>
+		</div>
+	</Container>
+</section>
+
+<style>
+	/* Mobile-first stack; lg+ becomes asymmetric spread (hero + two tiles). */
+	.gallery-showcase {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+
+	/* Stack satellites with the same rhythm as hero→stack — gap was lg-only before,
+	   so mobile had space after image 1 but none between 2 and 3. */
+	.gallery-showcase-stack {
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		min-height: 0;
+	}
+
+	@media (min-width: 1024px) {
+		.gallery-showcase {
+			display: grid;
+			grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+			grid-template-rows: auto;
+			gap: 1.25rem;
+			align-items: stretch;
+		}
+
+		.gallery-showcase-hero {
+			grid-row: 1 / span 1;
+		}
+
+		.gallery-showcase-stack {
+			gap: 1.25rem;
+		}
+	}
+</style>

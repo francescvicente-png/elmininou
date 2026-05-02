@@ -1,0 +1,227 @@
+---
+import '../styles/global.css';
+import { Font, getImage } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
+import type { ImageMetadata } from 'astro';
+import RestaurantHeader from '../components/restaurant/RestaurantHeader.astro';
+import RestaurantFooter from '../components/restaurant/RestaurantFooter.astro';
+import PageLoadingBar from '../components/PageLoadingBar.astro';
+import CookieBanner from '../components/CookieBanner.astro';
+import WhatsAppFloat from '../components/WhatsAppFloat.astro';
+import MetaTags from '../components/seo/MetaTags.astro';
+import SchemaLocalBusiness from '../components/seo/SchemaLocalBusiness.astro';
+import SchemaBreadcrumbs from '../components/seo/SchemaBreadcrumbs.astro';
+import SchemaWebSite from '../components/seo/SchemaWebSite.astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import { site } from '../data/site';
+import { business } from '../data/business';
+import { HOME_PAGE_CANVAS_COLOR } from '../config/home-page-canvas';
+
+interface BreadcrumbItem {
+	name: string;
+	url: string;
+}
+
+interface Props {
+	title: string;
+	description: string;
+	/** Path of the sibling page in the other language (used for hreflang and switcher). */
+	siblingPath?: string;
+	ogType?: 'website' | 'article';
+	keywords?: ReadonlyArray<string>;
+	noindex?: boolean;
+	breadcrumbs?: ReadonlyArray<BreadcrumbItem>;
+	/**
+	 * If set, emits a `<link rel="preload" as="image" fetchpriority="high">`
+	 * for this image in AVIF format. Use it on pages where the image is the
+	 * LCP element (typically the home pages with the Hero photo). Skip on
+	 * pages without an above-the-fold hero photo: a wasted preload steals
+	 * bandwidth from the critical path.
+	 */
+	preloadImage?: ImageMetadata;
+}
+
+const {
+	title,
+	description,
+	siblingPath,
+	ogType = 'website',
+	keywords,
+	noindex = false,
+	breadcrumbs,
+	preloadImage,
+} = Astro.props;
+
+// Pre-resolve the AVIF rendition + responsive srcset for the LCP image.
+const heroPreload = preloadImage
+	? await getImage({
+			src: preloadImage,
+			format: 'avif',
+			widths: [768, 1024, 1280, 1920, 2400],
+			sizes: '100vw',
+		})
+	: null;
+
+const lang: Lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const siblingUrl = siblingPath ? new URL(siblingPath, Astro.site) : undefined;
+
+const siteUrl = new URL('/', Astro.site).toString().replace(/\/$/, '');
+
+// Title: evitar duplicar el nom si la pàgina ja inclou la marca local.
+const fullTitle = title.includes(business.name) ? title : `${title} · ${business.name}`;
+
+const ogLocalePath = lang === 'ca' ? 'ca' : 'es';
+const ogImageUrl = `${siteUrl}/og/default-${ogLocalePath}.jpg?v=${site.ogImageCacheBust}`;
+const ogImageAlt =
+	lang === 'ca'
+		? `${business.name} — restaurant · ${business.address.street}, ${business.address.city}`
+		: `${business.name} — restaurante · ${business.address.street}, ${business.address.city}`;
+
+const isHome =
+	Astro.url.pathname === '/ca/' || Astro.url.pathname === '/es/';
+
+// The floating WhatsApp button is hidden on legal pages — when the
+// visitor is reading legal text (LSSI / RGPD / cookies) they're not in
+// "I want to book" mode, so the CTA would feel intrusive. The list
+// stays here (not in site.ts) because it's a *layout* concern: the
+// feature flag governs *whether* the button exists at all; this list
+// governs *where*.
+const LEGAL_PATHS: ReadonlyArray<string> = [
+	'/ca/avis-legal/',
+	'/es/aviso-legal/',
+	'/ca/politica-privacitat/',
+	'/es/politica-privacidad/',
+	'/ca/politica-cookies/',
+	'/es/politica-cookies/',
+];
+const showWhatsApp =
+	site.features.whatsappFloat && !LEGAL_PATHS.includes(Astro.url.pathname);
+
+const pageCanvasStyle = {
+	'--color-page-canvas': HOME_PAGE_CANVAS_COLOR,
+} as Record<string, string>;
+---
+
+<!doctype html>
+<html lang={lang} style={pageCanvasStyle}>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		{/* Favicons are generated from El mini nou logo.jpg (see copy-brand-logo.mjs)
+		    at prebuild time. The 32px tab icon covers
+		    desktop browsers; 180px is the iOS add-to-home-screen icon; 192/512
+		    serve Android launchers and PWA install prompts. */}
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/favicon-180.png" />
+		<link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+		<link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
+
+		<MetaTags
+			title={fullTitle}
+			description={description}
+			canonicalUrl={canonicalUrl}
+			siblingUrl={siblingUrl}
+			ogImage={ogImageUrl}
+			ogImageAlt={ogImageAlt}
+			ogType={ogType}
+			keywords={keywords}
+			noindex={noindex}
+			lang={lang}
+		/>
+
+		{
+			heroPreload && (
+				<link
+					rel="preload"
+					as="image"
+					href={heroPreload.src}
+					type="image/avif"
+					fetchpriority="high"
+					imagesrcset={heroPreload.srcSet?.attribute}
+					imagesizes="100vw"
+				/>
+			)
+		}
+
+		<SchemaLocalBusiness canonicalUrl={canonicalUrl} />
+		{breadcrumbs && <SchemaBreadcrumbs items={breadcrumbs} />}
+		{isHome && <SchemaWebSite />}
+
+		<slot name="head" />
+
+		<Font cssVariable="--font-playfair-display-sc" preload />
+		<Font cssVariable="--font-karla" preload />
+
+		{
+			/* Microsoft Clarity — heatmaps + session recordings, free.
+			   Emitted only when an ID is configured in src/data/site.ts.
+			   When empty (default until you register at clarity.microsoft.com
+			   and paste the project ID), the script is NOT inserted at all,
+			   so there is zero impact on performance or privacy. */
+		}
+		{
+			site.analytics.clarityProjectId && (
+				<script
+					is:inline
+					define:vars={{ clarityId: site.analytics.clarityProjectId }}
+				>{`
+					(function(c,l,a,r,i,t,y){
+						c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+						t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+						y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+					})(window, document, "clarity", "script", clarityId);
+				`}</script>
+			)
+		}
+
+		<ClientRouter />
+	</head>
+<body class="min-h-screen text-foreground font-body antialiased flex flex-col">
+		{/* Skip link MUST be the first focusable element in the body so
+		    that a Tab from the URL bar lands on it before the header.
+		    Hidden visually (translated -100% off the top) until focus,
+		    then slides into view at the top-left. WCAG 2.4.1. */}
+		<a href="#main-content" class="skip-link">{t('a11y.skipToContent')}</a>
+		<div class="scroll-progress-bar" aria-hidden="true"></div>
+		<PageLoadingBar transition:persist />
+		<CookieBanner transition:persist />
+		<RestaurantHeader lang={lang} siblingPath={siblingPath} />
+		<main
+			id="main-content"
+			class="flex flex-1 flex-col"
+			transition:animate="slide"
+		>
+			<slot />
+		</main>
+		<RestaurantFooter lang={lang} />
+
+		{showWhatsApp && <WhatsAppFloat lang={lang} />}
+
+		<script>
+			import '../scripts/mouse-tracker.ts';
+			import '../scripts/lenis.ts';
+			import '../scripts/mobile-menu.ts';
+			import '../scripts/scroll-reveal.ts';
+			import '../scripts/header-state.ts';
+			import '../scripts/home-hero-gallery-reveal.ts';
+			import '../scripts/page-loading-bar.ts';
+			import '../scripts/cookie-banner.ts';
+			import '../scripts/number-counter.ts';
+			import '../scripts/opening-now.ts';
+			import '../scripts/magnetic-heading.ts';
+			import '../scripts/hero-atmosphere.ts';
+			import '../scripts/font-weight-scroll.ts';
+			import '../scripts/gallery-lightbox.ts';
+			import '../scripts/gallery-filter.ts';
+			import '../scripts/before-after.ts';
+			import '../scripts/nav-image-trail.ts';
+			import '../scripts/storytelling.ts';
+			import '../scripts/cinematic-intro.ts';
+			import '../scripts/scroll-progress.ts';
+			import '../scripts/header-shyness.ts';
+		</script>
+	</body>
+</html>

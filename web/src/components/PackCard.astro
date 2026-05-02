@@ -1,0 +1,177 @@
+---
+/**
+ * PackCard
+ *
+ * Card visual for a single pack or gift card. Mirrors ServiceCard /
+ * ProductCard recipe (rounded-xl + hover lift) so the family of card
+ * surfaces stays consistent across the site.
+ *
+ * Two CTAs:
+ *   - WhatsApp: opens wa.me with a pre-filled question about THIS pack.
+ *   - Phone: tel: link as fallback.
+ *
+ * `pendingConfirmation` shows a discreet outline badge so visitors
+ * understand the pricing is provisional until the business validates.
+ */
+import Badge from './Badge.astro';
+import Heading from './Heading.astro';
+import Button from './Button.astro';
+import { Icon } from 'astro-icon/components';
+import type { Lang } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+import { business } from '../data/business';
+import type { Pack } from '../data/packs';
+
+type HeadingLevel = 'h2' | 'h3' | 'h4';
+
+interface Props {
+	pack: Pack;
+	lang: Lang;
+	headingLevel?: HeadingLevel;
+	class?: string;
+}
+
+const { pack, lang, headingLevel = 'h3', class: className } = Astro.props;
+const t = useTranslations(lang);
+
+const title = pack.title[lang];
+const tagline = pack.tagline[lang];
+const bullets = pack.bullets[lang];
+const description = pack.description[lang];
+const validity = pack.validity[lang];
+const ctaLabel = pack.ctaLabel ? pack.ctaLabel[lang] : t('packs.ctaWhatsapp');
+
+const priceFormatter = new Intl.NumberFormat('es-ES', {
+	style: 'currency',
+	currency: 'EUR',
+	maximumFractionDigits: pack.price % 1 === 0 ? 0 : 2,
+});
+const priceLabel =
+	pack.id === 'gift-card'
+		? `${t('packs.priceFrom')} ${priceFormatter.format(pack.price)}`
+		: priceFormatter.format(pack.price);
+
+// WhatsApp prefilled message — visitors reach the salon team directly.
+// from the first message which pack the visitor is interested in.
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waMessage =
+	lang === 'ca'
+		? `Hola! Tinc interès en el pack "${title}". Em pots donar més info?`
+		: `¡Hola! Me interesa el pack "${title}". ¿Me puedes dar más info?`;
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+---
+
+<article
+	class:list={[
+		'pack-card relative rounded-xl border border-border bg-card p-6 md:p-8 flex flex-col gap-5',
+		className,
+	]}
+>
+	<header class="flex items-start justify-between gap-4">
+		<Icon name={pack.iconKey} class="h-9 w-9 text-primary shrink-0" aria-hidden="true" />
+		{
+			pack.pendingConfirmation && (
+				<Badge variant="outline" class="shrink-0">
+					{t('packs.pendingBadge')}
+				</Badge>
+			)
+		}
+	</header>
+
+	<div class="space-y-2">
+		<Heading as={headingLevel} size="h3">{title}</Heading>
+		<p class="text-base text-muted leading-relaxed">{tagline}</p>
+	</div>
+
+	<div class="flex items-baseline gap-3">
+		<span class="font-display text-4xl text-foreground tabular-nums">
+			{priceLabel}
+		</span>
+		{
+			pack.originalPrice && (
+				<span class="text-muted line-through tabular-nums text-base">
+					{priceFormatter.format(pack.originalPrice)}
+				</span>
+			)
+		}
+	</div>
+
+	<div class="space-y-2">
+		<p class="text-xs uppercase tracking-widest text-primary">
+			{t('packs.includesHeading')}
+		</p>
+		<ul class="space-y-1.5">
+			{
+				bullets.map((b) => (
+					<li class="flex items-start gap-2 text-sm font-body text-foreground leading-relaxed">
+						<Icon
+							name="tabler:check"
+							class="h-4 w-4 mt-0.5 text-primary shrink-0"
+							aria-hidden="true"
+						/>
+						<span>{b}</span>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+
+	<p class="text-sm font-body text-foreground leading-relaxed">{description}</p>
+
+	<p class="text-xs text-muted">
+		<strong class="text-foreground font-semibold">{t('packs.validity')}:</strong>{' '}
+		{validity}
+	</p>
+
+	<footer class="pt-2 mt-auto flex flex-col sm:flex-row gap-3">
+		<Button as="a" href={waUrl} variant="primary" size="md" external class="flex-1">
+			<Icon
+				slot="icon-leading"
+				name="tabler:brand-whatsapp"
+				class="h-4 w-4"
+				aria-hidden="true"
+			/>
+			{ctaLabel}
+		</Button>
+		<Button
+			as="a"
+			href={`tel:${business.phoneTel}`}
+			variant="secondary"
+			size="md"
+			class="flex-1"
+		>
+			<Icon
+				slot="icon-leading"
+				name="tabler:phone"
+				class="h-4 w-4"
+				aria-hidden="true"
+			/>
+			{t('packs.ctaCall')}
+		</Button>
+	</footer>
+</article>
+
+<style>
+	.pack-card {
+		transition:
+			transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			border-color 400ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: transform;
+	}
+
+	.pack-card:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 12px 32px -8px oklch(30% 0.075 320 / 0.18);
+		border-color: var(--color-primary);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.pack-card,
+		.pack-card:hover {
+			transition: none;
+			transform: none;
+			box-shadow: none;
+		}
+	}
+</style>

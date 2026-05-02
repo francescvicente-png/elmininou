@@ -1,0 +1,47 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import EditorialDivider from '../../components/EditorialDivider.astro';
+import LocationBlock from '../../components/LocationBlock.astro';
+import ContactChannelsSection from '../../components/sections/ContactChannelsSection.astro';
+import FadeInOnScroll from '../../components/animations/FadeInOnScroll.astro';
+import { business } from '../../data/business';
+
+const lang = 'ca' as const;
+---
+
+<BaseLayout
+	title={`Contacte · ${business.name}`}
+	description={`Adreça, telèfon, horari i com arribar a ${business.name}. ${business.address.street}, ${business.address.city}. Reserva per telèfon o WhatsApp.`}
+	siblingPath="/es/contacto/"
+	keywords={[
+		'contacte el mini nou',
+		'restaurant la ametlla vallès telèfon',
+		'jeroni de moragas restaurant',
+		'reserva restaurant ametlla del vallès',
+	]}
+	breadcrumbs={[
+		{ name: 'Inici', url: '/ca/' },
+		{ name: 'Contacte', url: '/ca/contacte/' },
+	]}
+>
+	<EditorialDivider
+		number="—"
+		eyebrow="On ens trobaràs"
+		heading="Contacte"
+		subheading="Tot el que necessites per trobar-nos: adreça, telèfon, horari i les altres maneres de contactar."
+		as="h1"
+		flushTop={false}
+	/>
+
+	<FadeInOnScroll delay={100}>
+		<Container as="section" class="pb-16 md:pb-20">
+			<LocationBlock lang={lang} headingLevel="h2" />
+		</Container>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={150}>
+		<ContactChannelsSection lang={lang} />
+	</FadeInOnScroll>
+
+</BaseLayout>

@@ -1,0 +1,471 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Container from './Container.astro';
+import Heading from './Heading.astro';
+import Text from './Text.astro';
+import Button from './Button.astro';
+
+interface Props {
+	/** Short meta line above the title (brand promise / locality). */
+	eyebrow?: string;
+	title: string;
+	subtitle?: string;
+	ctaLabel?: string;
+	ctaHref?: string;
+	ctaExternal?: boolean;
+	/** Optional secondary CTA, rendered next to the primary one. Used by
+	 *  the home Hero to surface a "Veure serveis / Ver servicios"
+	 *  in-page anchor next to the booking button. */
+	secondaryCtaLabel?: string;
+	secondaryCtaHref?: string;
+	image?: ImageMetadata;
+	imageAlt?: string;
+	/** Optional corner label on the hero photograph (e.g. attribution). */
+	imageCredit?: string;
+	/** CSS `object-position` for full-bleed portraits (keeps the subject in frame). */
+	imageObjectPosition?: string;
+	/** Full viewport (100dvh) with image behind the sticky header — home “Alma” style. */
+	fullViewport?: boolean;
+	/**
+	 * No dark scrims or directional gradient on the photo — keeps your grade
+	 * as shot. The cursor spotlight (`.hero-spotlight`) still runs so the
+	 * “lit follow” effect works on the raw image. 3D tilt stays active.
+	 * Text still uses drop-shadow.
+	 */
+	preserveImageAppearance?: boolean;
+	/** Seamless backdrop colour sampled from the hero photo (html + section fallbacks). */
+	pageCanvasColor?: string;
+	class?: string;
+}
+
+const {
+	eyebrow,
+	title,
+	subtitle,
+	ctaLabel,
+	ctaHref,
+	ctaExternal = false,
+	secondaryCtaLabel,
+	secondaryCtaHref,
+	image,
+	imageAlt = '',
+	imageCredit,
+	imageObjectPosition,
+	fullViewport = false,
+	preserveImageAppearance = false,
+	pageCanvasColor,
+	class: className,
+} = Astro.props;
+
+const canvasCssVar = pageCanvasColor?.trim()
+	? ({ '--hero-page-canvas': pageCanvasColor.trim() } as Record<string, string>)
+	: undefined;
+
+const hasImage = Boolean(image);
+
+const cornerCreditLine = imageCredit?.trim() ?? '';
+---
+
+{
+	hasImage && image ? (
+		fullViewport ? (
+			<>
+				{/*
+				 * Viewport-fixed photograph (like background-attachment: fixed).
+				 * Lives outside the scrolling <section> so later home bands (z-10)
+				 * stack above the image while hero copy scrolls away. Opacity is
+				 * still driven by home-hero-gallery-reveal.ts via
+				 * [data-home-hero-image-layer].
+				 */}
+				<div
+					class="hero-home-fixed-bg"
+					data-home-hero-image-layer
+					{...(!preserveImageAppearance ? { 'data-warm-hero-grade': '' } : {})}
+				>
+					<Picture
+						src={image}
+						alt={imageAlt}
+						formats={['avif', 'webp']}
+						class="min-h-0 h-full w-full object-cover"
+						style={
+							imageObjectPosition
+								? { objectPosition: imageObjectPosition }
+								: undefined
+						}
+						loading="eager"
+						decoding="async"
+						fetchpriority="high"
+						sizes="100vw"
+					/>
+				</div>
+				<section
+					id="home-hero"
+					{...(preserveImageAppearance ? { 'data-preserve-image': '' } : {})}
+					style={canvasCssVar}
+					class:list={[
+						'hero-photo-static',
+						'relative isolate z-10 flex shrink-0 overflow-x-hidden bg-transparent',
+						'hero-full-viewport min-h-[100dvh] -mt-[4.75rem] pt-[4.75rem] md:-mt-[5.5rem] md:pt-[5.5rem] items-end pb-[max(1.75rem,env(safe-area-inset-bottom))] md:pb-28',
+						className,
+					]}
+				>
+					{
+						!preserveImageAppearance && (
+							<>
+								<div
+									class="absolute inset-0 -z-10 bg-[oklch(28%_0.06_42_/_0.52)]"
+									aria-hidden="true"
+								/>
+
+								<div
+									class="absolute inset-0 -z-10 bg-gradient-to-t from-[oklch(17%_0.08_38_/_0.88)] via-[oklch(23%_0.045_46_/_0.4)] to-[oklch(32%_0.035_52_/_0.14)] md:bg-gradient-to-r md:from-[oklch(20%_0.09_40_/_0.82)] md:via-[oklch(27%_0.045_48_/_0.2)] md:to-transparent"
+									aria-hidden="true"
+								/>
+							</>
+						)
+					}
+
+					{cornerCreditLine && (
+						<p class="absolute bottom-3 right-3 z-10 bg-black/55 text-on-image px-2 py-1 text-xs tracking-widest rounded-md">
+							{cornerCreditLine}
+						</p>
+					)}
+
+					<div
+						class:list={[
+							'relative z-10 mx-auto w-full max-w-6xl px-6 md:px-8',
+							'pb-2 md:pb-4',
+						]}
+					>
+						<div class="max-w-3xl text-left space-y-6">
+							{
+								eyebrow?.trim() && (
+									<p
+										class="hero-eyebrow font-body font-semibold text-on-image/90 uppercase tracking-[0.26em] text-[0.7rem] md:text-[0.8125rem] drop-shadow-[0_2px_10px_oklch(12%_0.06_40_/_0.85)]"
+									>
+										{eyebrow.trim()}
+									</p>
+								)
+							}
+							<h1
+								class="hero-title font-display tracking-tight text-on-image drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]"
+								data-magnetic-heading
+								data-scroll-weight
+							>
+								{title}
+							</h1>
+							{subtitle && (
+								<p class="hero-subtitle font-body text-on-image/95 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+									{subtitle}
+								</p>
+							)}
+							{ctaLabel && ctaHref && (
+								<div class="pt-2 flex flex-wrap gap-3">
+									<span class="has-aura">
+										<Button
+											as="a"
+											href={ctaHref}
+											variant="primary"
+											size="lg"
+											external={ctaExternal}
+										>
+											{ctaLabel}
+										</Button>
+									</span>
+									{secondaryCtaLabel && secondaryCtaHref && (
+										<Button
+											as="a"
+											href={secondaryCtaHref}
+											variant="onImage"
+											size="lg"
+										>
+											{secondaryCtaLabel}
+										</Button>
+									)}
+								</div>
+							)}
+						</div>
+					</div>
+				</section>
+			</>
+		) : (
+			<section
+				data-hero-atmosphere
+				{...(preserveImageAppearance ? { 'data-preserve-image': '' } : {})}
+				style={canvasCssVar}
+				class:list={[
+					'hero-atmosphere',
+					'relative isolate z-10 flex shrink-0 overflow-hidden bg-[var(--hero-page-canvas,var(--color-page-canvas))]',
+					'min-h-[70vh] items-end md:items-center',
+					className,
+				]}
+			>
+				<div class="hero-image-3d absolute inset-0 -z-20">
+					<div class="hero-image-parallax absolute inset-0 h-full w-full">
+						<Picture
+							src={image}
+							alt={imageAlt}
+							formats={['avif', 'webp']}
+							class="h-full w-full object-cover"
+							style={
+								imageObjectPosition
+									? { objectPosition: imageObjectPosition }
+									: undefined
+							}
+							loading="eager"
+							decoding="async"
+							fetchpriority="high"
+							sizes="100vw"
+						/>
+					</div>
+				</div>
+
+				{
+					!preserveImageAppearance && (
+						<>
+							<div
+								class="absolute inset-0 -z-10 bg-[oklch(28%_0.06_42_/_0.52)]"
+								aria-hidden="true"
+							/>
+
+							<div
+								class="absolute inset-0 -z-10 bg-gradient-to-t from-[oklch(17%_0.08_38_/_0.88)] via-[oklch(23%_0.045_46_/_0.4)] to-[oklch(32%_0.035_52_/_0.14)] md:bg-gradient-to-r md:from-[oklch(20%_0.09_40_/_0.82)] md:via-[oklch(27%_0.045_48_/_0.2)] md:to-transparent"
+								aria-hidden="true"
+							/>
+						</>
+					)
+				}
+
+				<div
+					class="hero-spotlight absolute inset-0 -z-10 pointer-events-none"
+					aria-hidden="true"
+				/>
+
+				{cornerCreditLine && (
+					<p class="absolute bottom-3 right-3 z-10 bg-black/55 text-on-image px-2 py-1 text-xs tracking-widest rounded-md">
+						{cornerCreditLine}
+					</p>
+				)}
+
+				<div
+					class:list={[
+						'relative z-10 mx-auto w-full max-w-6xl px-6 md:px-8',
+						'py-20 md:py-24',
+					]}
+				>
+					<div class="max-w-3xl text-left space-y-6">
+						{
+							eyebrow?.trim() && (
+								<p
+									class="hero-eyebrow font-body font-semibold text-on-image/90 uppercase tracking-[0.26em] text-[0.7rem] md:text-[0.8125rem] drop-shadow-[0_2px_10px_oklch(12%_0.06_40_/_0.85)]"
+								>
+									{eyebrow.trim()}
+								</p>
+							)
+						}
+						<h1
+							class="hero-title font-display tracking-tight text-on-image drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)]"
+							data-magnetic-heading
+							data-scroll-weight
+						>
+							{title}
+						</h1>
+						{subtitle && (
+							<p class="hero-subtitle font-body text-on-image/95 leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,0.6)]">
+								{subtitle}
+							</p>
+						)}
+						{ctaLabel && ctaHref && (
+							<div class="pt-2 flex flex-wrap gap-3">
+								<span class="has-aura">
+									<Button
+										as="a"
+										href={ctaHref}
+										variant="primary"
+										size="lg"
+										external={ctaExternal}
+									>
+										{ctaLabel}
+									</Button>
+								</span>
+								{secondaryCtaLabel && secondaryCtaHref && (
+									<Button
+										as="a"
+										href={secondaryCtaHref}
+										variant="onImage"
+										size="lg"
+									>
+										{secondaryCtaLabel}
+									</Button>
+								)}
+							</div>
+						)}
+					</div>
+				</div>
+			</section>
+		)
+	) : (
+		<section
+			class:list={[
+				'relative isolate min-h-[70vh] flex items-center bg-background',
+				className,
+			]}
+		>
+			<Container class="py-20 md:py-24">
+				<div class="max-w-3xl text-left space-y-6">
+					<Heading as="h1" size="h1">
+						{title}
+					</Heading>
+					{subtitle && <Text variant="lead">{subtitle}</Text>}
+					{ctaLabel && ctaHref && (
+						<div class="pt-2">
+							<Button
+								as="a"
+								href={ctaHref}
+								variant="primary"
+								size="lg"
+								external={ctaExternal}
+							>
+								{ctaLabel}
+							</Button>
+						</div>
+					)}
+				</div>
+			</Container>
+		</section>
+	)
+}
+
+<style>
+	/* Full-viewport home: photo fixed to viewport; copy + sections scroll over it. */
+	.hero-photo-static {
+		perspective: none;
+	}
+
+	.hero-home-fixed-bg {
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		width: 100%;
+		height: 100dvh;
+		min-height: 100dvh;
+		pointer-events: none;
+		/* home-hero-gallery-reveal.ts animates opacity */
+		will-change: opacity;
+	}
+
+	.hero-home-fixed-bg :global(img) {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	.hero-home-fixed-bg[data-warm-hero-grade] :global(img) {
+		filter: saturate(103%) sepia(9%) hue-rotate(-5deg);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero-home-fixed-bg[data-warm-hero-grade] :global(img) {
+			filter: none;
+		}
+	}
+
+	/* 3D tilt wrapper (inner pages only). The section establishes the perspective; this
+	   wrapper rotates around its centre based on `--tilt-x` / `--tilt-y`
+	   written to the section by hero-atmosphere.ts. Max tilt is small
+	   (≤2°) — enough for a "watching from a slightly different angle"
+	   feel without looking like a flip card.
+
+	   The transition is intentional: it smooths the cursor data, so a
+	   sharp swipe across the section doesn't yank the layer instantly. */
+	.hero-atmosphere {
+		perspective: 1200px;
+	}
+
+	.hero-image-3d {
+		transform-style: preserve-3d;
+		transform: rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+		transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: transform;
+	}
+
+	@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+		.hero-image-3d {
+			transform: none !important;
+			transition: none;
+			will-change: auto;
+		}
+	}
+
+	/* Cursor spotlight. The gradient is centred on `--spot-x` /
+	   `--spot-y` (written by hero-atmosphere.ts as percentages within
+	   the section). It LIFTS a small disc of the image with a warm
+	   tint, while the dark overlays underneath keep the rest moody.
+
+	   `mix-blend-mode: soft-light` means the spotlight modulates the
+	   image rather than painting on top — this avoids the harsh "white
+	   blob" look of a plain overlay. Falls back to `screen` when
+	   soft-light isn't supported (very rare on modern browsers). */
+	.hero-spotlight {
+		z-index: 0;
+		background: radial-gradient(
+			circle 360px at var(--spot-x, 50%) var(--spot-y, 50%),
+			rgba(255, 240, 220, 0.22),
+			rgba(255, 240, 220, 0) 60%
+		);
+		mix-blend-mode: soft-light;
+		opacity: 0.9;
+	}
+
+	/* No dark scrims: the lift reads directly on the photograph — widen
+	   slightly so the effect stays noticeable without a black floor. */
+	.hero-atmosphere[data-preserve-image] .hero-spotlight {
+		background: radial-gradient(
+			circle 400px at var(--spot-x, 50%) var(--spot-y, 50%),
+			rgba(255, 243, 230, 0.32),
+			rgba(255, 240, 220, 0) 62%
+		);
+	}
+
+	@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+		.hero-spotlight {
+			display: none;
+		}
+	}
+
+	/* Inner hero: image layer follows section (no home opacity script). */
+	.hero-image-parallax {
+		will-change: auto;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.hero-home-fixed-bg {
+			will-change: auto;
+		}
+	}
+
+	/* Hero title sizing — fluid `clamp()` so the type never gets large
+	   enough to force the browser to break a word mid-line on narrow
+	   viewports. `text-wrap: balance` plus explicit `word-break: normal`
+	   and `hyphens: none` defend against any auto-hyphenation that some
+	   user-agents apply when hyphens-auto inherits from upstream styles.
+	   The subtitle gets `text-wrap: pretty` (softer balance for body
+	   text) and a smaller fluid range. */
+	.hero-title {
+		font-size: clamp(2.5rem, 6vw + 1rem, 5.5rem);
+		line-height: 1.05;
+		text-wrap: balance;
+		word-break: normal;
+		overflow-wrap: normal;
+		hyphens: none;
+	}
+
+	.hero-subtitle {
+		font-size: clamp(1rem, 1.5vw + 0.5rem, 1.5rem);
+		text-wrap: pretty;
+		word-break: normal;
+		overflow-wrap: normal;
+		hyphens: none;
+	}
+</style>

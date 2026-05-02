@@ -1,0 +1,173 @@
+---
+/**
+ * Dark footer aligned with logo black (`--color-footer-bg`); copy uses airy cream/on-image tint.
+ */
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { business } from '../../data/business';
+import { getRoutePair } from '../../i18n/routes';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+const currentYear = new Date().getFullYear();
+
+const menuHref = getRoutePair('menu')[lang];
+const galleryHref = getRoutePair('gallery')[lang];
+const faqHref = getRoutePair('faq')[lang];
+const directionsHref = getRoutePair('directions')[lang];
+const legalNoticeHref = getRoutePair('legalNotice')[lang];
+const privacyHref = getRoutePair('privacyPolicy')[lang];
+const cookiesHref = getRoutePair('cookiesPolicy')[lang];
+---
+
+<footer transition:persist class="restaurant-footer mt-auto text-[color:var(--color-on-image)]">
+	<div class="relative z-10 mx-auto max-w-6xl px-6 py-12 md:px-8 md:py-14">
+		<div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-4">
+			<div class="space-y-3">
+				<div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+					<img
+						src="/brand/el-mini-nou-logo.jpg"
+						alt={business.name}
+						width={180}
+						height={72}
+						loading="lazy"
+						decoding="async"
+						class="h-14 w-auto max-w-[11rem] shrink-0 select-none object-contain object-left"
+						data-brand-logo
+					/>
+					<div class="min-w-0 space-y-3">
+						<a
+							href={business.googleMapsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="block max-w-xs text-sm text-[color-mix(in_oklch,var(--color-on-image)_92%,transparent)] hover:text-[var(--color-on-image)] transition-colors"
+						>
+							<address class="leading-relaxed not-italic">
+								{business.address.street}<br />
+								{business.address.postalCode}
+								{business.address.city}<br />
+								{business.address.region}
+							</address>
+						</a>
+					</div>
+				</div>
+			</div>
+			<div class="space-y-4">
+				<p class="text-xs uppercase tracking-[0.2em] text-[color-mix(in_oklch,var(--color-on-image)_72%,transparent)]">
+					{t('footer.phone')}
+				</p>
+				<a
+					href={`tel:${business.phoneTel}`}
+					class="block text-lg font-semibold tabular-nums hover:text-white transition-colors"
+				>
+					{business.phone}
+				</a>
+				<div class="space-y-2 text-sm text-[color-mix(in_oklch,var(--color-on-image)_88%,transparent)]">
+					<p class="uppercase tracking-wider text-xs font-semibold text-[color-mix(in_oklch,var(--color-on-image)_70%,transparent)]">
+						{t('footer.hours')}
+					</p>
+					<ul class="space-y-1 leading-relaxed">
+						<li>{t('footer.hours.weekdays')}</li>
+						<li>{t('footer.hours.sunday')}</li>
+						<li>{t('footer.hours.closed')}</li>
+						<li class="text-xs opacity-85">{t('footer.hours.note')}</li>
+					</ul>
+				</div>
+			</div>
+			<div class="space-y-3">
+				<p class="text-xs uppercase tracking-[0.2em] text-[color-mix(in_oklch,var(--color-on-image)_72%,transparent)]">
+					{t('footer.businessSection')}
+				</p>
+				<ul class="space-y-2 text-sm">
+					<li>
+						<a href={menuHref} class="underline-offset-4 hover:underline">
+							{t('nav.services')}
+						</a>
+					</li>
+					<li>
+						<a href={galleryHref} class="underline-offset-4 hover:underline">
+							{t('nav.gallery')}
+						</a>
+					</li>
+					<li>
+						<a href={faqHref} class="underline-offset-4 hover:underline">{t('nav.faq')}</a>
+					</li>
+					<li>
+						<a href={directionsHref} class="underline-offset-4 hover:underline">
+							{t('nav.directions')}
+						</a>
+					</li>
+				</ul>
+			</div>
+			<div class="space-y-3">
+				<p class="text-xs uppercase tracking-[0.2em] text-[color-mix(in_oklch,var(--color-on-image)_72%,transparent)]">
+					{t('footer.online')}
+				</p>
+				<ul class="space-y-2 text-sm">
+					{
+						business.socialLinks.instagram ? (
+							<li>
+								<a
+									href={business.socialLinks.instagram}
+									target="_blank"
+									rel="noopener noreferrer"
+									class="inline-flex items-center gap-2 underline-offset-4 hover:underline"
+								>
+									<Icon name="tabler:brand-instagram" class="size-4 shrink-0" aria-hidden="true" />
+									Instagram
+								</a>
+							</li>
+						) : null
+					}
+					<li>
+						<a
+							href={business.googleMapsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-flex items-center gap-2 underline-offset-4 hover:underline"
+						>
+							<Icon name="tabler:map-pin" class="size-4 shrink-0" aria-hidden="true" />
+							Google Maps
+						</a>
+					</li>
+				</ul>
+			</div>
+		</div>
+
+		<div
+			class="mt-12 flex flex-col gap-6 border-t border-[color-mix(in_oklch,var(--color-on-image)_22%,transparent)] pt-8 text-xs text-[color-mix(in_oklch,var(--color-on-image)_75%,transparent)] md:flex-row md:items-center md:justify-between"
+		>
+			<p class="tabular-nums">© {currentYear} {business.name}</p>
+			<ul class="flex flex-wrap items-center gap-x-3 gap-y-2">
+				<li>
+					<a href={legalNoticeHref} class="hover:text-[var(--color-on-image)] transition-colors underline-offset-2 hover:underline">
+						{t('footer.legal.notice')}
+					</a>
+				</li>
+				<li aria-hidden="true">·</li>
+				<li>
+					<a href={privacyHref} class="hover:text-[var(--color-on-image)] transition-colors underline-offset-2 hover:underline">
+						{t('footer.legal.privacy')}
+					</a>
+				</li>
+				<li aria-hidden="true">·</li>
+				<li>
+					<a href={cookiesHref} class="hover:text-[var(--color-on-image)] transition-colors underline-offset-2 hover:underline">
+						{t('footer.legal.cookies')}
+					</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</footer>
+
+<style>
+	.restaurant-footer {
+		background-color: var(--color-footer-bg);
+	}
+</style>

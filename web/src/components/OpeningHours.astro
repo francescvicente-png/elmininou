@@ -1,0 +1,246 @@
+---
+import type { Lang } from '../i18n/config';
+import { openingHours, type DayKey, type DayHours } from '../data/business';
+import { useTranslations } from '../i18n/utils';
+
+interface Props {
+	lang: Lang;
+	variant?: 'inline' | 'compact';
+	class?: string;
+}
+
+const { lang, variant = 'inline', class: className } = Astro.props;
+const t = useTranslations(lang);
+
+const dayLabels: Record<DayKey, { ca: string; es: string; caShort: string; esShort: string }> = {
+	monday: { ca: 'Dilluns', es: 'Lunes', caShort: 'Dl', esShort: 'Lun' },
+	tuesday: { ca: 'Dimarts', es: 'Martes', caShort: 'Dt', esShort: 'Mar' },
+	wednesday: { ca: 'Dimecres', es: 'Miércoles', caShort: 'Dc', esShort: 'Mié' },
+	thursday: { ca: 'Dijous', es: 'Jueves', caShort: 'Dj', esShort: 'Jue' },
+	friday: { ca: 'Divendres', es: 'Viernes', caShort: 'Dv', esShort: 'Vie' },
+	saturday: { ca: 'Dissabte', es: 'Sábado', caShort: 'Ds', esShort: 'Sáb' },
+	sunday: { ca: 'Diumenge', es: 'Domingo', caShort: 'Dg', esShort: 'Dom' },
+};
+
+/* Lowercase day names used inside the "Tancat avui · obrim {day} a
+   les..." status text. The CA template reads "obrim dimarts" (no
+   article) while ES reads "abrimos el martes" (article in the
+   template, so the day stays bare). Keep them lowercase here so the
+   rendered sentence flows naturally — the i18n template starts the
+   word that needs the capital. */
+const dayInSentence: Record<DayKey, { ca: string; es: string }> = {
+	monday: { ca: 'dilluns', es: 'lunes' },
+	tuesday: { ca: 'dimarts', es: 'martes' },
+	wednesday: { ca: 'dimecres', es: 'miércoles' },
+	thursday: { ca: 'dijous', es: 'jueves' },
+	friday: { ca: 'divendres', es: 'viernes' },
+	saturday: { ca: 'dissabte', es: 'sábado' },
+	sunday: { ca: 'diumenge', es: 'domingo' },
+};
+
+/* Config consumed by src/scripts/opening-now.ts on the client. We
+   serialise everything the script needs — the hours table, the i18n
+   templates and the day names — so the script doesn't have to import
+   the TypeScript modules and its bundle stays tiny. The script reads
+   this once on mount and recalculates the status each minute. */
+const openingConfig = {
+	hours: openingHours,
+	i18n: {
+		open: t('opening.statusOpen'),
+		closesAt: t('opening.statusClosesAt'),
+		closedNow: t('opening.statusClosedNow'),
+		opensAt: t('opening.statusOpensAt'),
+		closedToday: t('opening.statusClosedToday'),
+		opensOn: t('opening.statusOpensOn'),
+	},
+	days: {
+		monday: dayInSentence.monday[lang],
+		tuesday: dayInSentence.tuesday[lang],
+		wednesday: dayInSentence.wednesday[lang],
+		thursday: dayInSentence.thursday[lang],
+		friday: dayInSentence.friday[lang],
+		saturday: dayInSentence.saturday[lang],
+		sunday: dayInSentence.sunday[lang],
+	},
+};
+const openingConfigJson = JSON.stringify(openingConfig);
+
+const dayKeys: ReadonlyArray<DayKey> = [
+	'monday',
+	'tuesday',
+	'wednesday',
+	'thursday',
+	'friday',
+	'saturday',
+	'sunday',
+];
+
+// JS Date.getDay(): 0=Sunday, 1=Monday, ..., 6=Saturday.
+const jsDayToKey: ReadonlyArray<DayKey> = [
+	'sunday',
+	'monday',
+	'tuesday',
+	'wednesday',
+	'thursday',
+	'friday',
+	'saturday',
+];
+const todayKey: DayKey = jsDayToKey[new Date().getDay()] ?? 'monday';
+
+const closedLabel = lang === 'ca' ? 'Tancat' : 'Cerrado';
+
+function formatSlots(slots: DayHours): string {
+	if (slots === null) return closedLabel;
+	return slots.map(([from, to]) => `${from} – ${to}`).join(' / ');
+}
+
+function dayLabel(key: DayKey, short = false): string {
+	const labels = dayLabels[key];
+	if (lang === 'ca') return short ? labels.caShort : labels.ca;
+	return short ? labels.esShort : labels.es;
+}
+---
+
+{
+	variant === 'compact' ? (
+		<ul class:list={['font-body text-sm space-y-1', className]}>
+			{dayKeys.map((key) => {
+				const isToday = key === todayKey;
+				const slots = openingHours[key];
+				const isClosed = slots === null;
+				return (
+					<li
+						class:list={[
+							'flex items-baseline gap-3',
+							isToday ? 'text-foreground font-semibold' : 'text-muted',
+						]}
+					>
+						<span class="w-10 shrink-0 uppercase tracking-widest text-xs">
+							{dayLabel(key, true)}
+						</span>
+						<span class:list={['tabular-nums', isClosed ? 'italic' : '']}>
+							{formatSlots(slots)}
+						</span>
+					</li>
+				);
+			})}
+		</ul>
+	) : (
+		<div
+			class:list={[
+				'opening-hours rounded-xl border border-border bg-card overflow-hidden',
+				className,
+			]}
+		>
+			{/* "Open now / closed" status row. Hidden by default with
+			    `display: none` (see <style>) so visitors with JS off
+			    or before the script runs don't see a "Calculating…"
+			    flash. The script attaches `data-opening-state` once
+			    it has computed the answer, which flips the row to
+			    `display: flex`. Recalculated every minute by the
+			    script so a visitor who opens the page at 13:55 and
+			    reads it at 14:01 sees the badge update. */}
+			<div
+				class="opening-status"
+				data-opening-status
+				data-opening-config={openingConfigJson}
+				role="status"
+				aria-live="polite"
+			>
+				<span class="opening-status-dot" aria-hidden="true" />
+				<span class="opening-status-text" />
+			</div>
+			<table class="w-full">
+				<tbody>
+					{dayKeys.map((key) => {
+						const isToday = key === todayKey;
+						const slots = openingHours[key];
+						const isClosed = slots === null;
+						return (
+							<tr
+								class:list={[
+									'border-b border-border last:border-b-0',
+									isToday ? 'bg-background' : '',
+								]}
+							>
+								<th
+									scope="row"
+									class:list={[
+										'text-left px-5 py-3 font-body text-sm font-medium',
+										isToday ? 'text-primary' : 'text-foreground',
+									]}
+								>
+									{dayLabel(key)}
+								</th>
+								<td
+									class:list={[
+										'px-5 py-3 text-right font-body text-sm tabular-nums',
+										isClosed ? 'text-muted italic' : 'text-foreground',
+									]}
+								>
+									{formatSlots(slots)}
+								</td>
+							</tr>
+						);
+					})}
+				</tbody>
+			</table>
+		</div>
+	)
+}
+
+<style>
+	/* "Open now / closed" status row. Hidden until the client-side
+	   script computes the state and adds `data-opening-state` — that
+	   way visitors with JS off (or during the brief window before the
+	   script boots) never see an empty row or a "Calculating…" flash.
+	   The row becomes a horizontal pill when shown. */
+	.opening-status {
+		display: none;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.75rem 1.25rem;
+		font-family: var(--font-body);
+		font-size: 0.875rem;
+		font-weight: 500;
+		border-bottom: 1px solid var(--color-border);
+		background-color: var(--color-background);
+		color: var(--color-foreground);
+	}
+
+	.opening-status[data-opening-state] {
+		display: flex;
+	}
+
+	.opening-status-dot {
+		width: 8px;
+		height: 8px;
+		border-radius: 9999px;
+		flex-shrink: 0;
+		background-color: var(--color-muted);
+	}
+
+	/* Open: bright green dot. NOT the brand primary (bottle green is
+	   too dark and reads as "default chrome"); a fresher green carries
+	   the "live, ready now" affordance. */
+	.opening-status[data-opening-state='open'] .opening-status-dot {
+		background-color: oklch(60% 0.18 145);
+		box-shadow: 0 0 0 4px oklch(60% 0.18 145 / 0.15);
+	}
+
+	/* Opens-later: amber. "We're not open right now but we will be
+	   today" — soft warning colour, not red (red would scream
+	   "wrong"). */
+	.opening-status[data-opening-state='opens-later'] .opening-status-dot {
+		background-color: oklch(70% 0.15 70);
+	}
+
+	/* Closed (today, opens another day): muted dot, muted text. The
+	   visitor reads this and downshifts expectations naturally. */
+	.opening-status[data-opening-state='closed'] {
+		color: var(--color-muted);
+	}
+	.opening-status[data-opening-state='closed'] .opening-status-dot {
+		background-color: var(--color-muted);
+	}
+</style>

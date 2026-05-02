@@ -1,0 +1,53 @@
+---
+/**
+ * FaqList
+ *
+ * Renders the full FAQ list in a single column (vertical accordion).
+ * Each item gets `.fade-in-on-scroll` directly with an incremental
+ * `--fade-delay` so they cascade in (item by item, ~80 ms apart) when
+ * the list enters the viewport. The page wrapper does NOT wrap this
+ * in another <FadeInOnScroll>, otherwise the cascade plays inside
+ * an already-faded parent and disappears.
+ */
+import type { Lang } from '../i18n/config';
+import {
+	faqs as defaultFaqs,
+	type FaqItemData,
+} from '../data/faq';
+import FaqItem from './FaqItem.astro';
+
+type HeadingLevel = 'h2' | 'h3' | 'h4';
+
+interface Props {
+	lang: Lang;
+	class?: string;
+	/** When set, overrides the default FAQ list from `src/data/faq.ts`. */
+	items?: ReadonlyArray<FaqItemData>;
+	cascadeStep?: number;
+	headingLevel?: HeadingLevel;
+}
+
+const {
+	lang,
+	class: className,
+	items,
+	cascadeStep = 150,
+	headingLevel = 'h3',
+} = Astro.props;
+
+const faqItems = items ?? defaultFaqs;
+---
+
+<div class:list={['max-w-3xl mx-auto', className]}>
+	{
+		faqItems.map((item, idx) => (
+			<FaqItem
+				item={item}
+				lang={lang}
+				headingLevel={headingLevel}
+				class="fade-in-on-scroll"
+				style={`--fade-delay: ${idx * cascadeStep}ms; --fade-duration: 600ms; --fade-y: 16px;`}
+			/>
+		))
+	}
+</div>

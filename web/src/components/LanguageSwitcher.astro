@@ -1,0 +1,30 @@
+---
+import type { Lang } from '../i18n/config';
+import { useTranslations } from '../i18n/utils';
+
+interface Props {
+	currentLang: Lang;
+	siblingPath?: string;
+}
+
+const { currentLang, siblingPath } = Astro.props;
+const t = useTranslations(currentLang);
+const otherLang: Lang = currentLang === 'ca' ? 'es' : 'ca';
+const targetPath = siblingPath ?? `/${otherLang}/`;
+// Build an accessible name that contains the visible label ("ES" or
+// "CA"), satisfying the axe `label-content-name-mismatch` rule while
+// still announcing the intent ("change language") for screen readers.
+const visibleLabel = otherLang.toUpperCase();
+const accessibleLabel = `${t('lang.switch')} — ${visibleLabel}`;
+---
+
+<a
+	href={targetPath}
+	class="text-sm font-body uppercase tracking-widest text-foreground hover:text-primary transition-colors duration-fast rounded-sm px-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+	aria-label={accessibleLabel}
+	hreflang={otherLang}
+	data-astro-reload
+	data-language-switcher
+>
+	{otherLang.toUpperCase()}
+</a>

@@ -1,0 +1,181 @@
+---
+/**
+ * BridalCtaClosing — final conversion section.
+ *
+ * Champagne-accent surface (subtle, not a screaming gradient) with
+ * paired CTAs: WhatsApp (primary, with prereserva message) and call
+ * the salon (secondary, tel: link). The phone number renders directly
+ * underneath in tabular figures so it's the last thing the eye reads.
+ *
+ * Per `taste-skill` Rule 5 (Interactive UI States) the CTAs reuse the
+ * shared <Button /> which already handles hover lift + active press +
+ * focus ring + reduced-motion fallback.
+ *
+ * Skills enforced:
+ *   - soft-skill §B (Spatial Rhythm: massive padding) +
+ *     Button-in-Button trailing icon idea (we keep the tabler arrow
+ *     trailing icon inline with the WhatsApp glyph leading)
+ *   - ui-ux-pro-max §8 (one primary CTA, secondary visually subordinate)
+ *   - redesign-skill ("Always one filled button + one ghost button" —
+ *     OK here because the secondary is the salon phone, a different
+ *     channel, and is visually clearly subordinate)
+ */
+import Container from '../Container.astro';
+import Button from '../Button.astro';
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { business } from '../../data/business';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waMessage = t('bridal.whatsappPrecitaMessage');
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+---
+
+<section
+	class="bridal-closing relative isolate overflow-hidden py-24 md:py-32 lg:py-36"
+	aria-labelledby="bridal-closing-title"
+>
+	{/* Subtle champagne radial — tinted, not a stock gradient banner */}
+	<div class="bridal-closing-glow" aria-hidden="true"></div>
+
+	<Container class="!max-w-3xl text-center">
+		<div class="fade-in-on-scroll" style="--fade-delay: 80ms; --fade-duration: 800ms;">
+			<p class="bridal-eyebrow flex items-center justify-center gap-2 mb-6">
+				<span class="bridal-closing-dot" aria-hidden="true"></span>
+				<span>{t('bridal.ctaEyebrow')}</span>
+			</p>
+			<h2
+				id="bridal-closing-title"
+				class="bridal-closing-title font-display text-foreground"
+			>
+				{t('bridal.ctaTitleNew')}
+			</h2>
+			<p class="bridal-closing-body font-body text-muted leading-relaxed mt-5 mb-10 mx-auto">
+				{t('bridal.ctaBodyNew')}
+			</p>
+			<div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center justify-center gap-3">
+				<Button as="a" href={waUrl} variant="primary" size="lg" external>
+					<Icon
+						slot="icon-leading"
+						name="tabler:brand-whatsapp"
+						class="h-5 w-5 shrink-0"
+						aria-hidden="true"
+					/>
+					{t('bridal.whatsappCta')}
+				</Button>
+				<Button
+					as="a"
+					href={`tel:${business.phoneTel}`}
+					variant="secondary"
+					size="lg"
+				>
+					<Icon
+						slot="icon-leading"
+						name="tabler:phone"
+						class="h-5 w-5 shrink-0"
+						aria-hidden="true"
+					/>
+					{t('cta.callToBook')}
+				</Button>
+			</div>
+			<p class="bridal-closing-phone font-body">
+				<span class="text-muted text-xs uppercase tracking-widest">{t('bridal.ctaCallLine')}</span>
+				<a
+					href={`tel:${business.phoneTel}`}
+					class="bridal-closing-phone-number tabular-nums"
+				>
+					{business.phone}
+				</a>
+			</p>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.bridal-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.bridal-closing-dot {
+		display: inline-block;
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 9999px;
+		background: var(--color-accent);
+		box-shadow: 0 0 12px 1px color-mix(in oklch, var(--color-accent) 45%, transparent);
+	}
+
+	.bridal-closing-glow {
+		position: absolute;
+		inset: 0;
+		z-index: -10;
+		background:
+			radial-gradient(
+				ellipse 60% 50% at 50% 30%,
+				color-mix(in oklch, var(--color-accent) 12%, transparent) 0%,
+				transparent 70%
+			),
+			radial-gradient(
+				ellipse 80% 60% at 30% 90%,
+				color-mix(in oklch, var(--color-primary) 10%, transparent) 0%,
+				transparent 70%
+			);
+		pointer-events: none;
+	}
+
+	.bridal-closing-title {
+		font-size: clamp(2rem, 3vw + 1rem, 3.75rem);
+		line-height: 1.05;
+		letter-spacing: -0.02em;
+		font-weight: 400;
+		text-wrap: balance;
+		margin: 0;
+	}
+
+	.bridal-closing-body {
+		font-size: clamp(1rem, 0.4vw + 0.85rem, 1.15rem);
+		max-width: 50ch;
+		text-wrap: pretty;
+	}
+
+	.bridal-closing-phone {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.65rem;
+		margin-top: 2rem;
+		flex-wrap: wrap;
+		justify-content: center;
+	}
+
+	.bridal-closing-phone-number {
+		font-family: var(--font-display), Georgia, serif;
+		font-size: 1.25rem;
+		color: var(--color-foreground);
+		letter-spacing: 0.04em;
+		text-decoration: none;
+		border-bottom: 1px solid color-mix(in oklch, var(--color-accent) 50%, transparent);
+		padding-bottom: 1px;
+		transition: border-color 220ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	.bridal-closing-phone-number:hover {
+		border-color: var(--color-accent);
+	}
+	.bridal-closing-phone-number:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 4px;
+		border-radius: 2px;
+	}
+</style>

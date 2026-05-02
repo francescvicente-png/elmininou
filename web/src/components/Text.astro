@@ -1,0 +1,25 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type TextVariant = 'lead' | 'body' | 'small' | 'caption';
+
+interface Props extends HTMLAttributes<'p'> {
+	variant?: TextVariant;
+	as?: 'p' | 'span' | 'div';
+}
+
+const { variant = 'body', as = 'p', class: className, ...rest } = Astro.props;
+
+const Tag = as;
+
+const variantClasses: Record<TextVariant, string> = {
+	lead: 'text-lg md:text-xl text-foreground leading-relaxed',
+	body: 'text-base text-foreground leading-relaxed',
+	small: 'text-sm text-muted leading-normal',
+	caption: 'text-xs text-muted uppercase tracking-widest',
+};
+---
+
+<Tag class:list={['font-body', variantClasses[variant], className]} {...rest}>
+	<slot />
+</Tag>

@@ -1,0 +1,72 @@
+---
+/**
+ * DrawnBorder
+ *
+ * Decorative SVG overlay that traces a rectangular outline around its
+ * host element when the host enters the viewport. The host carries
+ * `class="drawn-border-host"`; src/scripts/scroll-reveal.ts adds
+ * `.is-visible` once the IntersectionObserver fires, and the CSS
+ * transition animates `stroke-dashoffset` from 100 to 0.
+ *
+ * Why `pathLength="100"`:
+ *   The SVG uses `viewBox="0 0 100 100"` with
+ *   `preserveAspectRatio="none"`, so it stretches to whatever the
+ *   host's box is. Without `pathLength`, `stroke-dasharray` is
+ *   measured in path units, which means the dasharray would have to
+ *   match the actual perimeter — and we'd need JS to measure each
+ *   card. `pathLength="100"` normalises the perimeter to 100 units
+ *   regardless of the rendered size, so a single CSS rule works for
+ *   every host.
+ *
+ * Why `vector-effect: non-scaling-stroke`:
+ *   With `preserveAspectRatio="none"` the rect stretches in X and Y
+ *   independently. Without this hint, the stroke would scale with
+ *   the box and look thicker on the long edges. `non-scaling-stroke`
+ *   keeps the line a constant 1.5 px regardless.
+ *
+ * The SVG is purely decorative — the host's CSS `border` stays
+ * visible underneath in the muted border colour. This SVG draws
+ * a brand-coloured stroke ON TOP of that, so the effect reads as
+ * "the card was already there; the brand outline is being added".
+ *
+ * Reduced motion: stroke-dashoffset jumps to 0 with no transition.
+ */
+
+interface Props {
+	/** Stroke colour. Defaults to the brand primary (bottle green). */
+	color?: string;
+	/** Stroke width in CSS px. Stays constant thanks to non-scaling-stroke. */
+	strokeWidth?: number;
+	/** Corner radius — match the host's `border-radius`. */
+	radius?: number;
+	/** Animation duration in ms. */
+	duration?: number;
+	class?: string;
+}
+
+const {
+	color = 'var(--color-primary)',
+	strokeWidth = 1.5,
+	radius = 12,
+	duration = 1400,
+	class: className,
+} = Astro.props;
+---
+
+<svg
+	class:list={['drawn-border', className]}
+	viewBox="0 0 100 100"
+	preserveAspectRatio="none"
+	aria-hidden="true"
+	style={`--db-color: ${color}; --db-stroke: ${strokeWidth}; --db-dur: ${duration}ms;`}
+>
+	<rect
+		x="0"
+		y="0"
+		width="100"
+		height="100"
+		rx={radius}
+		ry={radius}
+		pathLength="100"
+	></rect>
+</svg>

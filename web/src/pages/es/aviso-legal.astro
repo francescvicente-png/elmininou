@@ -1,0 +1,202 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import { legalEntity, serviceProvider, websiteOwner, legalLastUpdated } from '../../data/legal';
+import { business } from '../../data/business';
+
+const lang = 'es' as const;
+const updatedHuman = '1 de mayo de 2026';
+---
+
+<BaseLayout
+	title={`Aviso legal · ${business.name}`}
+	description={`Aviso legal de ${business.name} en ${business.address.city}. Identificación del prestador, condiciones de uso y derechos.`}
+	siblingPath="/ca/avis-legal/"
+	breadcrumbs={[
+		{ name: 'Inicio', url: '/es/' },
+		{ name: 'Aviso legal', url: '/es/aviso-legal/' },
+	]}
+>
+	<Container as="section" class="pt-16 pb-8 md:pt-24 md:pb-10 space-y-4 max-w-3xl">
+		<Heading as="h1">Aviso legal</Heading>
+		<Text variant="lead">
+			Información legal de este sitio web en cumplimiento de la Ley 34/2002,
+			de servicios de la sociedad de la información y de comercio electrónico
+			(LSSI-CE).
+		</Text>
+	</Container>
+
+	<Container as="section" class="pb-20 md:pb-24 space-y-10 max-w-3xl">
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">1. Identificación del prestador</Heading>
+			{!websiteOwner.isFinalOwner && (
+				<div class="rounded-md border border-border bg-card px-5 py-4 text-sm text-muted">
+					{websiteOwner.note}
+				</div>
+			)}
+			<Text>
+				En cumplimiento del artículo 10 de la LSSI-CE, se informa de que el
+				prestador de este sitio web (servicio de la sociedad de la información) es:
+			</Text>
+			<ul class="space-y-1 text-base font-body text-foreground leading-relaxed">
+				<li><strong>Nombre:</strong> {serviceProvider.fullName}</li>
+				<li><strong>NIF:</strong> {serviceProvider.taxId}</li>
+				<li><strong>Dirección:</strong> {serviceProvider.addressLine}</li>
+				<li>
+					<strong>Correo electrónico:</strong>{' '}
+					<a href={`mailto:${serviceProvider.email}`} class="hover:text-primary transition-colors">{serviceProvider.email}</a>
+				</li>
+			</ul>
+			<Text>
+				El prestador es una persona física. El nombre comercial del negocio descrito
+				en el sitio — {legalEntity.tradeName} — y la identidad fiscal de la
+				profesional del salón son datos claramente diferenciados del prestador del
+				servicio web; los contenidos informativos sobre el salón se publican con
+				finalidad informativa. Para citas, precios y tratamiento de datos en la
+				relación comercial con el local, utilice los datos de contacto del salón
+				(apartado siguiente).
+			</Text>
+			<Heading as="h3" size="h4" class="pt-2">1.1. Datos del salón (negocio descrito en el sitio)</Heading>
+			<ul class="space-y-1 text-base font-body text-foreground leading-relaxed">
+				<li><strong>Nombre comercial:</strong> {legalEntity.tradeName}</li>
+				<li><strong>Titular (nombre legal):</strong> {legalEntity.legalName}</li>
+				<li><strong>Dirección del local:</strong> {legalEntity.address}</li>
+				<li>
+					<strong>NIF de la titular del negocio del salón:</strong>{' '}
+					{legalEntity.taxId.startsWith('TODO_') ? (
+						<span class="text-muted italic">[pendiente — datos de la titular fiscal del salón]</span>
+					) : (
+						legalEntity.taxId
+					)}
+				</li>
+				<li>
+					<strong>Correo electrónico del salón:</strong>{' '}
+					{legalEntity.email.startsWith('TODO_') ? (
+						<span class="text-muted italic">[pendiente]</span>
+					) : (
+						<a href={`mailto:${legalEntity.email}`} class="hover:text-primary transition-colors">{legalEntity.email}</a>
+					)}
+				</li>
+				<li><strong>Teléfono del salón:</strong> {legalEntity.phone}</li>
+			</ul>
+			<Text>
+				Si la titular fiscal del salón actúa como profesional autónoma, puede no
+				constar registro mercantil. Los datos registrales que correspondan se
+				publicarán aquí cuando estén disponibles.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">2. Objeto</Heading>
+			<Text>
+				El presente aviso legal regula las condiciones de uso del sitio web
+				dedicado a {legalEntity.tradeName}. La navegación por el sitio atribuye
+				la condición de usuario e implica la aceptación plena de las condiciones
+				aquí recogidas en la versión publicada en el momento de acceder. El
+				prestador se reserva la facultad de modificarlas sin previo aviso.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">3. Condiciones de uso</Heading>
+			<Text>
+				El usuario se compromete a hacer un uso diligente del sitio y de los
+				servicios accesibles, conforme a la legalidad vigente, la buena fe,
+				las buenas costumbres y el respeto a terceros. En particular, el
+				usuario se abstiene de:
+			</Text>
+			<ul class="list-disc pl-6 space-y-2 text-base font-body text-foreground leading-relaxed">
+				<li>Utilizar el sitio web con fines ilícitos o lesivos.</li>
+				<li>
+					Reproducir, copiar, distribuir o transformar los contenidos del
+					sitio sin autorización expresa del prestador o, en su caso, de los titulares de los contenidos.
+				</li>
+				<li>
+					Introducir programas informáticos, virus o cualquier otro elemento
+					que pueda alterar los sistemas informáticos del prestador o de
+					terceros.
+				</li>
+				<li>
+					Suplantar la identidad de terceros o falsear la propia mediante la
+					navegación por el sitio.
+				</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">4. Propiedad intelectual e industrial</Heading>
+			<Text>
+				Los contenidos de este sitio web — incluyendo textos, marca,
+				logotipo, estructura, diseño y software — son titularidad exclusiva
+				del prestador, del salón o, en su caso, de sus licenciantes, y están protegidos
+				por la normativa española e internacional de propiedad intelectual e
+				industrial.
+			</Text>
+			<Text>
+				La mayor parte de las fotografías actuales corresponden a una sesión
+				encargada para el web, con atribución visible en el propio sitio.
+				Cualquier otra imagen residual de demostración, si la hubiera en el futuro,
+				se mostrará con la licencia y la atribución que corresponda.
+			</Text>
+			<Text>
+				Queda prohibida cualquier reproducción, distribución o comunicación
+				pública de los contenidos sin autorización expresa.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">5. Enlaces externos</Heading>
+			<Text>
+				Este sitio incluye enlaces a recursos y servicios de terceros,
+				principalmente a WhatsApp (Meta), a Google Maps y a las redes sociales
+				enlazadas. El prestador no controla estos servicios ni asume
+				responsabilidad sobre sus contenidos, políticas o disponibilidad. El acceso
+				a estos recursos se rige por las condiciones y políticas de privacidad
+				propias de cada proveedor.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">6. Limitación de responsabilidad</Heading>
+			<Text>
+				El prestador procura mantener la información publicada actualizada y
+				correcta, pero no garantiza la ausencia de errores ni la disponibilidad
+				continuada del servicio. En ningún caso será responsable de los daños
+				derivados de una caída puntual del servidor, errores de software de
+				terceros, ni del uso indebido del sitio por parte del usuario.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">7. Ley aplicable y jurisdicción</Heading>
+			<Text>
+				La relación entre el prestador y el usuario se rige por la legislación
+				española vigente. Para la resolución de controversias que puedan
+				surgir, las partes se someten a los juzgados y tribunales que
+				correspondan según la normativa procesal aplicable, con sede en
+				Cataluña.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">8. Modificaciones</Heading>
+			<Text>
+				El prestador se reserva el derecho de modificar el contenido de este
+				aviso legal en cualquier momento para adaptarlo a cambios normativos
+				u operativos. Las modificaciones tendrán efecto desde el momento de
+				su publicación en esta misma página.
+			</Text>
+		</div>
+
+		<div class="pt-6 border-t border-border">
+			<Text variant="small" class="text-muted">
+				Última actualización: {updatedHuman}.
+				{!websiteOwner.isFinalOwner && (
+					<span class="block mt-2">Identificador interno de la versión del documento: {legalLastUpdated}.</span>
+				)}
+			</Text>
+		</div>
+	</Container>
+</BaseLayout>

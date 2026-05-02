@@ -1,0 +1,51 @@
+---
+/**
+ * ClipPathReveal
+ *
+ * Sister of FadeInOnScroll: same scroll-triggered "appear when in
+ * view" mechanic, but the visual is a horizontal wipe (clip-path
+ * inset 0 100% 0 0 → inset 0 0 0 0) instead of an opacity + Y
+ * transform.
+ *
+ * Used as an alternative reveal for editorial-style image grids
+ * where a curtain wipe reads more cinematic than a fade. It is NOT
+ * applied to the home gallery cascade because the existing fade
+ * works there and changing it would break the per-item delay
+ * tuning. Apply this component selectively on pages where the
+ * effect adds meaning — e.g. a future portfolio section.
+ *
+ * Same scroll-reveal observer (`src/scripts/scroll-reveal.ts`)
+ * drives this component too: the rule below targets
+ * `.clip-reveal.is-visible`, so any element flagged with the
+ * `.clip-reveal` class is picked up automatically. The observer
+ * adds `.is-visible` when the element enters the viewport.
+ *
+ * Reduced-motion: clip-path is removed entirely so users who
+ * prefer no motion get the content immediately, no curtain.
+ *
+ * The wrapper element is `<div>` by default; pass an extra class
+ * via `class` to layout it (e.g. inline-block, h-full, etc.).
+ */
+
+interface Props {
+	/** Animation delay in ms. Default 0. */
+	delay?: number;
+	/** Animation duration in ms. Default 800. */
+	duration?: number;
+	/** Optional extra class for the wrapper. */
+	class?: string;
+}
+
+const {
+	delay = 0,
+	duration = 800,
+	class: className,
+} = Astro.props;
+---
+
+<div
+	class:list={['clip-reveal', className]}
+	style={`--clip-duration: ${duration}ms; --clip-delay: ${delay}ms;`}
+>
+	<slot />
+</div>

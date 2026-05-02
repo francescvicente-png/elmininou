@@ -1,0 +1,99 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Text from '../../components/Text.astro';
+import CtaBanner from '../../components/CtaBanner.astro';
+import FadeInOnScroll from '../../components/animations/FadeInOnScroll.astro';
+import ServicesPageHero from '../../components/sections/ServicesPageHero.astro';
+import ServicesCategoryNav from '../../components/sections/ServicesCategoryNav.astro';
+import ServicesGroupedCatalog from '../../components/sections/ServicesGroupedCatalog.astro';
+import { Icon } from 'astro-icon/components';
+import { getServicesGrouped } from '../../data/services';
+import { business } from '../../data/business';
+import { getBookingCta } from '../../data/site';
+import { useTranslations } from '../../i18n/utils';
+
+const lang = 'es' as const;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+const grouped = getServicesGrouped();
+const firstIllustratedServiceId = grouped
+	.flatMap((g) => g.items)
+	.find((s) => s.illustration)?.id;
+---
+
+<BaseLayout
+	title={`Carta · ${business.name}`}
+	description={`Menú con precios orientativos · ${business.name} en ${business.address.city}: entrantes, brasas, combinados, bocadillos y bebidas. Alérgenos en texto; confirman siempre en el local.`}
+	siblingPath="/ca/menu/"
+	keywords={[
+		'restaurante la ametlla valles',
+		'carta restaurante',
+		'el mini nou',
+	]}
+	breadcrumbs={[
+		{ name: 'Inicio', url: '/es/' },
+		{ name: 'Carta', url: '/es/menu/' },
+	]}
+>
+	<ServicesPageHero lang={lang} />
+
+	<FadeInOnScroll delay={100}>
+		<Container as="section" class="pb-6 pt-4 md:pb-10 md:pt-6">
+			<ServicesCategoryNav lang={lang} groups={grouped} />
+		</Container>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<Container as="section" class="pb-16 md:pb-24" aria-labelledby="menu-catalog-visual">
+			<p id="menu-catalog-visual" class="sr-only">
+				{t('services.dividerSub')}
+			</p>
+			<ServicesGroupedCatalog
+				lang={lang}
+				groups={grouped}
+				firstIllustratedServiceId={firstIllustratedServiceId}
+			/>
+		</Container>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<section class="bg-card py-16 md:py-20" aria-labelledby="menu-allergens-policy">
+			<Container>
+				<div
+					class="mx-auto max-w-3xl rounded-xl border border-border bg-background/60 p-6 md:flex md:gap-8 md:p-10"
+				>
+					<Icon
+						name="tabler:circle-check"
+						class="h-10 w-10 shrink-0 text-primary hidden md:block"
+						aria-hidden="true"
+					/>
+					<div class="min-w-0">
+						<p class="font-body text-sm font-medium uppercase tracking-[0.16em] text-muted">
+							{t('services.policyIntro')}
+						</p>
+						<h2
+							id="menu-allergens-policy"
+							class="mt-3 font-display text-2xl tracking-tight text-foreground md:text-3xl"
+						>
+							{t('services.policyHeading')}
+						</h2>
+						<Text variant="small" class="!mt-4 !text-base leading-relaxed text-muted max-w-[56ch]">
+							{t('services.bookingPolicyNote')}
+						</Text>
+					</div>
+				</div>
+			</Container>
+		</section>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<CtaBanner
+			title={t('cta.bannerTitle')}
+			ctaLabel={t('cta.callToBook')}
+			ctaHref={booking.href}
+			ctaExternal={booking.external}
+			variant="primary"
+		/>
+	</FadeInOnScroll>
+</BaseLayout>

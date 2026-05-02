@@ -1,0 +1,27 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type BadgeVariant = 'default' | 'outline';
+
+interface Props extends HTMLAttributes<'span'> {
+	variant?: BadgeVariant;
+}
+
+const { variant = 'default', class: className, ...rest } = Astro.props;
+
+const variantClasses: Record<BadgeVariant, string> = {
+	default: 'bg-primary/10 text-primary',
+	outline: 'border border-border text-muted',
+};
+---
+
+<span
+	class:list={[
+		'inline-flex items-center px-2 py-0.5 rounded-md font-body text-xs font-semibold uppercase tracking-widest',
+		variantClasses[variant],
+		className,
+	]}
+	{...rest}
+>
+	<slot />
+</span>

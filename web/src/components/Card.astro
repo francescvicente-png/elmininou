@@ -1,0 +1,59 @@
+---
+/**
+ * Card
+ *
+ * Canonical surface for any "panel" content not covered by a more
+ * specific component (ServiceCard, ProductCard, ReviewCard,
+ * LocationBlock, GoogleReviewsBlock, OpeningHours). Uses the same
+ * recipe — `rounded-xl`, border, bg-card, p-6 — so a generic Card
+ * lives next to the specific cards without standing out.
+ *
+ * `hoverable` adds the canonical card lift used everywhere else.
+ *
+ * Currently used by `/dev/styleguide` (development-only) as a
+ * generic example. Domain pages should keep using the dedicated
+ * components above.
+ */
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'div'> {
+	hoverable?: boolean;
+}
+
+const { hoverable = false, class: className, ...rest } = Astro.props;
+
+const baseClasses = 'bg-card border border-border rounded-xl p-6';
+const hoverClasses = hoverable ? 'card-hoverable' : '';
+---
+
+<div class:list={[baseClasses, hoverClasses, className]} {...rest}>
+	<slot />
+</div>
+
+<style>
+	/* Canonical card lift: identical recipe to ServiceCard, ProductCard,
+	   ReviewCard, LocationBlock, GoogleReviewsBlock. One hover, one shadow,
+	   one border-color shift across the whole site. */
+	.card-hoverable {
+		transition:
+			transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			border-color 400ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: transform;
+	}
+
+	.card-hoverable:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 12px 32px -8px oklch(30% 0.075 320 / 0.18);
+		border-color: var(--color-primary);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.card-hoverable,
+		.card-hoverable:hover {
+			transition: none;
+			transform: none;
+			box-shadow: none;
+		}
+	}
+</style>

@@ -1,0 +1,20 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import RestaurantHomePage from '../../components/restaurant/RestaurantHomePage.astro';
+
+const lang = 'ca' as const;
+---
+
+<BaseLayout
+	title="El mini nou · Restaurant a L’Ametlla del Vallès"
+	description="Restaurant i bar amb brases, entrepans i tapes ràpides a L'Ametlla del Vallès (Barcelona). Consulta carta bilíngue (català / castellà) i reserva per telèfon."
+	siblingPath="/es/"
+	keywords={[
+		'restaurant la ametlla valles',
+		'menú català restaurant',
+		'el mini nou',
+		'bars tapes ametlla vallès',
+	]}
+>
+	<RestaurantHomePage lang={lang} />
+</BaseLayout>

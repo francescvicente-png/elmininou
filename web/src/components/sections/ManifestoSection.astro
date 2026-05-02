@@ -1,0 +1,202 @@
+---
+/**
+ * ManifestoSection
+ *
+ * A single editorial pull-quote in massive Cormorant Garamond, with generous
+ * vertical breathing room. Sits between two heavier home sections
+ * to deliberately slow the rhythm of the page — the equivalent of
+ * a magazine "spread" with one sentence on it.
+ *
+ * The first character of the quote is enlarged as a drop cap. The
+ * mark glyph (a small primary-tinted ❝) sits to the left of the
+ * sentence, anchoring the typography on the left edge.
+ *
+ * Animations:
+ *   - the section enters via FadeInOnScroll wrapper at the home level
+ *   - a hairline left rail draws in vertically when the quote
+ *     enters viewport (uses .ed-rule pattern via direct class)
+ *
+ * Reduced-motion: the rail is shown statically.
+ */
+import Container from '../Container.astro';
+import Badge from '../Badge.astro';
+import { manifesto, manifestoPlaceholder } from '../../data/manifesto';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const eyebrow = manifesto.eyebrow[lang];
+const body = manifesto.body[lang];
+const attribution = manifesto.attribution[lang];
+
+const placeholderBadge =
+	lang === 'ca'
+		? 'Frase demostrativa — pendent de personalitzar amb el negoci'
+		: 'Frase demostrativa — pendiente de personalizar con el negocio';
+---
+
+<section id="home-section-manifesto" class="manifesto-section scroll-mt-32">
+	<Container>
+		<div class="grid grid-cols-12 gap-x-6 md:gap-x-12 gap-y-8 items-start">
+			{/* Left rail: vertical hairline + eyebrow (the section
+			    number column was removed in the post-feedback pass —
+			    user found numbering noisy across the site). */}
+			<div class="col-span-12 md:col-span-3 manifesto-rail">
+				<div class="manifesto-rail-line" aria-hidden="true"></div>
+				<p class="manifesto-eyebrow">{eyebrow}</p>
+			</div>
+
+			{/* Right column: the pull-quote itself */}
+			<div class="col-span-12 md:col-span-9 space-y-6 md:space-y-8">
+				<blockquote class="manifesto-quote editorial-pull-quote">
+					<span class="manifesto-mark" aria-hidden="true">&#10078;</span>
+					<p class="manifesto-text">{body}</p>
+				</blockquote>
+				<footer class="manifesto-attribution">
+					— {attribution}
+				</footer>
+				{
+					manifestoPlaceholder && (
+						<div>
+							<Badge variant="outline">{placeholderBadge}</Badge>
+						</div>
+					)
+				}
+			</div>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.manifesto-section {
+		padding-top: 6rem;
+		padding-bottom: 6rem;
+		background: var(--color-background);
+	}
+
+	@media (min-width: 768px) {
+		.manifesto-section {
+			padding-top: 8rem;
+			padding-bottom: 8rem;
+		}
+	}
+
+	.manifesto-rail {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		min-height: 4rem;
+	}
+
+	.manifesto-rail-line {
+		width: 1px;
+		height: 4.5rem;
+		background-color: var(--color-primary);
+		transform-origin: top center;
+		transform: scaleY(0);
+		transition: transform 1100ms cubic-bezier(0.22, 1, 0.36, 1) 200ms;
+	}
+
+	.manifesto-quote.is-visible ~ .manifesto-attribution,
+	.editorial-pull-quote.is-visible .manifesto-rail-line,
+	.manifesto-section :global(.editorial-pull-quote.is-visible) ~ * .manifesto-rail-line {
+		/* fallback selectors not used; real trigger is below */
+	}
+
+	/* When the pull-quote enters the viewport, drive the rail
+	   line via a sibling-aware class on the closest section. We
+	   use scroll-reveal observing `.editorial-pull-quote` and
+	   propagate via section-level state. */
+	.manifesto-section :global(.editorial-pull-quote.is-visible) {
+		/* container-only marker */
+	}
+
+	/* Simpler driver: the IntersectionObserver in scroll-reveal.ts
+	   adds .is-visible to .editorial-pull-quote. We reach back up
+	   the cascade via `:has()` (Chrome 105+, Safari 15.4+, Firefox
+	   121+ — all supported in current evergreens; older browsers
+	   simply skip the rail animation, which is fine). */
+	.manifesto-section:has(.editorial-pull-quote.is-visible) .manifesto-rail-line {
+		transform: scaleY(1);
+	}
+
+	.manifesto-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.manifesto-number {
+		display: flex;
+		gap: 0.5rem;
+		align-items: baseline;
+		font-family: var(--font-body), system-ui, sans-serif;
+		margin: 0;
+	}
+
+	.manifesto-number-current {
+		font-size: clamp(1.25rem, 1vw + 1rem, 2rem);
+		font-weight: 600;
+		color: var(--color-primary);
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.02em;
+	}
+
+	.manifesto-number-total {
+		font-size: 0.75rem;
+		color: var(--color-muted);
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.18em;
+	}
+
+	.manifesto-quote {
+		position: relative;
+		margin: 0;
+		padding: 0;
+	}
+
+	.manifesto-mark {
+		display: block;
+		font-family: var(--font-display), Georgia, serif;
+		font-size: clamp(3rem, 6vw, 5rem);
+		line-height: 0.7;
+		color: var(--color-primary);
+		opacity: 0.55;
+		margin-bottom: 1rem;
+	}
+
+	.manifesto-text {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 400;
+		font-size: clamp(1.65rem, 3.4vw + 0.5rem, 3.5rem);
+		line-height: 1.18;
+		letter-spacing: -0.012em;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: balance;
+		max-width: 30ch;
+	}
+
+	.manifesto-attribution {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-muted);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.manifesto-rail-line {
+			transform: scaleY(1);
+			transition: none;
+		}
+	}
+</style>

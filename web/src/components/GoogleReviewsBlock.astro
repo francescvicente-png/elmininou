@@ -1,0 +1,108 @@
+---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import { googleReviews } from '../data/business';
+import { Icon } from 'astro-icon/components';
+import Heading from './Heading.astro';
+import Text from './Text.astro';
+import Link from './Link.astro';
+
+interface Props {
+	lang: Lang;
+	rating: number;
+	count: number;
+	class?: string;
+}
+
+const { lang, rating, count, class: className } = Astro.props;
+const t = useTranslations(lang);
+
+// 5 stars; for v1 each star is either fully filled or empty.
+// Decimal precision (4.9 → 4 full + 1 ~90% filled) is deferred to v2.
+const filledThreshold = rating + 0.05;
+const stars = [1, 2, 3, 4, 5];
+
+const locale = lang === 'ca' ? 'ca-ES' : 'es-ES';
+const ratingLabel = rating.toLocaleString(locale, {
+	minimumFractionDigits: 1,
+	maximumFractionDigits: 1,
+});
+const lastUpdatedLabel = new Date(googleReviews.lastUpdated).toLocaleDateString(
+	locale,
+	{ day: 'numeric', month: 'long', year: 'numeric' },
+);
+const countLabel = count === 1 ? t('reviews.countSingular') : t('reviews.count');
+---
+
+<div
+	class:list={[
+		'google-reviews-block mx-auto max-w-2xl rounded-xl border border-border bg-card p-10 md:p-14 text-center space-y-6',
+		className,
+	]}
+>
+	<div
+		class="flex items-center justify-center gap-1"
+		role="img"
+		aria-label={`${ratingLabel} / 5`}
+	>
+		{
+			stars.map((s) => (
+				<Icon
+					name={s <= Math.floor(filledThreshold) ? 'tabler:star-filled' : 'tabler:star'}
+					class:list={[
+						'h-6 w-6',
+						s <= Math.floor(filledThreshold) ? 'text-rating' : 'text-muted',
+					]}
+					aria-hidden="true"
+				/>
+			))
+		}
+	</div>
+
+	<div class="space-y-2">
+		<Heading as="p" size="h1" class="!text-6xl md:!text-7xl tabular-nums">
+			{ratingLabel}
+		</Heading>
+		<Text variant="small">{t('reviews.outOf')}</Text>
+	</div>
+
+	<p class="text-base text-foreground">
+		<span class="tabular-nums">{count}</span> {countLabel}
+	</p>
+
+	<p class="text-xs text-muted">
+		{t('reviews.lastUpdated')}: {lastUpdatedLabel}
+	</p>
+
+	<div>
+		<Link href={googleReviews.url} variant="standalone" external>
+			{t('reviews.cta')}
+		</Link>
+	</div>
+</div>
+
+<style>
+	/* Hover lift consistent with other card surfaces. */
+	.google-reviews-block {
+		transition:
+			transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			border-color 400ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: transform;
+	}
+
+	.google-reviews-block:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 12px 32px -8px oklch(30% 0.075 320 / 0.18);
+		border-color: var(--color-primary);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.google-reviews-block,
+		.google-reviews-block:hover {
+			transition: none;
+			transform: none;
+			box-shadow: none;
+		}
+	}
+</style>

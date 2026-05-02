@@ -1,0 +1,210 @@
+---
+/**
+ * BridalEditorialIntro — second beat of the page.
+ *
+ * Typographic statement on the left (display serif headline, body
+ * paragraph at 65ch) flanked by two editorial detail photographs on
+ * the right arranged in a deliberate vertical offset (the second is
+ * pushed downward so the pair reads as a film contact-sheet, not a
+ * symmetric grid).
+ *
+ * Why this section exists at all (vs. jumping straight to packages):
+ *   The original landing went from a thin hero straight into a 3-card
+ *   pricing grid. That is the standard "AI shop page" rhythm. Inserting
+ *   a slow editorial beat between the hero and the offer is what makes
+ *   the page read as a brand rather than a checkout.
+ *
+ * Skills enforced:
+ *   - imagegen-frontend-web §10 (section rhythm) — calmer beat after hero
+ *   - soft-skill §A (Editorial Luxury Noir) — paper feel via spacing
+ *   - taste-skill (anti-three-card row) — only two images, intentionally
+ *     offset vertically
+ */
+import { Picture } from 'astro:assets';
+import Container from '../Container.astro';
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { business } from '../../data/business';
+import { bridalEditorialDetails } from '../../data/bridal';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const introWaMessage = t('bridal.introTrustWhatsAppMessage');
+const introWaUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(introWaMessage)}`;
+
+const [veil, flatlay] = bridalEditorialDetails;
+if (!veil || !flatlay) {
+	throw new Error('BridalEditorialIntro expects two editorial detail images');
+}
+---
+
+<section
+	class="bridal-intro relative bg-card border-y border-border py-24 md:py-32 lg:py-40 overflow-hidden"
+	aria-labelledby="bridal-intro-title"
+>
+	<Container>
+		<div class="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+			{/* Left — typographic block */}
+			<div class="lg:col-span-7 space-y-8 fade-in-on-scroll" style="--fade-delay: 80ms; --fade-duration: 700ms;">
+				<p class="bridal-eyebrow">{t('bridal.introEyebrow')}</p>
+				<h2
+					id="bridal-intro-title"
+					class="bridal-intro-title font-display text-foreground"
+				>
+					{t('bridal.introTitle')}
+				</h2>
+				<p class="bridal-intro-body font-body text-muted leading-relaxed">
+					{t('bridal.introBody')}
+				</p>
+				<a
+					href={introWaUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="bridal-intro-trust-pill inline-flex items-center gap-3 pt-2 px-4 py-2.5 rounded-full border border-border bg-background font-body no-underline transition-colors duration-fast"
+					aria-label={t('bridal.introTrustWhatsAppAriaLabel')}
+				>
+					<Icon
+						name="tabler:map-pin"
+						class="h-4 w-4 text-accent shrink-0"
+						aria-hidden="true"
+					/>
+					<span class="text-xs uppercase tracking-widest text-muted">
+						{t('bridal.introTrustLabel')}
+					</span>
+				</a>
+			</div>
+
+			{/* Right — two offset editorial details */}
+			<div class="lg:col-span-5 relative">
+				<figure
+					class="bridal-detail bridal-detail-veil fade-in-on-scroll"
+					style="--fade-delay: 220ms; --fade-duration: 800ms; --fade-y: 32px;"
+				>
+					<Picture
+						src={veil.src}
+						alt={veil.alt[lang]}
+						formats={['avif', 'webp']}
+						widths={[320, 480, 640]}
+						sizes="(min-width: 1024px) 22vw, 60vw"
+						loading="lazy"
+						decoding="async"
+						class="bridal-detail-image"
+					/>
+				</figure>
+				<figure
+					class="bridal-detail bridal-detail-flatlay fade-in-on-scroll"
+					style="--fade-delay: 380ms; --fade-duration: 800ms; --fade-y: 32px;"
+				>
+					<Picture
+						src={flatlay.src}
+						alt={flatlay.alt[lang]}
+						formats={['avif', 'webp']}
+						widths={[320, 480, 640]}
+						sizes="(min-width: 1024px) 26vw, 70vw"
+						loading="lazy"
+						decoding="async"
+						class="bridal-detail-image"
+					/>
+				</figure>
+			</div>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.bridal-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.bridal-intro-title {
+		font-size: clamp(1.875rem, 2.6vw + 0.75rem, 3.25rem);
+		line-height: 1.12;
+		letter-spacing: -0.018em;
+		text-wrap: balance;
+		word-break: normal;
+		overflow-wrap: normal;
+		hyphens: none;
+		margin: 0;
+		font-weight: 400;
+		max-width: 38ch;
+	}
+
+	.bridal-intro-body {
+		font-size: clamp(1rem, 0.25vw + 0.95rem, 1.125rem);
+		max-width: 60ch;
+		text-wrap: pretty;
+	}
+
+	/* Trust pill doubles as WhatsApp deep link — keep affordance subtle. */
+	.bridal-intro-trust-pill:hover {
+		border-color: color-mix(in oklch, var(--color-accent) 35%, var(--color-border));
+		background: color-mix(in oklch, var(--color-accent) 6%, var(--color-background));
+	}
+	.bridal-intro-trust-pill:hover .text-muted {
+		color: var(--color-foreground);
+	}
+	.bridal-intro-trust-pill:focus-visible {
+		outline: none;
+		box-shadow:
+			0 0 0 2px var(--color-background),
+			0 0 0 4px var(--color-primary);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.bridal-intro-trust-pill {
+			transition: none;
+		}
+	}
+
+	.bridal-detail {
+		position: relative;
+		overflow: hidden;
+		border-radius: 1.5rem;
+		background: var(--color-background);
+		box-shadow: 0 20px 50px -25px oklch(0% 0 0 / 0.5);
+	}
+
+	.bridal-detail-image {
+		display: block;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+
+	/* Two-image offset layout (lg+):
+	   The veil portrait sits top-left of the column; the flatlay sits
+	   below-and-right with deliberate negative offset so they overlap
+	   slightly — the contact-sheet feel. On smaller viewports they
+	   stack normally. */
+	.bridal-detail-veil {
+		aspect-ratio: 4 / 5;
+		max-width: 22rem;
+	}
+	.bridal-detail-flatlay {
+		aspect-ratio: 3 / 2;
+		max-width: 28rem;
+		margin-top: 1.5rem;
+		margin-left: auto;
+	}
+
+	@media (min-width: 1024px) {
+		.bridal-detail-veil {
+			margin-left: 0;
+		}
+		.bridal-detail-flatlay {
+			margin-top: -3rem;
+			margin-left: 7rem;
+		}
+	}
+</style>

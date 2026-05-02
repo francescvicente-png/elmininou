@@ -1,0 +1,248 @@
+---
+/**
+ * CinematicIntro
+ *
+ * First-paint signature moment for the home page. A full-viewport
+ * cream-on-near-black curtain shows the trade wordmark for **El mini nou** in
+ * massive display type while a thin razor blade sweeps across it (same
+ * brand language as the header `logo-shave` effect, but at the
+ * scale of the page).
+ *
+ * Sequence:
+ *   0 ms     blade enters left
+ *   200 ms   wordmark starts revealing (clip-path follows the blade)
+ *   1400 ms  wordmark is fully revealed; subtitle fades in
+ *   2400 ms  curtain "lifts" — clip-path slides upwards, exposing
+ *            the hero (which has been rendered behind it the whole
+ *            time, so it's already painted and the photo is decoded)
+ *   3300 ms  curtain is fully gone; component removes itself
+ *
+ * The curtain is rendered in the body (not in the layout) and is
+ * shown ONLY on the very first paint of the home (gated by
+ * sessionStorage so internal SPA-like navigations don't repeat it).
+ *
+ * Reduced-motion: render the curtain hidden from the start. The
+ * intro is a non-essential delight; users who asked the OS to
+ * reduce motion get the home page directly.
+ *
+ * Why this is safe for LCP: the hero <picture> + its preloaded
+ * AVIF rendition are emitted in the same HTML response, so the
+ * browser starts decoding them immediately. The curtain is just
+ * a fixed-position overlay sitting on top — it doesn't block the
+ * hero from painting underneath.
+ */
+import type { Lang } from '../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const eyebrow =
+	lang === 'ca'
+		? "Restaurant i bar · L'Ametlla del Vallès"
+		: 'Restaurante y bar · La Ametlla del Vallès';
+const tagline =
+	lang === 'ca'
+		? 'Brasa i tapes al mateix local — reserva per telèfon o WhatsApp.'
+		: 'Brasa y tapas en el mismo local — reserva por teléfono o WhatsApp.';
+---
+
+{/*
+   The curtain ships hidden by default (`style="display: none"`), and an
+   `is:inline` script directly below removes the inline style ONLY when
+   the curtain should actually play (first visit in this session, no
+   prefers-reduced-motion). This prevents the black flash on refresh:
+   without it, the curtain renders server-side at full opacity, paints
+   for one frame, and only then is the JS module loaded and the element
+   removed — the user sees a brief black overlay every time.
+
+   Inline style beats the `.cinematic-intro` class rule (display:flex)
+   because inline > class specificity. When the inline script clears
+   the inline style, the class rule wins and the curtain becomes
+   visible — at which point the CSS animations on the children start
+   from t=0 (they hadn't started yet because the parent was display:none).
+*/}
+<div class="cinematic-intro" data-cinematic-intro aria-hidden="true" style="display: none;">
+	<div class="cinematic-intro-inner">
+		<p class="cinematic-intro-eyebrow">{eyebrow}</p>
+		<div class="cinematic-intro-wordmark">
+			<span class="cinematic-intro-blade" aria-hidden="true"></span>
+			<span class="cinematic-intro-text">EL MINI NOU</span>
+		</div>
+		<p class="cinematic-intro-tagline">{tagline}</p>
+	</div>
+</div>
+
+<script is:inline>
+	/* Decide whether to play the curtain BEFORE the browser paints
+	   the next frame. If we should play, remove the inline display:none
+	   so the class CSS (display:flex) wins and the curtain shows. If
+	   not (sessionStorage flag set, or prefers-reduced-motion), leave
+	   it hidden — the curtain DOM is still there, but invisible, and
+	   the deferred cinematic-intro.ts module will remove it later
+	   without any visible flash. */
+	(function () {
+		try {
+			if (sessionStorage.getItem('el-mini-nou-cinematic-intro-played') === '1') return;
+		} catch (e) {
+			/* storage unavailable (privacy mode); fall through and play */
+		}
+		try {
+			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+		} catch (e) {
+			/* old browser; assume motion is fine */
+		}
+		var el = document.querySelector('[data-cinematic-intro]');
+		if (el) el.style.display = '';
+	})();
+</script>
+
+<style>
+	/* Fixed full-viewport overlay above everything else (including
+	   the persistent header which uses its own z-index). The curtain
+	   sits between the page content and the cookie banner / page
+	   loading bar (z=9000 / z=10000 in CookieBanner.astro and
+	   PageLoadingBar.astro respectively). */
+	.cinematic-intro {
+		position: fixed;
+		inset: 0;
+		z-index: 9500;
+		background: oklch(15% 0.012 60);
+		color: var(--color-on-image);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		overflow: hidden;
+		clip-path: inset(0 0 0 0);
+		transition: clip-path 450ms cubic-bezier(0.65, 0, 0.35, 1);
+		will-change: clip-path;
+		pointer-events: auto;
+	}
+
+	/* Hidden state: applied by JS once the intro finishes. We use
+	   visibility (not display:none) so the transition can finish
+	   smoothly before the element is removed from the DOM. */
+	.cinematic-intro.is-lifting {
+		clip-path: inset(0 0 100% 0);
+	}
+
+	.cinematic-intro.is-finished {
+		visibility: hidden;
+		pointer-events: none;
+	}
+
+	.cinematic-intro-inner {
+		text-align: center;
+		padding: 0 1.5rem;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1.25rem;
+	}
+
+	.cinematic-intro-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: clamp(0.65rem, 0.5vw + 0.5rem, 0.85rem);
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: oklch(75% 0.04 75);
+		opacity: 0;
+		transform: translateY(0.5rem);
+		animation: cinematic-fade-in 350ms cubic-bezier(0.22, 1, 0.36, 1) 100ms
+			forwards;
+	}
+
+	/* The wordmark uses a clip-path that slides from left → right,
+	   matching the blade. Same trick as `.logo-shave`. */
+	.cinematic-intro-wordmark {
+		position: relative;
+		display: inline-block;
+	}
+
+	.cinematic-intro-text {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 700;
+		font-size: clamp(3.5rem, 14vw, 11rem);
+		line-height: 0.95;
+		letter-spacing: -0.02em;
+		display: inline-block;
+		clip-path: inset(0 100% 0 0);
+		animation: cinematic-reveal 700ms cubic-bezier(0.65, 0, 0.35, 1) 175ms
+			forwards;
+	}
+
+	/* The blade — 2 px vertical line that sweeps across the wordmark
+	   then disappears off the right edge. Tinted with the brand
+	   primary colour and a subtle bloom. */
+	.cinematic-intro-blade {
+		position: absolute;
+		top: 6%;
+		bottom: 6%;
+		left: 0;
+		width: 2px;
+		background: var(--color-primary);
+		box-shadow:
+			0 0 12px oklch(50% 0.10 155 / 0.7),
+			0 0 36px oklch(60% 0.12 155 / 0.4);
+		opacity: 0;
+		animation: cinematic-blade 700ms cubic-bezier(0.65, 0, 0.35, 1) 175ms
+			forwards;
+	}
+
+	.cinematic-intro-tagline {
+		font-family: var(--font-display), Georgia, serif;
+		font-style: italic;
+		font-size: clamp(1rem, 1.4vw + 0.5rem, 1.5rem);
+		color: oklch(80% 0.02 70);
+		letter-spacing: 0.005em;
+		opacity: 0;
+		transform: translateY(0.75rem);
+		animation: cinematic-fade-in 300ms cubic-bezier(0.22, 1, 0.36, 1) 550ms
+			forwards;
+	}
+
+	@keyframes cinematic-fade-in {
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	@keyframes cinematic-reveal {
+		from {
+			clip-path: inset(0 100% 0 0);
+		}
+		to {
+			clip-path: inset(0 0 0 0);
+		}
+	}
+
+	@keyframes cinematic-blade {
+		0% {
+			left: 0;
+			opacity: 0;
+		}
+		8% {
+			opacity: 1;
+		}
+		94% {
+			opacity: 1;
+			left: calc(100% - 2px);
+		}
+		100% {
+			opacity: 0;
+			left: calc(100% - 2px);
+		}
+	}
+
+	/* Reduced motion: skip the entire intro. The curtain is hidden
+	   from the very first paint, so the user sees the home page
+	   immediately. */
+	@media (prefers-reduced-motion: reduce) {
+		.cinematic-intro {
+			display: none !important;
+		}
+	}
+</style>

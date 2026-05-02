@@ -1,0 +1,196 @@
+---
+import '../../styles/global.css';
+import { Font } from 'astro:assets';
+import Container from '../Container.astro';
+import Heading from '../Heading.astro';
+import Text from '../Text.astro';
+import Badge from '../Badge.astro';
+import Section from '../Section.astro';
+
+import Hero from '../Hero.astro';
+import ServiceCard from '../ServiceCard.astro';
+import GalleryGrid from '../GalleryGrid.astro';
+import OpeningHours from '../OpeningHours.astro';
+import GoogleReviewsBlock from '../GoogleReviewsBlock.astro';
+import LocationBlock from '../LocationBlock.astro';
+import CtaBanner from '../CtaBanner.astro';
+
+import { services, getServiceName, getServiceDescription } from '../../data/services';
+import { heroImage, galleryImages } from '../../data/gallery';
+import { business } from '../../data/business';
+import { getBookingCta } from '../../data/site';
+import { useTranslations } from '../../i18n/utils';
+
+const lang = 'ca' as const;
+const booking = getBookingCta();
+const t = useTranslations(lang);
+
+const previewSwatches = [
+	{ aspect: '16/9', grad: 'linear-gradient(135deg, var(--color-primary), var(--color-card))' },
+	{ aspect: '1/1', grad: 'linear-gradient(45deg, var(--color-card), var(--color-background))' },
+	{ aspect: '3/4', grad: 'linear-gradient(180deg, var(--color-primary), var(--color-foreground))' },
+];
+---
+
+<html lang="ca">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="generator" content={Astro.generator} />
+		<meta name="robots" content="noindex, nofollow" />
+		<title>{`Components preview · ${business.name} (dev)`}</title>
+		<Font cssVariable="--font-playfair-display-sc" preload />
+		<Font cssVariable="--font-karla" preload />
+	</head>
+	<body class="min-h-screen">
+		<Container as="main" class="py-12 md:py-16 space-y-20">
+			<header class="space-y-4 border-b border-border pb-10">
+				<Badge variant="outline">Dev components preview</Badge>
+				<Heading as="h1" size="h2">Vista previa de componentes</Heading>
+				<Text variant="lead">
+					Inspección visual de los componentes con datos del proyecto. Las fotos de galería y hero pueden ser demostrativas; comprueba `src/data/gallery.ts`. Página solo accesible en desarrollo; en producción retorna 404.
+				</Text>
+			</header>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">Hero</Heading>
+				<Text variant="small">
+					Sillón vacío + gradiente direccional (bottom→top en mobile, left→right en desktop). Texto en color crema con <code class="font-mono">text-shadow-soft</code> para legibilidad.
+				</Text>
+			</Section>
+			<div class="-mx-6 md:-mx-8">
+				<Hero
+					title="Brases sense complicacions · L'Ametlla del Vallès"
+					subtitle="Reserva taula per telèfon o WhatsApp."
+					ctaLabel="Truca per reservar"
+					ctaHref={booking.href}
+					ctaExternal={booking.external}
+					image={heroImage.src}
+					imageAlt={heroImage.alt[lang]}
+					imageCredit={heroImage.credit?.[lang]}
+					imageObjectPosition={heroImage.objectPosition}
+				/>
+			</div>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">ServiceCard</Heading>
+				<Text variant="small">
+					Los 6 servicios demo de <code class="font-mono">src/data/services.ts</code>. El destacado lleva borde primary.
+				</Text>
+				<div
+					class:list={[
+						'grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6 md:gap-y-8',
+						'lg:grid lg:gap-x-8 lg:gap-y-10',
+						'lg:[grid-template-columns:minmax(0,1.16fr)_minmax(0,1fr)_minmax(0,1fr)]',
+					]}
+				>
+					{services.map((s, index) => (
+						<ServiceCard
+							name={getServiceName(s, lang)}
+							description={getServiceDescription(s, lang)}
+							duration={s.duration}
+							price={s.price}
+							icon={s.icon}
+							illustration={s.illustration}
+							illustrationAlt={
+								s.illustration
+									? t('services.cardIllustrationAlt').replace(
+											'{name}',
+											getServiceName(s, lang),
+										)
+									: undefined
+							}
+							imageFetchPriority={
+								index === 0 && s.illustration ? 'high' : 'auto'
+							}
+							featured={s.featured ?? false}
+						/>
+					))}
+				</div>
+			</Section>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">GalleryGrid</Heading>
+				<Text variant="small">
+					{galleryImages.length} imágenes (muestras de pelo + retratos de sesión). Aspect ratios alternados (1/1, 3/4, 4/3).
+				</Text>
+				<GalleryGrid
+					images={galleryImages.map((g) => ({
+						src: g.src,
+						alt: g.alt[lang],
+						photographer: g.photographer,
+						photoLicense: g.photoLicense,
+					}))}
+					columns={3}
+				/>
+			</Section>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">OpeningHours · variant inline</Heading>
+				<OpeningHours lang={lang} />
+			</Section>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">OpeningHours · variant compact</Heading>
+				<OpeningHours lang={lang} variant="compact" />
+			</Section>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">GoogleReviewsBlock</Heading>
+				<GoogleReviewsBlock lang={lang} rating={4.9} count={35} />
+			</Section>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">LocationBlock · variant full</Heading>
+				<Text variant="small">
+					Sustituye al MapEmbed eliminado. Dirección, teléfono, horario y dos botones (Google Maps + OpenStreetMap).
+				</Text>
+				<LocationBlock lang={lang} />
+			</Section>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">LocationBlock · variant compact</Heading>
+				<Text variant="small">Versión reducida para sidebars / footers / homes.</Text>
+				<LocationBlock lang={lang} variant="compact" />
+			</Section>
+
+			<Section class="!py-0 space-y-4">
+				<Heading as="h2" size="h3">CtaBanner</Heading>
+				<Text variant="small">Variantes primary (verde botella) y subtle (card).</Text>
+			</Section>
+			<div class="-mx-6 md:-mx-8">
+				<CtaBanner
+					title="Reserva la teva cita ara"
+					ctaLabel="Truca per reservar"
+					ctaHref={booking.href}
+					ctaExternal={booking.external}
+					variant="primary"
+				/>
+			</div>
+			<div class="-mx-6 md:-mx-8">
+				<CtaBanner
+					title="Vols saber més dels serveis?"
+					ctaLabel="Veure serveis"
+					ctaHref="#"
+					variant="subtle"
+				/>
+			</div>
+
+			<Section class="!py-0 space-y-4 opacity-60">
+				<Heading as="h2" size="h3">Placeholder swatches (referencia)</Heading>
+				<Text variant="small">
+					Gradientes de la paleta para validar layouts cuando no hay imágenes reales.
+				</Text>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+					{previewSwatches.map((s) => (
+						<div
+							class="rounded-md border border-border"
+							style={`aspect-ratio: ${s.aspect}; background: ${s.grad};`}
+							aria-hidden="true"
+						/>
+					))}
+				</div>
+			</Section>
+		</Container>
+	</body>
+</html>

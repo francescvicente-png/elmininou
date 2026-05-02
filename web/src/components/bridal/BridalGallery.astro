@@ -1,0 +1,652 @@
+---
+/**
+ * BridalGallery — gapless asymmetric bento + lightbox carousel.
+ *
+ * Bento layout per `imagegen-frontend-web` §11. Each tile uses `coverFocus`
+ * (data layer) as CSS `object-position` so crops favour the hairstyle, not
+ * neck or empty frame edges.
+ *
+ * User-facing: clicking a tile opens a `<dialog>` with large `object-fit:
+ * contain` views, prev/next controls, keyboard arrows, and live region counter.
+ *
+ * Skills enforced:
+ *   - imagegen-frontend-web §11 (Pristine Gapless Bento Grid)
+ *   - taste-skill (asymmetric layout)
+ *   - ui-ux-pro-max §1 (alt text, dialog semantics, aria-labels)
+ */
+import { Picture } from 'astro:assets';
+import Container from '../Container.astro';
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { bridalGallery } from '../../data/bridal';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const bySlot = (slot: (typeof bridalGallery)[number]['slot']) => {
+	const img = bridalGallery.find((i) => i.slot === slot);
+	if (!img) throw new Error(`BridalGallery missing slot "${slot}"`);
+	return img;
+};
+
+const anchor = bySlot('anchor');
+const top = bySlot('top');
+const midL = bySlot('middle-left');
+const midR = bySlot('middle-right');
+const wide = bySlot('wide');
+
+/** Reading order for the carousel (matches bento story flow). */
+const carouselSlides = [anchor, top, midL, midR, wide] as const;
+
+const slotCarouselIndex: Record<(typeof bridalGallery)[number]['slot'], number> = {
+	anchor: 0,
+	top: 1,
+	'middle-left': 2,
+	'middle-right': 3,
+	wide: 4,
+};
+
+type GalleryTileConfig = {
+	item: (typeof bridalGallery)[number];
+	tileClass: string;
+	widths: [number, ...number[]];
+	sizes: string;
+};
+
+const galleryTiles: readonly GalleryTileConfig[] = [
+	{
+		item: anchor,
+		tileClass: 'bridal-gallery-anchor',
+		widths: [480, 720, 960, 1280],
+		sizes: '(min-width: 768px) 56vw, 100vw',
+	},
+	{
+		item: top,
+		tileClass: 'bridal-gallery-top',
+		widths: [360, 520, 720],
+		sizes: '(min-width: 768px) 36vw, 100vw',
+	},
+	{
+		item: midL,
+		tileClass: 'bridal-gallery-middle-left',
+		widths: [280, 420, 560],
+		sizes: '(min-width: 768px) 22vw, 100vw',
+	},
+	{
+		item: midR,
+		tileClass: 'bridal-gallery-middle-right',
+		widths: [280, 420, 560],
+		sizes: '(min-width: 768px) 22vw, 100vw',
+	},
+	{
+		item: wide,
+		tileClass: 'bridal-gallery-wide',
+		widths: [640, 960, 1280],
+		sizes: '(min-width: 768px) 92vw, 100vw',
+	},
+];
+---
+
+<section
+	class="bridal-gallery relative bg-background py-24 md:py-32 lg:py-40"
+	aria-labelledby="bridal-gallery-title"
+>
+	<Container>
+		<header class="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 md:mb-16 fade-in-on-scroll" style="--fade-delay: 0ms; --fade-duration: 700ms;">
+			<div class="space-y-4 max-w-2xl">
+				<p class="bridal-eyebrow">{t('bridal.galleryEyebrow')}</p>
+				<h2
+					id="bridal-gallery-title"
+					class="bridal-gallery-title font-display text-foreground"
+				>
+					{t('bridal.galleryTitleNew')}
+				</h2>
+				<p class="bridal-gallery-intro font-body text-muted leading-relaxed">
+					{t('bridal.galleryIntroNew')}
+				</p>
+			</div>
+			<p class="bridal-gallery-ai-pill" role="note">
+				<Icon name="tabler:sparkles" class="h-3.5 w-3.5 shrink-0 text-accent" aria-hidden="true" />
+				<span>{t('bridal.galleryAiNotice')}</span>
+			</p>
+		</header>
+
+		<div class="bridal-gallery-grid fade-in-on-scroll" style="--fade-delay: 150ms; --fade-duration: 900ms; --fade-y: 24px;">
+			{
+				galleryTiles.map(({ item, tileClass, widths, sizes }) => {
+					const carouselIdx = slotCarouselIndex[item.slot];
+					const openLabel = `${t('bridal.galleryLightboxOpenLabel')}: ${item.caption[lang]}`;
+					return (
+						<figure class:list={['bridal-gallery-tile', tileClass]}>
+							<div class="bridal-gallery-media">
+								<Picture
+									src={item.src}
+									alt={item.alt[lang]}
+									formats={['avif', 'webp']}
+									widths={widths}
+									sizes={sizes}
+									loading="lazy"
+									decoding="async"
+									class="bridal-gallery-image"
+									style={{ objectPosition: item.coverFocus }}
+								/>
+								<button
+									type="button"
+									class="bridal-gallery-hit"
+									data-bridal-gallery-open={carouselIdx}
+									aria-label={openLabel}
+								/>
+							</div>
+							<figcaption class="bridal-gallery-caption">{item.caption[lang]}</figcaption>
+						</figure>
+					);
+				})
+			}
+		</div>
+
+		<dialog
+			id="bridal-gallery-lightbox"
+			class="bridal-gallery-lightbox"
+			aria-modal="true"
+			aria-label={t('bridal.galleryLightboxTitle')}
+			data-bridal-gallery-dialog
+		>
+			<div class="bridal-gallery-lightbox-panel">
+				<button
+					type="button"
+					class="bridal-gallery-lightbox-close"
+					data-bridal-gallery-close
+					aria-label={t('gallery.closeImage')}
+				>
+					<Icon name="tabler:x" class="h-5 w-5" aria-hidden="true" />
+				</button>
+				<button
+					type="button"
+					class="bridal-gallery-lightbox-nav bridal-gallery-lightbox-prev"
+					data-bridal-gallery-prev
+					aria-label={t('bridal.galleryLightboxPrev')}
+				>
+					<Icon name="tabler:chevron-left" class="h-7 w-7" aria-hidden="true" />
+				</button>
+				<button
+					type="button"
+					class="bridal-gallery-lightbox-nav bridal-gallery-lightbox-next"
+					data-bridal-gallery-next
+					aria-label={t('bridal.galleryLightboxNext')}
+				>
+					<Icon name="tabler:chevron-right" class="h-7 w-7" aria-hidden="true" />
+				</button>
+				<div class="bridal-gallery-lightbox-stage">
+					{
+						carouselSlides.map((item, i) => (
+							<div class="bridal-gallery-lightbox-slide" data-bridal-gallery-slide={i} hidden={i !== 0}>
+								<Picture
+									src={item.src}
+									alt={item.alt[lang]}
+									formats={['avif', 'webp']}
+									widths={[800, 1200, 1600]}
+									sizes="min(100vw - 2rem, 1200px)"
+									loading="lazy"
+									decoding="async"
+									class="bridal-gallery-lightbox-image"
+									style={{ objectPosition: item.coverFocus }}
+								/>
+								<p class="bridal-gallery-lightbox-caption">{item.caption[lang]}</p>
+							</div>
+						))
+					}
+				</div>
+				<p class="bridal-gallery-lightbox-counter" data-bridal-gallery-counter aria-live="polite">
+					{`1 / ${carouselSlides.length}`}
+				</p>
+			</div>
+		</dialog>
+	</Container>
+</section>
+
+<script is:inline>
+	(function () {
+		var dlg = document.getElementById('bridal-gallery-lightbox');
+		if (!dlg || typeof dlg.showModal !== 'function') return;
+
+		var slides = Array.prototype.slice.call(dlg.querySelectorAll('[data-bridal-gallery-slide]'));
+		var total = slides.length;
+		if (!total) return;
+
+		var counterEl = dlg.querySelector('[data-bridal-gallery-counter]');
+		var idx = 0;
+
+		function renderSlide() {
+			for (var i = 0; i < total; i++) {
+				if (slides[i]) slides[i].hidden = i !== idx;
+			}
+			if (counterEl) counterEl.textContent = idx + 1 + ' / ' + total;
+		}
+
+		function go(delta) {
+			idx = (idx + delta + total * 10) % total;
+			renderSlide();
+		}
+
+		function openAt(raw) {
+			var i = parseInt(raw, 10);
+			if (!isNaN(i)) {
+				idx = ((i % total) + total) % total;
+				renderSlide();
+				dlg.showModal();
+			}
+		}
+
+		document.addEventListener(
+			'click',
+			function (e) {
+				var t = e.target;
+				if (!t || !t.closest) return;
+				var opener = t.closest('[data-bridal-gallery-open]');
+				if (opener && dlg.contains(opener) === false) {
+					var oi = opener.getAttribute('data-bridal-gallery-open');
+					if (oi != null) openAt(oi);
+				}
+			},
+			true,
+		);
+
+		var closeBtn = dlg.querySelector('[data-bridal-gallery-close]');
+		if (closeBtn) closeBtn.addEventListener('click', function () { dlg.close(); });
+
+		var prevBtn = dlg.querySelector('[data-bridal-gallery-prev]');
+		if (prevBtn) prevBtn.addEventListener('click', function () { go(-1); });
+
+		var nextBtn = dlg.querySelector('[data-bridal-gallery-next]');
+		if (nextBtn) nextBtn.addEventListener('click', function () { go(1); });
+
+		dlg.addEventListener('click', function (e) {
+			if (e.target === dlg) dlg.close();
+		});
+
+		dlg.addEventListener('keydown', function (e) {
+			if (e.key === 'ArrowLeft') {
+				e.preventDefault();
+				go(-1);
+			} else if (e.key === 'ArrowRight') {
+				e.preventDefault();
+				go(1);
+			}
+		});
+	})();
+</script>
+
+<style>
+	.bridal-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.bridal-gallery-title {
+		font-size: clamp(1.875rem, 2.6vw + 0.75rem, 3.25rem);
+		line-height: 1.1;
+		letter-spacing: -0.018em;
+		font-weight: 400;
+		text-wrap: balance;
+		margin: 0;
+	}
+	.bridal-gallery-intro {
+		font-size: 1rem;
+		max-width: 56ch;
+		text-wrap: pretty;
+		margin: 0;
+	}
+
+	.bridal-gallery-ai-pill {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		padding: 0.45rem 0.9rem;
+		border: 1px solid color-mix(in oklch, var(--color-accent) 25%, var(--color-border));
+		border-radius: 9999px;
+		background: color-mix(in oklch, var(--color-accent) 5%, var(--color-card));
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		color: var(--color-muted);
+		margin: 0;
+		flex-shrink: 0;
+	}
+
+	/* The bento grid. Mobile: single column, generous gaps.
+	   md+: 12-col grid with 2 rows for the top "L" + a wide row below. */
+	.bridal-gallery-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 1rem;
+		border-radius: 1.75rem;
+		overflow: hidden;
+		background: color-mix(in oklch, var(--color-foreground) 5%, transparent);
+		padding: 1px;
+	}
+
+	@media (min-width: 768px) {
+		.bridal-gallery-grid {
+			grid-template-columns: repeat(12, 1fr);
+			grid-auto-rows: minmax(11rem, auto);
+			gap: 1px;
+		}
+
+		.bridal-gallery-anchor {
+			grid-column: span 7;
+			grid-row: span 2;
+		}
+		.bridal-gallery-top {
+			grid-column: span 5;
+			grid-row: span 1;
+		}
+		.bridal-gallery-middle-left {
+			grid-column: span 2;
+			grid-row: span 1;
+		}
+		.bridal-gallery-middle-right {
+			grid-column: span 3;
+			grid-row: span 1;
+		}
+		.bridal-gallery-wide {
+			grid-column: 1 / -1;
+			grid-row: span 1;
+			min-height: 16rem;
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.bridal-gallery-grid {
+			grid-auto-rows: minmax(13rem, auto);
+		}
+		.bridal-gallery-wide {
+			min-height: 20rem;
+		}
+	}
+
+	.bridal-gallery-tile {
+		position: relative;
+		overflow: hidden;
+		background: var(--color-card);
+		margin: 0;
+	}
+
+	.bridal-gallery-media {
+		position: absolute;
+		inset: 0;
+	}
+
+	/* On mobile we cannot rely on grid-auto-rows to size each tile, so we
+	   give each tile an explicit aspect ratio that matches the source
+	   image's intrinsic crop. This avoids the "head-cropped portrait"
+	   problem caused by object-fit: cover inside a fixed min-height box. */
+	.bridal-gallery-tile {
+		aspect-ratio: 4 / 5;
+	}
+	.bridal-gallery-anchor {
+		aspect-ratio: 3 / 4;
+	}
+	.bridal-gallery-top {
+		aspect-ratio: 4 / 5;
+	}
+	.bridal-gallery-middle-left,
+	.bridal-gallery-middle-right {
+		aspect-ratio: 1 / 1;
+	}
+	.bridal-gallery-wide {
+		aspect-ratio: 16 / 10;
+	}
+
+	@media (min-width: 768px) {
+		/* On md+ the explicit grid rows take over and we want every tile
+		   to fill its grid cell instead of fighting it with an aspect
+		   ratio. Reset everything. */
+		.bridal-gallery-tile,
+		.bridal-gallery-anchor,
+		.bridal-gallery-top,
+		.bridal-gallery-middle-left,
+		.bridal-gallery-middle-right,
+		.bridal-gallery-wide {
+			aspect-ratio: auto;
+		}
+	}
+
+	.bridal-gallery-image {
+		position: absolute;
+		inset: 0;
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.bridal-gallery-hit {
+		position: absolute;
+		inset: 0;
+		z-index: 1;
+		margin: 0;
+		padding: 0;
+		border: none;
+		background: transparent;
+		cursor: zoom-in;
+		border-radius: 0;
+	}
+	.bridal-gallery-hit:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: -4px;
+	}
+
+	@media (hover: hover) {
+		.bridal-gallery-tile:hover .bridal-gallery-image {
+			transform: scale(1.04);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bridal-gallery-image,
+		.bridal-gallery-tile:hover .bridal-gallery-image {
+			transition: none;
+			transform: none;
+		}
+	}
+
+	.bridal-gallery-caption {
+		position: absolute;
+		left: 0.85rem;
+		bottom: 0.85rem;
+		padding: 0.35rem 0.75rem;
+		background: color-mix(in oklch, oklch(0% 0 0) 65%, transparent);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border: 1px solid color-mix(in oklch, var(--color-on-image) 18%, transparent);
+		border-radius: 9999px;
+		color: var(--color-on-image);
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		font-weight: 500;
+		pointer-events: none;
+		z-index: 2;
+	}
+
+	/* Lightbox */
+	.bridal-gallery-lightbox {
+		margin: auto;
+		padding: 0;
+		border: none;
+		width: min(100vw - 1rem, 1200px);
+		max-width: 100%;
+		max-height: 100vh;
+		background: oklch(8% 0.02 300 / 0.94);
+		color: var(--color-on-image);
+		box-shadow: 0 40px 100px oklch(0% 0 0 / 0.55);
+	}
+	.bridal-gallery-lightbox::backdrop {
+		background: oklch(0% 0 0 / 0.65);
+		backdrop-filter: blur(5px);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.bridal-gallery-lightbox::backdrop {
+			backdrop-filter: none;
+		}
+	}
+
+	.bridal-gallery-lightbox-panel {
+		position: relative;
+		padding: 3.25rem 0.75rem 1rem;
+		min-height: 0;
+	}
+	@media (min-width: 640px) {
+		.bridal-gallery-lightbox-panel {
+			padding: 3.25rem 3.5rem 1.25rem;
+		}
+	}
+
+	.bridal-gallery-lightbox-close {
+		position: absolute;
+		top: 0.65rem;
+		right: 0.65rem;
+		z-index: 4;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 9999px;
+		border: 1px solid color-mix(in oklch, var(--color-on-image) 28%, transparent);
+		background: color-mix(in oklch, oklch(0% 0 0) 45%, transparent);
+		color: var(--color-on-image);
+		cursor: pointer;
+		transition: background-color 180ms ease, border-color 180ms ease;
+	}
+	.bridal-gallery-lightbox-close:hover {
+		border-color: var(--color-accent);
+		background: color-mix(in oklch, var(--color-accent) 22%, transparent);
+	}
+	.bridal-gallery-lightbox-close:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+
+	.bridal-gallery-lightbox-nav {
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+		z-index: 3;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 9999px;
+		border: 1px solid color-mix(in oklch, var(--color-on-image) 28%, transparent);
+		background: color-mix(in oklch, oklch(0% 0 0) 45%, transparent);
+		color: var(--color-on-image);
+		cursor: pointer;
+		transition: background-color 180ms ease, border-color 180ms ease;
+	}
+	.bridal-gallery-lightbox-nav:hover {
+		border-color: var(--color-accent);
+		background: color-mix(in oklch, var(--color-accent) 22%, transparent);
+	}
+	.bridal-gallery-lightbox-nav:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+	.bridal-gallery-lightbox-prev {
+		left: 0.35rem;
+	}
+	.bridal-gallery-lightbox-next {
+		right: 0.35rem;
+	}
+	@media (min-width: 640px) {
+		.bridal-gallery-lightbox-prev {
+			left: 0.75rem;
+		}
+		.bridal-gallery-lightbox-next {
+			right: 0.75rem;
+		}
+	}
+
+	.bridal-gallery-lightbox-stage {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		min-height: min(65vh, 520px);
+		max-height: 82vh;
+	}
+
+	.bridal-gallery-lightbox-slide {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		gap: 1rem;
+		width: 100%;
+		max-height: inherit;
+	}
+
+	.bridal-gallery-lightbox-slide:not([hidden]) {
+		animation: bridalGalleryLightboxFade 400ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	@keyframes bridalGalleryLightboxFade {
+		from {
+			opacity: 0.45;
+		}
+		to {
+			opacity: 1;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.bridal-gallery-lightbox-slide:not([hidden]) {
+			animation: none;
+		}
+	}
+
+	.bridal-gallery-lightbox-image {
+		max-height: 72vh;
+		width: auto;
+		max-width: 100%;
+		height: auto;
+		object-fit: contain;
+		display: block;
+		margin: 0 auto;
+	}
+
+	.bridal-gallery-lightbox-caption {
+		margin: 0;
+		padding: 0.35rem 0.85rem;
+		background: color-mix(in oklch, oklch(0% 0 0) 58%, transparent);
+		backdrop-filter: blur(8px);
+		-webkit-backdrop-filter: blur(8px);
+		border: 1px solid color-mix(in oklch, var(--color-on-image) 20%, transparent);
+		border-radius: 9999px;
+		color: var(--color-on-image);
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.72rem;
+		letter-spacing: 0.18em;
+		text-transform: uppercase;
+		font-weight: 500;
+	}
+
+	.bridal-gallery-lightbox-counter {
+		text-align: center;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.75rem;
+		letter-spacing: 0.14em;
+		color: color-mix(in oklch, var(--color-on-image) 75%, transparent);
+		margin: 0.75rem 0 0;
+	}
+</style>

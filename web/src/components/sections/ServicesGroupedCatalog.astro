@@ -1,0 +1,118 @@
+---
+/**
+ * Renders the full service grid in category sections for /serveis/.
+ * Each section is a landmark with h2 + ServiceCard grid (h3 titles).
+ */
+import ServiceCard from '../ServiceCard.astro';
+import Heading from '../Heading.astro';
+import type { Lang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import {
+	type ServiceCategoryKey,
+	type ServiceGroup,
+	getServiceDescription,
+	getServiceName,
+	serviceCategoryAnchorId,
+} from '../../data/services';
+import type { UIKey } from '../../i18n/ui';
+
+interface Props {
+	lang: Lang;
+	groups: ReadonlyArray<ServiceGroup>;
+	/** First illustrated card in DOM order gets LCP-friendly fetch priority. */
+	firstIllustratedServiceId: string | undefined;
+	class?: string;
+}
+
+const {
+	lang,
+	groups,
+	firstIllustratedServiceId,
+	class: className,
+} = Astro.props;
+
+const t = useTranslations(lang);
+
+const categoryLabelKey: Record<ServiceCategoryKey, string> = {
+	starters: 'services.categoryStarters',
+	grills: 'services.categoryGrills',
+	pasta: 'services.categoryPasta',
+	combos: 'services.categoryCombos',
+	'sandwiches-hot': 'services.categorySandwichesHot',
+	'sandwiches-cold': 'services.categorySandwichesCold',
+	tapas: 'services.categoryTapas',
+	drinks: 'services.categoryDrinks',
+};
+---
+
+<div class:list={['services-grouped-catalog', className]}>
+	<h2 id="services-catalog-start" class="sr-only">
+		{t('services.catalogSrHeading')}
+	</h2>
+	{
+		groups.map((group) => {
+			const sectionId = serviceCategoryAnchorId(group.category);
+			const headingId = `${sectionId}-title`;
+			return (
+				<section
+					class="services-cat-section scroll-mt-28 md:scroll-mt-32"
+					id={sectionId}
+					aria-labelledby={headingId}
+				>
+					<header class="mb-6 md:mb-8">
+						<Heading as="h2" size="h3" class="!font-display tracking-tight" id={headingId}>
+							{t(categoryLabelKey[group.category] as UIKey)}
+						</Heading>
+					</header>
+					<div
+						class:list={[
+							'services-catalog-grid grid grid-cols-1 gap-5 md:grid-cols-2 md:gap-6 md:gap-y-8',
+							'lg:grid lg:gap-x-8 lg:gap-y-10',
+							'lg:[grid-template-columns:minmax(0,1.16fr)_minmax(0,1fr)_minmax(0,1fr)]',
+						]}
+					>
+						{group.items.map((s) => (
+							<ServiceCard
+								name={getServiceName(s, lang)}
+								description={getServiceDescription(s, lang)}
+								duration={s.duration}
+								price={s.price}
+								icon={s.icon}
+								illustration={s.illustration}
+								illustrationAlt={
+									s.illustration
+										? t('services.cardIllustrationAlt').replace(
+												'{name}',
+												getServiceName(s, lang),
+											)
+										: undefined
+								}
+								imageFetchPriority={
+									firstIllustratedServiceId === s.id && s.illustration
+										? 'high'
+										: 'auto'
+								}
+								featured={s.featured ?? false}
+								pendingConfirmation={s.pendingConfirmation ?? false}
+								size={s.featured ? 'lg' : 'md'}
+								headingLevel="h3"
+								class:list={[(s.featured ?? false) && 'lg:col-span-2']}
+							/>
+						))}
+					</div>
+				</section>
+			);
+		})
+	}
+</div>
+
+<style>
+	.services-cat-section + .services-cat-section {
+		margin-top: 3rem;
+	}
+	@media (min-width: 768px) {
+		.services-cat-section + .services-cat-section {
+			margin-top: 3.75rem;
+		}
+	}
+</style>

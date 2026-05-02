@@ -1,0 +1,177 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import Button from '../../components/Button.astro';
+import EditorialDivider from '../../components/EditorialDivider.astro';
+import LocationBlock from '../../components/LocationBlock.astro';
+import FadeInOnScroll from '../../components/animations/FadeInOnScroll.astro';
+import { Icon } from 'astro-icon/components';
+import { business } from '../../data/business';
+import { getBookingCta } from '../../data/site';
+import { useTranslations } from '../../i18n/utils';
+
+const lang = 'es' as const;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+
+const mapsDestination =
+	'Carrer+Jeroni+de+Moragas,+13,+08480+L%27Ametlla+del+Vall%C3%A8s,+Barcelona,+Spain';
+
+const origins = [
+	{
+		from: 'Barcelona',
+		distanceKm: 38,
+		minutes: 38,
+		summary:
+			'Sube al Vallès Oriental — normalmente por C-58 / red BV hacia zona Granollers y enlaces a La Ametlla del Vallès hasta Jeroni de Moragas: el navegador reordenará según tráfico; abre siempre la ruta desde el botón.',
+		mapsUrl: `https://www.google.com/maps/dir/Barcelona/${mapsDestination}/`,
+		bus: 'Los operadores conectan el Vallès Oriental; consulte la parada más cercana a Jeroni de Moragas en cada planificador.',
+		train:
+			'Cercanías hasta zona Granollers; último tramo en bus interurbano o coche hasta el número 13 (combine horarios Renfe / operadores).',
+	},
+	{
+		from: 'Granollers',
+		distanceKm: 11,
+		minutes: 14,
+		summary:
+			'Circular por BV-5473 / zona urbana hasta La Ametlla del Vallès: Jeroni de Moragas queda bien señalizado en navegación.',
+		mapsUrl: `https://www.google.com/maps/dir/Granollers,+Barcelona/${mapsDestination}/`,
+		bus: 'Líneas Sagalés / interurbanas del Vallès Oriental (confirme paradas en la web del operador).',
+		train:
+			'Cercanías hasta Granollers; último tramo en bus interurbano o taxi según horario.',
+	},
+	{
+		from: 'Cardedeu',
+		distanceKm: 7,
+		minutes: 11,
+		summary:
+			'Por BV-5474 / BV-5482 según entrada: La Ametlla está a pocos minutos de Cardedeu — siga la navegación hasta el tramo Jeroni de Moragas.',
+		mapsUrl: `https://www.google.com/maps/dir/Cardedeu,+Barcelona/${mapsDestination}/`,
+		bus: 'Línea interurbana Cardedeu – La Ametlla según horario (consultar Sagalés u operador actual).',
+		train: 'Cercanías hasta Cardedeu; último tramo en bus o coche urbano hasta el número 13.',
+	},
+];
+---
+
+<BaseLayout
+	title={`Cómo llegar · ${business.name}`}
+	description={`Cómo llegar a ${business.name} (${business.address.street}). Rutas orientativas desde Barcelona, Granollers o Cardedeu — coche, bus y cercanías.`}
+	siblingPath="/ca/com-arribar/"
+	keywords={[
+		'cómo llegar ametlla vallès',
+		'restaurant jeroni moragas',
+		'el mini nou google maps',
+		'granollers restaurante',
+	]}
+	breadcrumbs={[
+		{ name: 'Inicio', url: '/es/' },
+		{ name: 'Cómo llegar', url: '/es/como-llegar/' },
+	]}
+>
+	<EditorialDivider
+		number="—"
+		eyebrow="Cómo llegar"
+		heading="Cómo llegar"
+		subheading={`${business.address.street}, ${business.address.postalCode} ${business.address.city}. Tres orígenes habituales — Barcelona, Granollers y Cardedeu — en coche, bus o tren.`}
+		as="h1"
+		flushTop={false}
+	/>
+
+	<FadeInOnScroll delay={100}>
+		<Container as="section" class="pb-12 md:pb-16">
+			<LocationBlock lang={lang} headingLevel="h2" />
+		</Container>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<Container as="section" class="pb-20 md:pb-24 space-y-8">
+			<Heading as="h2" size="h3">Desde las ciudades cercanas</Heading>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				{
+					origins.map((origin) => (
+						<article class="rounded-xl border border-border bg-card p-6 space-y-4 flex flex-col">
+							<header class="space-y-1">
+								<p class="text-xs uppercase tracking-widest text-muted">
+									Desde
+								</p>
+								<Heading as="h3" size="h4">{origin.from}</Heading>
+								<p class="text-sm text-muted tabular-nums">
+									{origin.distanceKm} km · ~{origin.minutes} min en coche
+								</p>
+							</header>
+
+							<section class="space-y-3 text-sm font-body text-foreground leading-relaxed flex-1">
+								<div class="space-y-1">
+									<p class="flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+										<Icon name="tabler:map-pin" class="h-3.5 w-3.5" aria-hidden="true" />
+										En coche
+									</p>
+									<p>{origin.summary}</p>
+								</div>
+								<div class="space-y-1">
+									<p class="flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+										<Icon name="tabler:menu-2" class="h-3.5 w-3.5" aria-hidden="true" />
+										Bus
+									</p>
+									<p class="text-muted">{origin.bus}</p>
+								</div>
+								<div class="space-y-1">
+									<p class="flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+										<Icon name="tabler:menu-2" class="h-3.5 w-3.5" aria-hidden="true" />
+										Tren
+									</p>
+									<p class="text-muted">{origin.train}</p>
+								</div>
+							</section>
+
+							<footer class="pt-2">
+								<Button as="a" href={origin.mapsUrl} variant="secondary" external size="sm">
+									<Icon
+										slot="icon-leading"
+										name="tabler:map-pin"
+										class="h-4 w-4"
+										aria-hidden="true"
+									/>
+									Abrir ruta en Google Maps
+								</Button>
+							</footer>
+						</article>
+					))
+				}
+			</div>
+		</Container>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<section class="py-16 md:py-20 bg-card">
+			<Container class="max-w-2xl space-y-4">
+				<Heading as="h2" size="h3">Aparcamiento</Heading>
+				<Text>
+					Plazas en vía pública y zonas reguladas según ordenanzas de La Ametlla del Vallès. Los
+					fines de semana y cenas conviene llegar unos minutos antes si buscáis aparcar con calma.
+				</Text>
+			</Container>
+		</section>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<section class="py-12 md:py-16">
+			<Container class="text-center max-w-xl space-y-4">
+				<Text variant="lead">¿Ya tenéis mesa confirmada?</Text>
+				<div>
+					<Button
+						as="a"
+						href={booking.href}
+						external={booking.external}
+						variant="primary"
+						size="lg"
+					>
+						{t('cta.callToBook')}
+					</Button>
+				</div>
+			</Container>
+		</section>
+	</FadeInOnScroll>
+</BaseLayout>

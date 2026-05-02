@@ -1,0 +1,248 @@
+---
+/**
+ * FeaturedReviewQuote
+ *
+ * Editorial full-width treatment for a single Google review. Used at
+ * the top of ReviewsBlock when prop `featuredFirst` is set: the review
+ * with `featured: true` in src/data/reviews.ts is rendered here as a
+ * massive Cormorant Garamond pull-quote, with the standard 3-card grid below
+ * showing the rest.
+ *
+ * The card carries the same "verified Google review" attribution as
+ * the standard cards (logo + reviewer + Local Guide badge), so the
+ * editorial treatment doesn't dilute the proof signal.
+ */
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import type { Review } from '../data/reviews';
+
+interface Props {
+	review: Review;
+	lang: Lang;
+}
+
+const { review, lang } = Astro.props;
+const t = useTranslations(lang);
+
+const text = review.pendingGoogleTranscript
+	? t('reviews.pendingGoogleTranscript')
+	: lang === 'ca' && review.textCa
+		? review.textCa
+		: review.textEs;
+
+const dateLabel = lang === 'ca' ? review.dateCa : review.dateEs;
+
+// "Translated from X" note when the original language differs.
+const translatedNote = (() => {
+	if (review.pendingGoogleTranscript) return null;
+	if (review.language === lang) return null;
+	if (review.language === 'de') return t('reviews.translatedFromDe');
+	if (review.language === 'es') return t('reviews.translatedFromEs');
+	if (review.language === 'ca') return t('reviews.translatedFromCa');
+	return null;
+})();
+
+const reviewCountLabel =
+	review.reviewCountByAuthor !== undefined && review.reviewCountByAuthor > 1
+		? t('reviews.reviewsByAuthor')
+		: t('reviews.reviewsByAuthorSingular');
+---
+
+<figure class="featured-review">
+	<blockquote class="featured-review-body editorial-pull-quote">
+		<span class="featured-review-mark" aria-hidden="true">&#10078;</span>
+		<p class="featured-review-text">{text}</p>
+	</blockquote>
+
+	<figcaption class="featured-review-caption">
+		<div class="featured-review-author">
+			<span
+				class="featured-review-avatar"
+				aria-hidden="true"
+			>
+				{review.authorInitial}
+			</span>
+			<div class="featured-review-author-meta">
+				<p class="featured-review-author-name">{review.authorName}</p>
+				<div class="featured-review-author-sub">
+					{
+						review.isLocalGuide && (
+							<>
+								<span class="featured-review-local-guide">
+									{t('reviews.localGuide')}
+								</span>
+								{review.reviewCountByAuthor !== undefined && (
+									<span aria-hidden="true">·</span>
+								)}
+							</>
+						)
+					}
+					{
+						review.reviewCountByAuthor !== undefined && (
+							<span>
+								{review.reviewCountByAuthor} {reviewCountLabel}
+							</span>
+						)
+					}
+					<span aria-hidden="true">·</span>
+					<span>{dateLabel}</span>
+				</div>
+			</div>
+		</div>
+
+		<div class="featured-review-source">
+			<span class="featured-review-stars" aria-label={t('reviews.starsAlt').replace('{rating}', String(review.rating))}>
+				{Array.from({ length: 5 }).map((_, i) => (
+					<Icon
+						name={i < review.rating ? 'tabler:star-filled' : 'tabler:star'}
+						class:list={['h-4 w-4', i < review.rating ? 'text-rating' : 'text-muted']}
+						aria-hidden="true"
+					/>
+				))}
+			</span>
+			<span class="featured-review-source-label">
+				{
+					review.pendingGoogleTranscript
+						? t('reviews.pendingVerificationFooter')
+						: t('reviews.verifiedBadge')
+				}
+			</span>
+		</div>
+	</figcaption>
+
+	{
+		translatedNote && (
+			<p class="featured-review-translated">{translatedNote}</p>
+		)
+	}
+</figure>
+
+<style>
+	.featured-review {
+		position: relative;
+		padding: 2.5rem 0;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2.5rem;
+		align-items: end;
+	}
+
+	@media (min-width: 768px) {
+		.featured-review {
+			padding: 3.5rem 0;
+			grid-template-columns: 9fr 3fr;
+			gap: 3.5rem;
+		}
+	}
+
+	.featured-review-body {
+		margin: 0;
+		padding: 0;
+		max-width: 56rem;
+	}
+
+	.featured-review-mark {
+		display: block;
+		font-family: var(--font-display), Georgia, serif;
+		font-size: clamp(2.5rem, 5vw, 4rem);
+		line-height: 0.7;
+		color: var(--color-primary);
+		opacity: 0.55;
+		margin-bottom: 0.85rem;
+	}
+
+	.featured-review-text {
+		font-family: var(--font-display), Georgia, serif;
+		font-style: italic;
+		font-size: clamp(1.5rem, 3vw + 0.5rem, 3rem);
+		line-height: 1.22;
+		letter-spacing: -0.01em;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: balance;
+		max-width: 24ch;
+	}
+
+	.featured-review-caption {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.featured-review-author {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+	}
+
+	.featured-review-avatar {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.5rem;
+		height: 2.5rem;
+		border-radius: 9999px;
+		background-color: oklch(30% 0.075 320 / 0.15);
+		color: var(--color-primary);
+		font-family: var(--font-display), Georgia, serif;
+		font-size: 1.1rem;
+		font-weight: 600;
+	}
+
+	.featured-review-author-name {
+		font-family: var(--font-body);
+		font-weight: 600;
+		font-size: 0.95rem;
+		color: var(--color-foreground);
+		margin: 0;
+		line-height: 1.2;
+	}
+
+	.featured-review-author-sub {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-body);
+		font-size: 0.8rem;
+		color: var(--color-muted);
+		margin-top: 0.15rem;
+	}
+
+	.featured-review-local-guide {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-primary);
+	}
+
+	.featured-review-source {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.featured-review-stars {
+		display: inline-flex;
+		gap: 2px;
+	}
+
+	.featured-review-source-label {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-muted);
+	}
+
+	.featured-review-translated {
+		grid-column: 1 / -1;
+		font-family: var(--font-body);
+		font-size: 0.8rem;
+		font-style: italic;
+		color: var(--color-muted);
+		margin: 0;
+	}
+</style>

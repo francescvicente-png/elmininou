@@ -1,0 +1,22 @@
+---
+/**
+ * Cream-band reviews (optional on home). If the post-gallery hero already
+ * lists every verbatim review, keep `reviews` disabled in `home-sections.ts`
+ * to avoid duplicating the same cards in a second strip.
+ */
+import Container from '../Container.astro';
+import ReviewsBlock from '../ReviewsBlock.astro';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<section class="py-10 md:py-14">
+	<Container>
+		<ReviewsBlock lang={lang} />
+	</Container>
+</section>

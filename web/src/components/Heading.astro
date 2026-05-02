@@ -1,0 +1,58 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+
+type HeadingLevel = 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+type HeadingSize = 'h1' | 'h2' | 'h3' | 'h4' | 'h5';
+type HeadingWeight = 'normal' | 'semibold' | 'bold';
+
+interface Props extends HTMLAttributes<'h1'> {
+	/** Semantic heading element. Defaults to h2. */
+	as?: HeadingLevel;
+	/** Visual size (independent of `as`). Lets a card render `<h2>`
+	 *  but display at h3 size when nested under a higher-level h1. */
+	size?: HeadingSize;
+	/** Display weight. Default normal — the display serif is delicate
+	 *  by design; semibold/bold should be reserved for short emphatic
+	 *  labels (e.g. footer column titles) where the heavier cut reads
+	 *  better at small sizes. */
+	weight?: HeadingWeight;
+}
+
+const {
+	as = 'h2',
+	size,
+	weight = 'normal',
+	class: className,
+	...rest
+} = Astro.props;
+
+const Tag = as;
+// Use the `as` value as size only when it's a valid display size.
+const effectiveSize: HeadingSize = (size ?? (as === 'h5' || as === 'h6' ? 'h5' : as)) as HeadingSize;
+
+const sizeClasses: Record<HeadingSize, string> = {
+	h1: 'text-4xl md:text-6xl lg:text-7xl tracking-tight',
+	h2: 'text-3xl md:text-5xl tracking-tight',
+	h3: 'text-2xl md:text-3xl tracking-tight',
+	h4: 'text-xl md:text-2xl tracking-tight',
+	h5: 'text-lg tracking-tight',
+};
+
+const weightClasses: Record<HeadingWeight, string> = {
+	normal: 'font-normal',
+	semibold: 'font-semibold',
+	bold: 'font-bold',
+};
+---
+
+<Tag
+	class:list={[
+		'font-display text-foreground',
+		sizeClasses[effectiveSize],
+		weightClasses[weight],
+		className,
+	]}
+	{...rest}
+>
+	<slot />
+</Tag>

@@ -1,0 +1,156 @@
+---
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import type { PhotoLicense } from '../types/photo-license';
+
+export type { PhotoLicense };
+
+interface Props {
+	src: ImageMetadata;
+	alt: string;
+	photographer: string;
+	caption?: string;
+	aspectRatio?: string;
+	sizes?: string;
+	loading?: 'eager' | 'lazy';
+	class?: string;
+	/** Inline style appended to the figure (used by cascading reveals to set per-item delay vars). */
+	style?: string;
+	/**
+	 * If a non-undefined index is provided, the figure becomes a
+	 * lightbox trigger: clicking it opens the GalleryLightbox at that
+	 * index. The matching slide carries the same view-transition-name
+	 * so the browser morphs the thumbnail into the fullscreen image.
+	 */
+	lightboxIndex?: number;
+	/** Marks this figure as a gallery-filter item (read by gallery-filter.ts). */
+	'data-gallery-item'?: '';
+	/** Space-separated list of category ids for the filter. */
+	'data-categories'?: string;
+	/**
+	 * `unsplash-demo` — prepends i18n demo label + "Foto: … / Unsplash".
+	 * `ai-demo` — illustrative salon AI shots: demo label + i18n Gemini / not premises notice.
+	 * `own` — salon / commissioned shots: "Foto: {photographer}" only (no Unsplash).
+	 */
+	photoLicense?: PhotoLicense;
+}
+
+const {
+	src,
+	alt,
+	photographer,
+	caption,
+	aspectRatio = '16/9',
+	sizes = '100vw',
+	loading = 'lazy',
+	class: className,
+	style: extraStyle,
+	lightboxIndex,
+	'data-gallery-item': dataGalleryItem,
+	'data-categories': dataCategories,
+	photoLicense = 'own',
+} = Astro.props;
+
+const figureStyle = (() => {
+	const parts = [`aspect-ratio: ${aspectRatio}`];
+	if (extraStyle) parts.push(extraStyle);
+	if (lightboxIndex !== undefined) {
+		parts.push(`view-transition-name: gallery-trigger-${lightboxIndex}`);
+	}
+	return parts.join('; ');
+})();
+
+const isLightboxTrigger = lightboxIndex !== undefined;
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const demoCaption = t('gallery.demoImageCaption');
+const aiDemoSuffix = t('gallery.aiDemoImageSuffix');
+
+const showFigcaption =
+	photoLicense === 'unsplash-demo' ||
+	photoLicense === 'ai-demo' ||
+	(photoLicense === 'own' && photographer.trim().length > 0);
+---
+
+<figure
+	class:list={[
+		'demo-image relative overflow-hidden rounded-md',
+		isLightboxTrigger && 'demo-image-clickable',
+		className,
+	]}
+	style={figureStyle}
+	{...(dataGalleryItem !== undefined ? { 'data-gallery-item': '' } : {})}
+	{...(dataCategories ? { 'data-categories': dataCategories } : {})}
+	{...(isLightboxTrigger
+		? {
+				'data-lightbox-trigger': '',
+				'data-lightbox-index': String(lightboxIndex),
+				role: 'button',
+				tabindex: '0',
+				'aria-label': t('gallery.openImage'),
+			}
+		: {})}
+>
+	<Picture
+		src={src}
+		alt={alt}
+		formats={['avif', 'webp']}
+		class="demo-image-picture absolute inset-0 h-full w-full object-cover"
+		loading={loading}
+		decoding="async"
+		sizes={sizes}
+	/>
+	{
+		showFigcaption && (
+			<figcaption class="absolute bottom-2 right-2 bg-foreground/85 text-background px-2 py-1 text-xs tracking-widest rounded-md backdrop-blur-sm z-10">
+				{photoLicense === 'unsplash-demo' ? (
+					<>
+						{demoCaption} · Foto: {photographer} / Unsplash
+						{caption ? ` · ${caption}` : ''}
+					</>
+				) : photoLicense === 'ai-demo' ? (
+					<>
+						{demoCaption} · {aiDemoSuffix}
+						{caption ? ` · ${caption}` : ''}
+					</>
+				) : (
+					<>
+						Foto: {photographer}
+						{caption ? ` · ${caption}` : ''}
+					</>
+				)}
+			</figcaption>
+		)
+	}
+</figure>
+
+<style>
+	.demo-image .demo-image-picture {
+		transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: transform;
+	}
+
+	.demo-image:hover .demo-image-picture {
+		transform: scale(1.05);
+	}
+
+	.demo-image-clickable {
+		cursor: zoom-in;
+	}
+
+	.demo-image-clickable:focus-visible {
+		outline: 3px solid var(--color-primary);
+		outline-offset: 2px;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.demo-image .demo-image-picture {
+			transition: none;
+		}
+		.demo-image:hover .demo-image-picture {
+			transform: none;
+		}
+	}
+</style>

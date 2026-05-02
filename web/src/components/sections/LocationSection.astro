@@ -1,0 +1,26 @@
+---
+/**
+ * LocationSection
+ *
+ * Full LocationBlock placed near the bottom of the home so visitors see
+ * address + phone + opening hours + map links right above the final CTA.
+ * Uses variant `full` (instead of `compact`) so the recurring visitor who
+ * has scrolled the home looking for "is the shop open now / how do I
+ * call" finds everything without an extra hop to /contacte/.
+ */
+import Container from '../Container.astro';
+import LocationBlock from '../LocationBlock.astro';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+---
+
+<section class="pb-8 md:pb-10">
+	<Container>
+		<LocationBlock lang={lang} variant="full" class="max-w-2xl mx-auto" />
+	</Container>
+</section>

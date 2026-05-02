@@ -1,0 +1,154 @@
+---
+/**
+ * AboutPlaceholder
+ *
+ * Tasteful 4:5 placeholder for the right column of the "Qui som"
+ * section, used until a portrait of the team or the salon is available.
+ * Replaces the previous lone-scissors look that read as "we forgot to put a photo here".
+ *
+ * Composition:
+ *   - Soft cream card (background-alt token).
+ *   - Three stylised pairs of scissors at increasing rotations and
+ *     decreasing opacity (centre most opaque, outer ones at 0.5 and
+ *     0.3) — gives a hand-drawn editorial feel without leaning on a
+ *     real photo.
+ *   - A faint diagonal hatch behind the scissors — sits in the
+ *     muted/15 alpha range so it never competes with the foreground.
+ *   - Caption strip at the bottom labelling the slot as a reserved
+ *     space for a real photograph, in the active language.
+ *
+ * Reads `lang` from the page URL via getLangFromUrl so the caption
+ * matches the rest of the page without the parent having to pass
+ * anything.
+ */
+import { getLangFromUrl, useTranslations } from '../../i18n/utils';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+---
+
+<figure
+	class="aspect-[4/5] w-full max-w-sm relative overflow-hidden rounded-md border border-border bg-card"
+	aria-hidden="true"
+>
+	<svg
+		viewBox="0 0 400 500"
+		preserveAspectRatio="xMidYMid slice"
+		class="absolute inset-0 h-full w-full"
+		role="presentation"
+	>
+		<defs>
+			<pattern
+				id="about-hatch"
+				width="14"
+				height="14"
+				patternUnits="userSpaceOnUse"
+				patternTransform="rotate(45)"
+			>
+				<line
+					x1="0"
+					y1="0"
+					x2="0"
+					y2="14"
+					stroke="currentColor"
+					stroke-width="0.6"
+					class="text-muted"
+				/>
+			</pattern>
+		</defs>
+
+		{/* Hatch fills the canvas at low alpha so it reads as a texture. */}
+		<rect
+			x="0"
+			y="0"
+			width="400"
+			height="500"
+			fill="url(#about-hatch)"
+			opacity="0.18"
+		/>
+
+		{/*
+		  Three stylised scissors at different sizes / rotations /
+		  opacities. The geometry is intentionally schematic — two
+		  finger rings (circles), a pivot (small dot), and two blades
+		  (lines fanning from the pivot). All strokes use the foreground
+		  colour via currentColor and are scaled by transform="…".
+		*/}
+
+		{/* Outer-left scissors — small, faint, rotated counter-clockwise. */}
+		<g
+			transform="translate(110 145) rotate(-22) scale(0.8)"
+			class="text-foreground"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			opacity="0.3"
+		>
+			<circle cx="-30" cy="40" r="14" />
+			<circle cx="30" cy="40" r="14" />
+			<line x1="-22" y1="32" x2="60" y2="-50" />
+			<line x1="22" y1="32" x2="-60" y2="-50" />
+			<circle cx="0" cy="20" r="2.5" fill="currentColor" />
+		</g>
+
+		{/* Centre scissors — biggest, most opaque, slight tilt right. */}
+		<g
+			transform="translate(200 250) rotate(8)"
+			class="text-foreground"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2.5"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			opacity="0.85"
+		>
+			<circle cx="-40" cy="55" r="18" />
+			<circle cx="40" cy="55" r="18" />
+			<line x1="-30" y1="44" x2="80" y2="-72" />
+			<line x1="30" y1="44" x2="-80" y2="-72" />
+			<circle cx="0" cy="28" r="3.5" fill="currentColor" />
+		</g>
+
+		{/* Outer-right scissors — medium, mid opacity, primary tint to
+		    inject the brand colour without a logo. */}
+		<g
+			transform="translate(310 360) rotate(34) scale(0.7)"
+			class="text-primary"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="2"
+			stroke-linecap="round"
+			stroke-linejoin="round"
+			opacity="0.5"
+		>
+			<circle cx="-30" cy="40" r="14" />
+			<circle cx="30" cy="40" r="14" />
+			<line x1="-22" y1="32" x2="60" y2="-50" />
+			<line x1="22" y1="32" x2="-60" y2="-50" />
+			<circle cx="0" cy="20" r="2.5" fill="currentColor" />
+		</g>
+
+		{/* Soft frame — primary colour at low alpha so the card looks
+		    intentional rather than empty. */}
+		<rect
+			x="14"
+			y="14"
+			width="372"
+			height="472"
+			fill="none"
+			rx="8"
+			class="text-primary"
+			stroke="currentColor"
+			stroke-width="1"
+			opacity="0.2"
+		/>
+	</svg>
+
+	<figcaption
+		class="absolute bottom-3 left-1/2 -translate-x-1/2 max-w-[80%] text-center text-xs uppercase tracking-widest text-muted bg-background/80 px-2 py-1 rounded-sm backdrop-blur-sm"
+	>
+		{t('about.placeholderImageCaption')}
+	</figcaption>
+</figure>

@@ -1,0 +1,168 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import GalleryPageHero from '../../components/sections/GalleryPageHero.astro';
+import GalleryMosaic from '../../components/sections/GalleryMosaic.astro';
+import GalleryFilter from '../../components/GalleryFilter.astro';
+import GalleryLightbox from '../../components/GalleryLightbox.astro';
+import BeforeAfterSlider from '../../components/BeforeAfterSlider.astro';
+import Button from '../../components/Button.astro';
+import FadeInOnScroll from '../../components/animations/FadeInOnScroll.astro';
+import { Icon } from 'astro-icon/components';
+import { galleryImages, galleryCategories, heroImage, galleryBeforeAfterEntries } from '../../data/gallery';
+import { useTranslations } from '../../i18n/utils';
+import { getRoutePair } from '../../i18n/routes';
+import { business } from '../../data/business';
+
+const lang = 'ca' as const;
+const t = useTranslations(lang);
+const contactHref = getRoutePair('contact')[lang];
+---
+
+<BaseLayout
+	title={`Galeria · ${business.name}`}
+	description={`Ambient, cuina oberta i espai gastronòmic de ${business.name} a ${business.address.city}. Fotografia de referència mentre arriben imatges del local.`}
+	siblingPath="/es/galeria/"
+	keywords={[
+		'restaurant galeria la ametlla vallès',
+		'el mini nou fotos restaurant',
+		'braseria tapes ametlla vallès',
+		'restaurant jeroni moragas',
+	]}
+	breadcrumbs={[
+		{ name: 'Inici', url: '/ca/' },
+		{ name: 'Galeria', url: '/ca/galeria/' },
+	]}
+>
+	<GalleryPageHero
+		lang={lang}
+		heroImage={heroImage}
+		eyebrow={t('galleryPage.heroEyebrow')}
+		title={t('galleryPage.heroTitle')}
+		subtitle={t('galleryPage.heroSubtitle')}
+	/>
+
+	<Container as="section" class="space-y-4 pb-10 md:pb-14 pt-10 md:pt-14">
+		<GalleryFilter categories={galleryCategories} lang={lang} sticky />
+		<p class="max-w-2xl text-xs leading-relaxed text-muted md:text-sm">
+			{t('galleryPage.toolbarHint')}
+		</p>
+		<div
+			class="rounded-[2rem] bg-card p-4 shadow-[0_32px_80px_-48px_oklch(0%_0_0/0.45)] ring-1 ring-[color-mix(in_oklch,var(--color-foreground)_7%,transparent)] md:p-7 md:px-8 md:py-9"
+		>
+			<GalleryMosaic
+				images={galleryImages.map((g) => ({
+					src: g.src,
+					alt: g.alt[lang],
+					photographer: g.photographer,
+					photoLicense: g.photoLicense,
+					categories: g.categories as unknown as ReadonlyArray<string>,
+				}))}
+				pullQuote={{
+					eyebrow: t('galleryPage.pullQuoteEyebrow'),
+					body: t('galleryPage.pullQuoteBody'),
+					attribution: t('galleryPage.pullQuoteAttribution'),
+				}}
+				lightbox
+				filterable
+				ariaLabel={t('galleryPage.mosaicAria')}
+				openFullLabel={t('galleryPage.overlayZoomAria')}
+			/>
+		</div>
+	</Container>
+
+	<FadeInOnScroll delay={100}>
+		<section class="border-t border-border bg-background py-16 md:py-24">
+			<Container class="space-y-8">
+				<div class="space-y-3">
+					<Heading as="h2" size="h3">{t('gallery.beforeAfterHeading')}</Heading>
+					<p class="max-w-xl text-sm leading-relaxed text-muted">
+						{t('gallery.beforeAfterIntro')}
+					</p>
+				</div>
+				<div class="grid gap-12 md:grid-cols-2 md:gap-x-10 md:gap-y-14">
+					{
+						galleryBeforeAfterEntries.map((entry, index) => {
+							const isOddLast =
+								galleryBeforeAfterEntries.length % 2 === 1 &&
+								index === galleryBeforeAfterEntries.length - 1;
+
+							const itemAria = `${t('gallery.beforeAfterAriaLabel')} — ${entry.title[lang]}`;
+
+							return (
+								<article
+									class:list={[
+										'flex flex-col gap-4',
+										isOddLast && 'md:col-span-2 max-w-4xl w-full mx-auto',
+									]}
+								>
+									<div class="border-b border-[color-mix(in_oklch,var(--color-border)_90%,transparent)] pb-4">
+										<h3 class="font-display text-xl font-medium tracking-tight text-foreground md:text-[1.35rem]">
+											{entry.title[lang]}
+										</h3>
+									</div>
+									<div
+										class:list={[
+											'overflow-hidden rounded-[1.75rem]',
+											'ring-1 ring-[color-mix(in_oklch,var(--color-foreground)_8%,transparent)]',
+											'shadow-[0_40px_100px_-50px_oklch(0%_0_0/0.5)]',
+										]}
+									>
+										<BeforeAfterSlider
+											afterSrc={entry.afterSrc}
+											beforeSrc={entry.beforeSrc}
+											altAfter={entry.altAfter[lang]}
+											beforeAlt={entry.altBefore?.[lang]}
+											beforeLabel={t('gallery.beforeLabel')}
+											afterLabel={t('gallery.afterLabel')}
+											ariaLabel={itemAria}
+											aspectRatio={entry.aspectRatio ?? '16/9'}
+										/>
+									</div>
+								</article>
+							);
+						})
+					}
+				</div>
+			</Container>
+		</section>
+	</FadeInOnScroll>
+
+	<GalleryLightbox
+		lang={lang}
+		images={galleryImages.map((g) => ({
+			src: g.src,
+			alt: g.alt[lang],
+			photographer: g.photographer,
+			photoLicense: g.photoLicense,
+		}))}
+	/>
+
+	<FadeInOnScroll delay={120}>
+		<section class="relative overflow-hidden border-t border-border bg-card py-20 md:py-28">
+			<div class="pointer-events-none absolute inset-0 opacity-[0.07]" aria-hidden="true" style="
+					background-image: radial-gradient(oklch(30% 0.05 305) 1px, transparent 0);
+					background-size: 22px 22px;
+				"
+			>
+			</div>
+			<Container class="relative text-center space-y-7">
+				<Heading as="h2" size="h3">{t('galleryPage.ctaHeading')}</Heading>
+				<Text variant="lead" class="max-w-xl mx-auto text-muted">{t('galleryPage.ctaBody')}</Text>
+				<div>
+					<Button as="a" href={contactHref} variant="primary" size="md">
+						{t('galleryPage.ctaButton')}
+						<Icon
+							slot="icon-trailing"
+							name="tabler:chevron-right"
+							class="h-4 w-4"
+							aria-hidden="true"
+						/>
+					</Button>
+				</div>
+			</Container>
+		</section>
+	</FadeInOnScroll>
+</BaseLayout>

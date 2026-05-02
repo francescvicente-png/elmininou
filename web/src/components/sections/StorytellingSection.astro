@@ -1,0 +1,308 @@
+---
+/**
+ * StorytellingSection
+ *
+ * Sticky-scroll storytelling. The outer section is tall (`height:
+ * 400vh` for 4 scenes, `100vh` per scene) so the document has
+ * enough vertical scroll to consume; the inner sticky child fills
+ * the viewport and holds 4 scene panels stacked on top of each
+ * other. The active panel is determined by scroll progress and
+ * shown via a class flip (CSS handles the cross-fade + per-scene
+ * background colour shift).
+ *
+ * Mobile / reduced-motion fallback (CSS): each scene becomes a
+ * normal flow block with `min-height: 80vh`. No sticky, no progress
+ * tracking — the user reads them as a sequence of full-bleed
+ * sections.
+ *
+ * Data lives in `src/data/storytelling.ts`. Currently INVENTED
+ * placeholder copy with a visible "history demo" badge — see
+ * `pendingConfirmation` flag.
+ */
+import { Picture } from 'astro:assets';
+import Container from '../Container.astro';
+import Heading from '../Heading.astro';
+import Text from '../Text.astro';
+import Badge from '../Badge.astro';
+import { storyScenes, storytellingPlaceholder } from '../../data/storytelling';
+import { galleryImages } from '../../data/gallery';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const headingCopy = {
+	ca: {
+		eyebrow: 'Història',
+		heading: 'Ofici i saló',
+		intro:
+			'Formació, precisió i manera d\'atendre: el que portem a la cadira cada dia.',
+		demoBadge:
+			'Història demostrativa — pendent de personalitzar amb el negoci',
+	},
+	es: {
+		eyebrow: 'Historia',
+		heading: 'Oficio y salón',
+		intro:
+			'Formación, precisión y forma de atender: lo que llevamos a la silla cada día.',
+		demoBadge:
+			'Historia demostrativa — pendiente de personalizar con el negocio',
+	},
+}[lang];
+
+// Resolve images by index from the gallery set.
+const scenes = storyScenes.map((scene) => ({
+	...scene,
+	image: galleryImages[scene.imageIndex] ?? galleryImages[0],
+}));
+---
+
+<section class="storytelling" data-storytelling>
+	<Container as="div" class="pt-20 md:pt-24 pb-8 md:pb-12 space-y-3">
+		<p class="text-xs uppercase tracking-widest text-muted">
+			{headingCopy.eyebrow}
+		</p>
+		<Heading as="h2">{headingCopy.heading}</Heading>
+		<Text variant="lead" class="max-w-2xl">{headingCopy.intro}</Text>
+		{
+			storytellingPlaceholder && (
+				<div>
+					<Badge variant="outline">{headingCopy.demoBadge}</Badge>
+				</div>
+			)
+		}
+	</Container>
+
+	<div class="storytelling-stage">
+		<div class="storytelling-sticky">
+			{
+				scenes.map((scene, idx) => (
+					<article
+						class:list={['story-scene', `story-scene-${scene.id}`]}
+						data-story-scene-index={idx}
+						data-story-scene-active={idx === 0 ? 'true' : undefined}
+					>
+						<div class="story-scene-grid">
+							<figure class="story-scene-figure">
+								<Picture
+									src={scene.image.src}
+									alt={scene.image.alt[lang]}
+									formats={['avif', 'webp']}
+									class="story-scene-img"
+									loading="lazy"
+									decoding="async"
+									sizes="(min-width: 1024px) 50vw, 100vw"
+								/>
+							</figure>
+							<div class="story-scene-text">
+								<p class="story-scene-idea">{scene.idea[lang]}</p>
+								<h3 class="story-scene-title">{scene.title[lang]}</h3>
+								<p class="story-scene-body">{scene.body[lang]}</p>
+								<div class="story-scene-progress" aria-hidden="true">
+									<span class="story-scene-progress-current">
+										{String(idx + 1).padStart(2, '0')}
+									</span>
+									<span class="story-scene-progress-sep">/</span>
+									<span class="story-scene-progress-total">
+										{String(scenes.length).padStart(2, '0')}
+									</span>
+								</div>
+							</div>
+						</div>
+					</article>
+				))
+			}
+		</div>
+	</div>
+</section>
+
+<style>
+	.storytelling {
+		position: relative;
+		background: var(--color-background);
+		transition: background-color 800ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	/* Per-scene tints applied at the SECTION level. UI audit (April
+	   2026): the previous tints (terracotta / blue-grey / olive /
+	   bottle green) departed too far from the cream + bottle-green
+	   identity of the rest of the site. Tints now sit within a single
+	   warm-cream family, all at L≈95% and chroma ≤0.02, so the
+	   "step into a different room" feel is preserved as a hue shift,
+	   not a palette change. Page-default cream is L96 / chroma 0.015 / hue 80.
+	     0 origen        → warmer cream, hue 65 (toward earth)
+	     1 alemanya      → cooler cream, hue 230 (faint slate)
+	     2 catalunya     → cream, hue 110 (faint olive)
+	     3 ametlla      → cream, hue 155 (faint brand green)
+	*/
+	.storytelling[data-active-scene='0'] {
+		background-color: oklch(95% 0.020 65);
+	}
+	.storytelling[data-active-scene='1'] {
+		background-color: oklch(95% 0.012 230);
+	}
+	.storytelling[data-active-scene='2'] {
+		background-color: oklch(95% 0.018 110);
+	}
+	.storytelling[data-active-scene='3'] {
+		background-color: oklch(95% 0.022 155);
+	}
+
+	/* Default (mobile + reduced-motion fallback): each scene is a
+	   normal block. The grid below stretches; no sticky. */
+	.storytelling-stage {
+		position: relative;
+	}
+
+	.storytelling-sticky {
+		display: block;
+	}
+
+	.story-scene {
+		display: block;
+		min-height: 70vh;
+		padding: 3rem 0;
+	}
+
+	.story-scene-grid {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 0 1.5rem;
+		display: grid;
+		grid-template-columns: 1fr;
+		gap: 2rem;
+		align-items: center;
+	}
+
+	.story-scene-figure {
+		margin: 0;
+		aspect-ratio: 4/5;
+		overflow: hidden;
+		border-radius: var(--radius-xl);
+	}
+
+	.story-scene-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+
+	.story-scene-text {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.story-scene-idea {
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-primary);
+		margin: 0;
+	}
+
+	.story-scene-title {
+		font-family: var(--font-display);
+		/* clamp max capped at 3rem (≈48 px) so this <h3> stays SMALLER
+		   than the section's <h2> ("Ofici i saló"), which
+		   is the document's natural h2 (text-3xl md:text-5xl ≈ 30/48 px).
+		   The scene title used to climb to 3.5rem ≈ 56 px on wide
+		   viewports, larger than the section heading above it — that
+		   inverted the document outline visually. */
+		font-size: clamp(1.75rem, 2.5vw + 0.5rem, 3rem);
+		line-height: 1.1;
+		color: var(--color-foreground);
+		margin: 0;
+	}
+
+	.story-scene-body {
+		font-family: var(--font-body);
+		font-size: clamp(1rem, 1vw + 0.5rem, 1.25rem);
+		line-height: 1.7;
+		color: var(--color-foreground);
+		margin: 0;
+		max-width: 38rem;
+	}
+
+	.story-scene-progress {
+		display: inline-flex;
+		gap: 0.4rem;
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		color: var(--color-muted);
+		margin-top: 1rem;
+	}
+
+	.story-scene-progress-current {
+		color: var(--color-primary);
+	}
+
+	/* Desktop sticky storytelling. Only when the viewport is wide
+	   enough AND the user hasn't asked for reduced motion. */
+	@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+		.storytelling-stage {
+			height: 400vh; /* 100 vh per scene */
+		}
+
+		.storytelling-sticky {
+			position: sticky;
+			top: 0;
+			height: 100vh;
+			overflow: hidden;
+		}
+
+		.story-scene {
+			position: absolute;
+			inset: 0;
+			min-height: 0;
+			padding: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			opacity: 0;
+			pointer-events: none;
+			transition:
+				opacity 700ms cubic-bezier(0.22, 1, 0.36, 1);
+			will-change: opacity;
+		}
+
+		.story-scene[data-story-scene-active='true'] {
+			opacity: 1;
+			pointer-events: auto;
+		}
+
+		.story-scene-grid {
+			grid-template-columns: 1fr 1fr;
+			gap: 4rem;
+			width: 100%;
+			padding: 0 4rem;
+		}
+
+		.story-scene-figure {
+			aspect-ratio: 4/5;
+			max-height: 75vh;
+		}
+
+		.story-scene-img {
+			transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1);
+		}
+
+		.story-scene[data-story-scene-active='true'] .story-scene-img {
+			transform: scale(1.04);
+		}
+
+		/* Sticky container is transparent — the section-level tint
+		   underneath shows through. */
+		.storytelling-sticky {
+			background-color: transparent;
+		}
+	}
+</style>

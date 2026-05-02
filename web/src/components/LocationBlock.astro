@@ -1,0 +1,167 @@
+---
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import { business } from '../data/business';
+import { getRoutePair } from '../i18n/routes';
+import OpeningHours from './OpeningHours.astro';
+import Button from './Button.astro';
+import Heading from './Heading.astro';
+import { Icon } from 'astro-icon/components';
+
+type HeadingLevel = 'h2' | 'h3' | 'h4';
+
+interface Props {
+	lang: Lang;
+	variant?: 'full' | 'compact';
+	class?: string;
+	/** Semantic heading level for the block title. Default h3. */
+	headingLevel?: HeadingLevel;
+}
+
+const {
+	lang,
+	variant = 'full',
+	class: className,
+	headingLevel = 'h3',
+} = Astro.props;
+const t = useTranslations(lang);
+const directionsHref = getRoutePair('directions')[lang];
+
+// OpenStreetMap deep link to the business coordinates.
+const osmUrl =
+	`https://www.openstreetmap.org/?mlat=${business.geo.lat}` +
+	`&mlon=${business.geo.lon}#map=17/${business.geo.lat}/${business.geo.lon}`;
+---
+
+{
+	variant === 'full' ? (
+		<div
+			class:list={[
+				'location-block location-block-full rounded-xl border border-border bg-card p-6 md:p-7 space-y-5',
+				className,
+			]}
+		>
+			<Heading as={headingLevel} size="h4">
+				{t('location.title')}
+			</Heading>
+
+			<div class="space-y-3">
+				{/* The address is wrapped in an <a> so tapping/clicking
+				    it opens Google Maps directly — the standard
+				    affordance on local-business sites (Yelp, ficha
+				    Google). The explicit "Open in Google Maps" button
+				    below stays for users who prefer the clear action. */}
+				<a
+					href={business.googleMapsUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="block text-foreground hover:text-primary transition-colors"
+				>
+					<address class="not-italic leading-relaxed">
+						{business.address.street}<br />
+						{`${business.address.postalCode} ${business.address.city}, ${business.address.region}`}
+					</address>
+				</a>
+				<p>
+					<a
+						href={`tel:${business.phoneTel}`}
+						class="text-foreground hover:text-primary transition-colors inline-flex items-center gap-2"
+					>
+						<Icon name="tabler:phone" class="h-4 w-4" aria-hidden="true" />
+						{business.phone}
+					</a>
+				</p>
+			</div>
+
+			<OpeningHours lang={lang} />
+
+			<div class="flex flex-wrap gap-3">
+				<Button
+					as="a"
+					href={business.googleMapsUrl}
+					variant="primary"
+					external
+					size="md"
+				>
+					<Icon
+						slot="icon-leading"
+						name="tabler:map-pin"
+						class="h-4 w-4"
+						aria-hidden="true"
+					/>
+					{t('map.openInGoogle')}
+				</Button>
+				<Button as="a" href={directionsHref} variant="secondary" size="md">
+					{t('nav.directions')}
+				</Button>
+				<Button as="a" href={osmUrl} variant="secondary" external size="md">
+					{t('location.viewOnOSM')}
+				</Button>
+			</div>
+		</div>
+	) : (
+		<div
+			class:list={[
+				'location-block location-block-compact rounded-xl border border-border bg-card p-6 space-y-4',
+				className,
+			]}
+		>
+			<a
+				href={business.googleMapsUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="block text-foreground hover:text-primary transition-colors"
+			>
+				<address class="not-italic leading-relaxed text-sm">
+					<Heading as="p" size="h5" class="!font-display !text-base mb-1">
+						{business.name}
+					</Heading>
+					{business.address.street}, {business.address.postalCode} {business.address.city}
+				</address>
+			</a>
+			<Button
+				as="a"
+				href={business.googleMapsUrl}
+				variant="secondary"
+				external
+				size="sm"
+			>
+				<Icon
+					slot="icon-leading"
+					name="tabler:map-pin"
+					class="h-4 w-4"
+					aria-hidden="true"
+				/>
+				{t('map.openInGoogle')}
+			</Button>
+		</div>
+	)
+}
+
+<style>
+	/* Cards lift slightly on hover with a primary-tinted shadow and a primary
+	   border. Same recipe as ServiceCard / ProductCard / ReviewCard so all
+	   card surfaces share one interaction language. */
+	.location-block {
+		transition:
+			transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			border-color 400ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: transform;
+	}
+
+	.location-block:hover {
+		transform: translateY(-4px);
+		box-shadow: 0 12px 32px -8px oklch(30% 0.075 320 / 0.18);
+		border-color: var(--color-primary);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.location-block,
+		.location-block:hover {
+			transition: none;
+			transform: none;
+			box-shadow: none;
+		}
+	}
+</style>

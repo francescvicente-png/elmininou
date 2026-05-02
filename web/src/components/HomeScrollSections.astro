@@ -1,0 +1,127 @@
+---
+/**
+ * Renders the home page sections below the hero (hero is handled by the
+ * parent so it can sit on the page canvas without a cream band behind it).
+ */
+import FadeInOnScroll from './animations/FadeInOnScroll.astro';
+import NuviesTeaser from './NuviesTeaser.astro';
+import HighlightsSection from './sections/HighlightsSection.astro';
+import ServicesPreview from './sections/ServicesPreview.astro';
+import GalleryPreview from './sections/GalleryPreview.astro';
+import MarqueeSection from './sections/MarqueeSection.astro';
+import PostGalleryHeroSection from './sections/PostGalleryHeroSection.astro';
+import AboutSection from './sections/AboutSection.astro';
+import StorytellingSection from './sections/StorytellingSection.astro';
+import ManifestoSection from './sections/ManifestoSection.astro';
+import EquipSection from './sections/EquipSection.astro';
+import FactsSection from './sections/FactsSection.astro';
+import TypographicInterlude from './TypographicInterlude.astro';
+import ReviewsSection from './sections/ReviewsSection.astro';
+import LocationSection from './sections/LocationSection.astro';
+import CtaBannerSection from './sections/CtaBannerSection.astro';
+import LogoVideoSection from './sections/LogoVideoSection.astro';
+import type { HomeSectionConfig } from '../config/home-sections';
+import type { Lang } from '../i18n/config';
+
+interface Props {
+	lang: Lang;
+	sections: ReadonlyArray<HomeSectionConfig>;
+}
+
+const { lang, sections } = Astro.props;
+---
+
+{
+	sections.map((section) => {
+		if (section.id === 'bridal-teaser') {
+			/*
+			 * Transparent band: teaser uses `bg-transparent` — no page-canvas slab
+			 * behind it so the fixed hero portrait reads through gutters + card area.
+			 */
+			return (
+				<FadeInOnScroll delay={100}>
+					<section class="relative z-[5] pb-6 md:pb-8">
+						<NuviesTeaser lang={lang} />
+					</section>
+				</FadeInOnScroll>
+			);
+		}
+
+		if (section.id === 'gallery-preview') {
+			/*
+			 * No opaque shell: typography and gutters sit over the fixed home
+			 * hero photograph (same layering as Highlights / Services band).
+			 * The rounded gallery island retains `bg-card` for contrast on the tiles.
+			 */
+			return (
+				<div class="relative z-20 -mt-12 md:-mt-20 lg:-mt-28">
+					<GalleryPreview lang={lang} />
+				</div>
+			);
+		}
+
+		if (section.id === 'interlude-aiguafreda') {
+			return <TypographicInterlude word="LA AMETLLA" size="lg" />;
+		}
+		if (section.id === 'interlude-ofici') {
+			return (
+				<TypographicInterlude
+					word={lang === 'ca' ? 'OFICI' : 'OFICIO'}
+					size="md"
+				/>
+			);
+		}
+
+		if (section.id === 'post-gallery-hero') {
+			return <PostGalleryHeroSection lang={lang} />;
+		}
+
+		let SectionComponent;
+		let delay = 100;
+		switch (section.id) {
+			case 'highlights':
+				SectionComponent = HighlightsSection;
+				break;
+			case 'marquee':
+				SectionComponent = MarqueeSection;
+				break;
+			case 'services-preview':
+				SectionComponent = ServicesPreview;
+				break;
+			case 'about':
+				SectionComponent = AboutSection;
+				break;
+			case 'storytelling':
+				SectionComponent = StorytellingSection;
+				break;
+			case 'equip':
+				SectionComponent = EquipSection;
+				break;
+			case 'manifesto':
+				SectionComponent = ManifestoSection;
+				break;
+			case 'facts':
+				SectionComponent = FactsSection;
+				break;
+			case 'reviews':
+				SectionComponent = ReviewsSection;
+				break;
+			case 'location':
+				SectionComponent = LocationSection;
+				break;
+			case 'cta-banner':
+				SectionComponent = CtaBannerSection;
+				break;
+			case 'logo-video':
+				SectionComponent = LogoVideoSection;
+				break;
+		}
+
+		if (!SectionComponent) return null;
+		return (
+			<FadeInOnScroll delay={delay}>
+				<SectionComponent lang={lang} />
+			</FadeInOnScroll>
+		);
+	})
+}

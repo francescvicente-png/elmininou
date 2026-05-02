@@ -1,0 +1,74 @@
+---
+/**
+ * BridalFaqBlock — eyebrow + headline framing the existing FaqList.
+ *
+ * The shared <FaqList /> already cascades each item with .fade-in-on-
+ * scroll and renders semantic <details>/<summary> with proper aria.
+ * We only add the editorial header so the bridal page keeps a unified
+ * section silhouette (eyebrow → display heading → body intro).
+ *
+ * Skills enforced:
+ *   - redesign-skill ("Accordion FAQ sections" → keep semantic
+ *     <details>, do NOT silently rebuild as inline disclosure list;
+ *     the existing FaqItem accomplishes both well already)
+ *   - ui-ux-pro-max §1 (heading hierarchy: page h1 → section h2 → item h3)
+ */
+import Container from '../Container.astro';
+import FaqList from '../FaqList.astro';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { bridalFaqs } from '../../data/bridal';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section
+	class="bridal-faq relative bg-background py-24 md:py-32 lg:py-36"
+	aria-labelledby="bridal-faq-title"
+>
+	<Container>
+		<header class="max-w-2xl mb-12 md:mb-16 fade-in-on-scroll" style="--fade-delay: 0ms; --fade-duration: 700ms;">
+			<p class="bridal-eyebrow">{t('bridal.faqEyebrow')}</p>
+			<h2
+				id="bridal-faq-title"
+				class="bridal-faq-title font-display text-foreground mt-4 mb-5"
+			>
+				{t('bridal.faqTitleNew')}
+			</h2>
+			<p class="bridal-faq-intro font-body text-muted leading-relaxed">
+				{t('bridal.faqIntroNew')}
+			</p>
+		</header>
+
+		<FaqList lang={lang} items={bridalFaqs} headingLevel="h3" cascadeStep={70} />
+	</Container>
+</section>
+
+<style>
+	.bridal-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+	.bridal-faq-title {
+		font-size: clamp(1.875rem, 2.6vw + 0.75rem, 3.25rem);
+		line-height: 1.1;
+		letter-spacing: -0.018em;
+		font-weight: 400;
+		text-wrap: balance;
+		margin-block: 0.5rem 0;
+	}
+	.bridal-faq-intro {
+		font-size: 1rem;
+		max-width: 56ch;
+		text-wrap: pretty;
+	}
+</style>

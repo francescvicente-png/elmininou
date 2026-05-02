@@ -1,0 +1,96 @@
+---
+/**
+ * Category sections for the products landing: editorial headers + alternating
+ * ProductShowcaseCard rows (h2 category, h3 product titles).
+ */
+import Heading from '../Heading.astro';
+import ProductShowcaseCard from '../ProductShowcaseCard.astro';
+import type { Lang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import {
+	type ProductCategoryKey,
+	type ProductGroup,
+	productCategoryAnchorId,
+} from '../../data/products';
+
+interface Props {
+	lang: Lang;
+	groups: ReadonlyArray<ProductGroup>;
+	/** First product in DOM order receives LCP-friendly image hints. */
+	firstProductId: string | undefined;
+	class?: string;
+}
+
+const { lang, groups, firstProductId, class: className } = Astro.props;
+const t = useTranslations(lang);
+
+const categoryLabelKey: Record<
+	ProductCategoryKey,
+	| 'products.categoryCare'
+	| 'products.categoryStyling'
+	| 'products.categoryAccessories'
+> = {
+	care: 'products.categoryCare',
+	styling: 'products.categoryStyling',
+	accessories: 'products.categoryAccessories',
+};
+
+let cardIndex = 0;
+---
+
+<div class:list={['products-grouped-catalog space-y-16 md:space-y-20', className]}>
+	<h2 id="products-catalog-start" class="sr-only">
+		{t('products.catalogSrHeading')}
+	</h2>
+	{
+		groups.map((group) => {
+			const sectionId = productCategoryAnchorId(group.category);
+			const headingId = `${sectionId}-title`;
+			return (
+				<section
+					class="products-prod-section scroll-mt-28 md:scroll-mt-32"
+					id={sectionId}
+					aria-labelledby={headingId}
+				>
+					<header class="relative mb-8 md:mb-10">
+						<p
+							class="mb-2 font-body text-[0.65rem] font-medium uppercase tracking-[0.28em] text-muted"
+							aria-hidden="true"
+						>
+							{t('products.pageTitle')}
+						</p>
+						<Heading
+							as="h2"
+							size="h3"
+							class="!font-display !text-2xl !tracking-tight md:!text-3xl"
+							id={headingId}
+						>
+							{t(categoryLabelKey[group.category])}
+						</Heading>
+						<div
+							class="mt-4 h-px max-w-[min(12rem,40%)] bg-gradient-to-r from-accent/80 to-transparent"
+							aria-hidden="true"
+						/>
+					</header>
+					<div class="flex flex-col gap-10 md:gap-12 lg:gap-14">
+						{group.items.map((p) => {
+							const flip = cardIndex % 2 === 1;
+							const isFirstLcp = p.id === firstProductId;
+							cardIndex += 1;
+							return (
+								<ProductShowcaseCard
+									product={p}
+									lang={lang}
+									layoutFlip={flip}
+									headingLevel="h3"
+									imageFetchPriority={isFirstLcp ? 'high' : 'auto'}
+									imageLoading={isFirstLcp ? 'eager' : 'lazy'}
+								/>
+							);
+						})}
+					</div>
+				</section>
+			);
+		})
+	}
+</div>

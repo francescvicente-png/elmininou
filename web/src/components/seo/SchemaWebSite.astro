@@ -1,0 +1,20 @@
+---
+// WebSite schema rendered ONLY on language home pages (/ca/, /es/).
+// We deliberately do NOT include a SearchAction: this site has no internal
+// search and declaring one would mislead crawlers.
+
+import { business } from '../../data/business';
+
+const siteUrl = new URL('/', Astro.site).toString().replace(/\/$/, '');
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'WebSite',
+	'@id': `${siteUrl}/#website`,
+	name: business.name,
+	url: `${siteUrl}/`,
+	inLanguage: ['ca-ES', 'es-ES'],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

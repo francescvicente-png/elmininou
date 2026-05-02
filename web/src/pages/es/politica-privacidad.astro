@@ -1,0 +1,231 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import { legalEntity, serviceProvider, websiteOwner } from '../../data/legal';
+import { business } from '../../data/business';
+---
+
+<BaseLayout
+	title={`Política de privacidad · ${business.name}`}
+	description={`Política de privacidad de ${business.name}. Tratamiento de datos, derechos del usuario y terceros que procesan datos.`}
+	siblingPath="/ca/politica-privacitat/"
+	breadcrumbs={[
+		{ name: 'Inicio', url: '/es/' },
+		{ name: 'Política de privacidad', url: '/es/politica-privacidad/' },
+	]}
+>
+	<Container as="section" class="pt-16 pb-8 md:pt-24 md:pb-10 space-y-4 max-w-3xl">
+		<Heading as="h1">Política de privacidad</Heading>
+		<Text variant="lead">
+			Tratamiento de datos personales de este sitio web, en cumplimiento del
+			Reglamento General de Protección de Datos (RGPD) y la Ley orgánica
+			3/2018, de protección de datos personales y garantía de los derechos
+			digitales (LOPDGDD).
+		</Text>
+	</Container>
+
+	<Container as="section" class="pb-20 md:pb-24 space-y-10 max-w-3xl">
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">1. Responsable del tratamiento</Heading>
+			{!websiteOwner.isFinalOwner && (
+				<div class="rounded-md border border-border bg-card px-5 py-4 text-sm text-muted">
+					{websiteOwner.note}
+				</div>
+			)}
+			<Heading as="h3" size="h4">1.1. Respecto a la navegación por este sitio web</Heading>
+			<Text variant="small" class="text-muted">
+				Tratamiento derivado de la publicación técnica del dominio y, en su caso,
+				de datos agregados o cookies estrictamente necesarias (véase la política de cookies).
+			</Text>
+			<ul class="space-y-1 text-base font-body text-foreground leading-relaxed">
+				<li><strong>Responsable:</strong> {serviceProvider.fullName}</li>
+				<li><strong>NIF:</strong> {serviceProvider.taxId}</li>
+				<li><strong>Dirección:</strong> {serviceProvider.addressLine}</li>
+				<li>
+					<strong>Correo electrónico:</strong>{' '}
+					<a href={`mailto:${serviceProvider.email}`} class="hover:text-primary transition-colors">{serviceProvider.email}</a>
+				</li>
+			</ul>
+			<Heading as="h3" size="h4" class="pt-2">1.2. Respecto a la relación comercial con el salón</Heading>
+			<Text variant="small" class="text-muted">
+				Para ejercer derechos o consultas sobre datos que haya facilitado al salón
+				al citar o contratar servicios presenciales, teléfono o WhatsApp, diríjase
+				al punto de contacto del negocio.
+			</Text>
+			<ul class="space-y-1 text-base font-body text-foreground leading-relaxed">
+				<li><strong>Nombre comercial:</strong> {legalEntity.tradeName}</li>
+				<li><strong>Titular (nombre legal):</strong> {legalEntity.legalName}</li>
+				<li><strong>Dirección del local:</strong> {legalEntity.address}</li>
+				<li>
+					<strong>Correo electrónico del salón:</strong>{' '}
+					{legalEntity.email.startsWith('TODO_') ? (
+						<span class="text-muted italic">[pendiente]</span>
+					) : (
+						<a href={`mailto:${legalEntity.email}`} class="hover:text-primary transition-colors">{legalEntity.email}</a>
+					)}
+				</li>
+				<li><strong>Teléfono:</strong> {legalEntity.phone}</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">2. Qué datos recogemos</Heading>
+			<Text>
+				<strong>Este sitio web no recoge datos personales directamente.</strong>{' '}
+				No hay formulario de contacto propio, no hay registro de usuarios, y
+				no se envía ningún boletín desde este dominio. Las únicas
+				interacciones disponibles son:
+			</Text>
+			<ul class="list-disc pl-6 space-y-2 text-base font-body text-foreground leading-relaxed">
+				<li>
+					<strong>Reservar cita:</strong> las reservas se gestionan por
+					teléfono o WhatsApp fuera de este dominio. Los datos que comuniques en
+					esas conversaciones se tratan según la política de tu operador
+					telefónico y, en su caso, de Meta (WhatsApp).
+				</li>
+				<li>
+					<strong>Llamar:</strong> el botón "Llamar" inicia una llamada
+					telefónica fuera del navegador. Esta acción no genera ningún
+					registro en la web.
+				</li>
+				<li>
+					<strong>Ver ubicación:</strong> los botones de ubicación abren
+					Google Maps y OpenStreetMap en una pestaña nueva. El tratamiento
+					de datos queda a cargo de cada uno de estos servicios.
+				</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">3. Tratamiento de datos agregados</Heading>
+			<Text>
+				El proveedor de alojamiento (Cloudflare Pages) procesa registros
+				técnicos agregados inherentes a todo servicio web — dirección IP
+				truncada, tipo de navegador, código de respuesta HTTP — con fines
+				de seguridad y diagnóstico. Estos datos se conservan durante un
+				periodo breve (típicamente 24 horas para los logs detallados) y no
+				se utilizan para identificar a personas.
+			</Text>
+			<Text>
+				En el momento de esta versión de la política, el sitio no tiene
+				activado ningún servicio adicional de analítica. Si se añade
+				Cloudflare Web Analytics, esta política indicará claramente que se
+				trata de un servicio sin cookies, sin seguimiento individual y sin
+				identificadores persistentes.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">4. Bases legales del tratamiento</Heading>
+			<Text>
+				El tratamiento de los registros técnicos descrito en el apartado
+				anterior se fundamenta en el <strong>interés legítimo</strong> del
+				titular y del proveedor de hosting para garantizar la seguridad, la
+				disponibilidad y la integridad del servicio. Cualquier cookie no
+				estrictamente técnica requerirá el <strong>consentimiento expreso</strong>{' '}
+				del usuario, que se recoge mediante el banner que aparece al
+				acceder al sitio.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">5. Derechos del usuario</Heading>
+			<Text>
+				Tienes derecho a solicitar al titular el <strong>acceso</strong>, la{' '}
+				<strong>rectificación</strong>, la <strong>supresión</strong>, la{' '}
+				<strong>limitación del tratamiento</strong>, la{' '}
+				<strong>oposición</strong> y la <strong>portabilidad</strong> de tus
+				datos, así como retirar el consentimiento en cualquier momento.
+			</Text>
+			<Text>
+				Para ejercer estos derechos, puedes contactar al correo electrónico
+				indicado en el apartado 1 de esta política, adjuntando un documento
+				que acredite tu identidad. La solicitud se atenderá en el plazo
+				legalmente establecido.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">6. Terceros que procesan datos</Heading>
+			<Text>
+				El funcionamiento de este sitio y los servicios asociados implica las
+				siguientes entidades encargadas del tratamiento o destinatarias de
+				datos:
+			</Text>
+			<ul class="list-disc pl-6 space-y-2 text-base font-body text-foreground leading-relaxed">
+				<li>
+					<strong>Cloudflare, Inc.</strong> — proveedor de alojamiento y red
+					de distribución de contenidos. Procesa logs técnicos y, si se
+					activa, datos agregados de Web Analytics sin cookies.
+				</li>
+				<li>
+					<strong>Meta Platforms Ireland Ltd. (WhatsApp)</strong> — al hacer
+					clic en el enlace de WhatsApp accedes a su servicio; cualquier dato
+					que comuniques se trata bajo su política de privacidad.
+				</li>
+				<li>
+					<strong>Google Maps</strong> — utilizado como destino de los
+					enlaces de ubicación. Tratamiento de datos regulado por la
+					política de Google.
+				</li>
+				<li>
+					<strong>Google (Gemini API)</strong> — utilizada puntualmente para
+					generar imágenes demostrativas de ambiente de restaurante (no son el
+					local real ni personas identificables). El material se publica de
+					forma estática en este alojamiento; la generación ya se produjo fuera
+					de tu visita a la página.
+				</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">7. Transferencias internacionales</Heading>
+			<Text>
+				Algunos de los proveedores mencionados — Cloudflare y Google de
+				manera notable — tienen matriz en Estados Unidos. Las
+				transferencias internacionales de datos se realizan al amparo de
+				mecanismos válidos reconocidos por la Comisión Europea, como el
+				marco <em>EU-U.S. Data Privacy Framework</em> y las cláusulas
+				contractuales tipo.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">8. Conservación de los datos</Heading>
+			<Text>
+				Los registros técnicos descritos se conservan durante un periodo
+				breve (orientativamente entre 24 horas y 30 días, según los
+				parámetros del proveedor) y se agregan o anonimizan pasado dicho
+				plazo. No se elabora ningún perfil individual con los datos del
+				sitio web.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">9. Reclamaciones ante la AEPD</Heading>
+			<Text>
+				Si consideras que el tratamiento de tus datos vulnera la normativa
+				vigente, tienes derecho a presentar una reclamación ante la
+				Agencia Española de Protección de Datos (AEPD), accesible en{' '}
+				<a href="https://www.aepd.es" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">www.aepd.es</a>.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">10. Modificaciones</Heading>
+			<Text>
+				El titular se reserva el derecho de actualizar esta política para
+				adaptarla a cambios normativos u operativos. Las modificaciones
+				tendrán efecto desde su publicación en esta misma página.
+			</Text>
+		</div>
+
+		<div class="pt-6 border-t border-border">
+			<Text variant="small" class="text-muted">
+				Última actualización: 27 de abril de 2026.
+			</Text>
+		</div>
+	</Container>
+</BaseLayout>

@@ -1,0 +1,74 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import Button from '../../components/Button.astro';
+import EditorialDivider from '../../components/EditorialDivider.astro';
+import FaqList from '../../components/FaqList.astro';
+import FadeInOnScroll from '../../components/animations/FadeInOnScroll.astro';
+import SchemaFaqPage from '../../components/seo/SchemaFaqPage.astro';
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../../i18n/utils';
+import { getRoutePair } from '../../i18n/routes';
+import { business } from '../../data/business';
+
+const lang = 'ca' as const;
+const t = useTranslations(lang);
+const directionsHref = getRoutePair('directions')[lang];
+---
+
+<BaseLayout
+	title={`Preguntes freqüents · ${business.name}`}
+description={`Respostes a les preguntes habituals sobre ${business.name}: taula, pagaments, aparcament, menú infantil i més.`}
+	siblingPath="/es/faq/"
+	keywords={[
+		'faq restaurant ametlla vallès',
+		'el mini nou reserves',
+		'al·lergens carta jeroni moragas',
+		'aparcament restaurant ametlla del vallès',
+	]}
+	breadcrumbs={[
+		{ name: 'Inici', url: '/ca/' },
+		{ name: 'FAQ', url: '/ca/faq/' },
+	]}
+>
+	<SchemaFaqPage slot="head" lang={lang} />
+
+	<EditorialDivider
+		number="03"
+		total="04"
+		eyebrow="Preguntes"
+		heading={t('faq.pageTitle')}
+		subheading={t('faq.pageSubtitle')}
+		as="h1"
+		flushTop={false}
+	/>
+
+	<Container as="section" class="pb-16 md:pb-20">
+		<FaqList lang={lang} headingLevel="h2" />
+	</Container>
+
+	<FadeInOnScroll delay={100}>
+		<section class="py-16 md:py-20 bg-card">
+			<Container class="text-center max-w-2xl space-y-4">
+				<Heading as="h2" size="h3">No saps com arribar?</Heading>
+				<Text>
+					Tens enllaços orientatius des de Barcelona, Granollers o Cardedeu — cotxe,
+					bus o tren rodalies.
+				</Text>
+				<div class="pt-2">
+					<Button as="a" href={directionsHref} variant="primary" size="md">
+						<Icon
+							slot="icon-leading"
+							name="tabler:map-pin"
+							class="h-4 w-4"
+							aria-hidden="true"
+						/>
+						Veure com arribar
+					</Button>
+				</div>
+			</Container>
+		</section>
+	</FadeInOnScroll>
+</BaseLayout>

@@ -1,0 +1,130 @@
+---
+/**
+ * Marquee
+ *
+ * Slow horizontal scroller used as an ambient strip between major
+ * home sections. Pure CSS, infinite, GPU-accelerated:
+ *
+ *   - The list is rendered TWICE inside the track, so when the
+ *     first half slides off the left edge the second half is still
+ *     visible — no parpadeo at the loop boundary.
+ *   - Animation: translateX(0) → translateX(-50%). 50% is exactly
+ *     the width of one copy of the list, so the resulting position
+ *     after the loop is identical to the starting position.
+ *   - Duration ~40s for an "ambient, almost still" feel — fast
+ *     enough to feel alive, slow enough not to be distracting.
+ *
+ * The duplicated copy is hidden from the accessibility tree
+ * (`aria-hidden`) so screen readers only announce each item once.
+ */
+
+interface Props {
+	items: ReadonlyArray<string>;
+	/** Visual separator between items. */
+	separator?: string;
+	/** Scroll direction. Default 'left' matches the original (track
+	 *  slides left → leftmost items disappear off-screen). 'right'
+	 *  reverses for the second strip in a bidirectional pair. */
+	direction?: 'left' | 'right';
+	/** Whether to wrap with the default `bg-card border-y` chrome.
+	 *  Set false when stacking two marquees in a single bidirectional
+	 *  block so the seam between them stays clean. */
+	wrap?: boolean;
+	class?: string;
+}
+
+const {
+	items,
+	separator = '·',
+	direction = 'left',
+	wrap = true,
+	class: className,
+} = Astro.props;
+
+const wrapperClass = wrap
+	? 'marquee overflow-hidden bg-card border-y border-border py-4 md:py-5'
+	: 'marquee overflow-hidden py-4 md:py-5';
+---
+
+<div
+	class:list={[wrapperClass, className]}
+	role="presentation"
+>
+	<div class="marquee-track" data-direction={direction}>
+		<ul class="marquee-list">
+			{
+				items.map((item) => (
+					<li class="marquee-item font-display text-2xl md:text-4xl tracking-tight text-muted">
+						{item}
+						<span class="marquee-sep px-6 md:px-10 text-primary/60" aria-hidden="true">
+							{separator}
+						</span>
+					</li>
+				))
+			}
+		</ul>
+		<ul class="marquee-list" aria-hidden="true">
+			{
+				items.map((item) => (
+					<li class="marquee-item font-display text-2xl md:text-4xl tracking-tight text-muted">
+						{item}
+						<span class="marquee-sep px-6 md:px-10 text-primary/60" aria-hidden="true">
+							{separator}
+						</span>
+					</li>
+				))
+			}
+		</ul>
+	</div>
+</div>
+
+<style>
+	@keyframes marquee-left {
+		from {
+			transform: translateX(0);
+		}
+		to {
+			transform: translateX(-50%);
+		}
+	}
+
+	@keyframes marquee-right {
+		from {
+			transform: translateX(-50%);
+		}
+		to {
+			transform: translateX(0);
+		}
+	}
+
+	.marquee-track {
+		display: flex;
+		width: max-content;
+		will-change: transform;
+		animation: marquee-left 40s linear infinite;
+	}
+
+	.marquee-track[data-direction='right'] {
+		animation: marquee-right 40s linear infinite;
+	}
+
+	.marquee-list {
+		display: flex;
+		align-items: center;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.marquee-item {
+		display: inline-flex;
+		align-items: center;
+		white-space: nowrap;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.marquee-track {
+			animation: none;
+		}
+	}
+</style>

@@ -1,0 +1,116 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Container from '../components/Container.astro';
+import Button from '../components/Button.astro';
+import Heading from '../components/Heading.astro';
+import { Icon } from 'astro-icon/components';
+import { business } from '../data/business';
+---
+
+<BaseLayout
+	title={`404 · Pàgina no trobada · ${business.name}`}
+	description="La pàgina que busques no existeix."
+	noindex
+>
+	<Container as="section" class="py-24 md:py-32 max-w-2xl">
+		<div data-lang-content="ca" class="space-y-6">
+			<p class="text-xs uppercase tracking-widest text-muted">Error 404</p>
+			<Heading as="h1" size="h1">Pàgina no trobada</Heading>
+			<p class="text-lg text-foreground leading-relaxed">
+				La pàgina que busques no existeix o s'ha mogut. Pots tornar a l'inici o veure la carta.
+			</p>
+			<div class="flex flex-wrap gap-4 pt-2">
+				<Button as="a" href="/ca/" variant="primary" size="md">
+					Tornar a l'inici
+				</Button>
+				<a
+					href="/ca/menu/"
+					class="font-body text-foreground hover:text-primary inline-flex items-center gap-1.5 transition-colors duration-fast self-center"
+				>
+					Veure la carta
+					<Icon
+						name="tabler:chevron-right"
+						class="h-4 w-4"
+						aria-hidden="true"
+					/>
+				</a>
+			</div>
+			{/* Direct contact line — for visitors that landed on 404
+			    via a stale link from Google / Instagram and just want
+			    to call. */}
+			<div class="pt-6 border-t border-border space-y-3">
+				<p class="text-sm text-muted">O contacta directament:</p>
+				<Button
+					as="a"
+					href={`tel:${business.phoneTel}`}
+					variant="secondary"
+					size="md"
+				>
+					<Icon
+						slot="icon-leading"
+						name="tabler:phone"
+						class="h-4 w-4"
+						aria-hidden="true"
+					/>
+					Trucar al {business.phone}
+				</Button>
+			</div>
+		</div>
+
+		<div data-lang-content="es" hidden class="space-y-6">
+			<p class="text-xs uppercase tracking-widest text-muted">Error 404</p>
+			<Heading as="h1" size="h1">Página no encontrada</Heading>
+			<p class="text-lg text-foreground leading-relaxed">
+				La página que buscas no existe o se ha movido. Puedes volver al inicio o ver la carta.
+			</p>
+			<div class="flex flex-wrap gap-4 pt-2">
+				<Button as="a" href="/es/" variant="primary" size="md">
+					Volver al inicio
+				</Button>
+				<a
+					href="/es/menu/"
+					class="font-body text-foreground hover:text-primary inline-flex items-center gap-1.5 transition-colors duration-fast self-center"
+				>
+					Ver la carta
+					<Icon
+						name="tabler:chevron-right"
+						class="h-4 w-4"
+						aria-hidden="true"
+					/>
+				</a>
+			</div>
+			<div class="pt-6 border-t border-border space-y-3">
+				<p class="text-sm text-muted">O contacta directamente:</p>
+				<Button
+					as="a"
+					href={`tel:${business.phoneTel}`}
+					variant="secondary"
+					size="md"
+				>
+					<Icon
+						slot="icon-leading"
+						name="tabler:phone"
+						class="h-4 w-4"
+						aria-hidden="true"
+					/>
+					Llamar al {business.phone}
+				</Button>
+			</div>
+		</div>
+	</Container>
+
+	<script is:inline define:vars={{ brandName: business.name, brandCity: business.address.city }}>
+		(function () {
+			var lang = (navigator.language || 'ca').toLowerCase();
+			if (lang.indexOf('es') === 0) {
+				document.documentElement.lang = 'es';
+				var ca = document.querySelector('[data-lang-content="ca"]');
+				var es = document.querySelector('[data-lang-content="es"]');
+				if (ca) ca.setAttribute('hidden', '');
+				if (es) es.removeAttribute('hidden');
+				var t = document.querySelector('title');
+				if (t) t.textContent = '404 · Página no encontrada · ' + brandName + ' · ' + brandCity;
+			}
+		})();
+	</script>
+</BaseLayout>

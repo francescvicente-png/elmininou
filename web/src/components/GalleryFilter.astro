@@ -1,0 +1,85 @@
+---
+/**
+ * GalleryFilter
+ *
+ * Pill row that toggles which categories of images are visible in
+ * the next sibling `<div data-gallery-grid>`. Powered by
+ * src/scripts/gallery-filter.ts which:
+ *   - listens for clicks on `[data-filter]`
+ *   - flips `is-active` on the clicked pill (and removes it from
+ *     the others)
+ *   - hides every item in the grid whose `data-categories` doesn't
+ *     contain the active filter (the "all" filter shows everything)
+ *
+ * The component is server-rendered so the default state ("all"
+ * active, every image visible) is correct before JS boots — no
+ * filter flash on first paint.
+ */
+import type { GalleryCategory } from '../data/gallery';
+
+interface Props {
+	categories: ReadonlyArray<GalleryCategory>;
+	lang: 'ca' | 'es';
+	class?: string;
+	/**
+	 * Pins the toolbar while scrolling — must stay a direct descendant of the
+	 * same wrapper as `[data-gallery-grid]` so `gallery-filter.ts` can discover the grid.
+	 */
+	sticky?: boolean;
+}
+
+const { categories, lang, class: className, sticky = false } = Astro.props;
+---
+
+<div
+	class:list={[
+		'gallery-filter flex flex-wrap items-center gap-2 md:gap-3',
+		sticky &&
+			'sticky top-[4.75rem] z-30 -mx-1 mb-10 rounded-xl border border-[color-mix(in_oklch,var(--color-border)_88%,transparent)] bg-[color-mix(in_oklch,var(--color-background)_86%,transparent)] px-3 py-3 shadow-[0_18px_50px_-40px_oklch(0%_0_0/0.55)] backdrop-blur-xl supports-[backdrop-filter]:bg-[color-mix(in_oklch,var(--color-background)_78%,transparent)]',
+		className,
+	]}
+	role="toolbar"
+	aria-label={lang === 'ca' ? 'Filtrar per categoria' : 'Filtrar por categoría'}
+	data-gallery-filter
+>
+	{
+		categories.map((cat, idx) => (
+			<button
+				type="button"
+				class:list={[
+					'gallery-filter-pill px-4 py-2 rounded-full text-sm font-body font-medium border transition-colors',
+					idx === 0
+						? 'is-active border-primary bg-primary text-primary-foreground'
+						: 'border-border bg-card text-foreground hover:border-muted hover:bg-background',
+				]}
+				data-filter={cat.id}
+				aria-pressed={idx === 0 ? 'true' : 'false'}
+			>
+				{cat.label[lang]}
+			</button>
+		))
+	}
+</div>
+
+<style>
+	/* Pill active state: primary fill + cream text. The button-not-active
+	   variant keeps the cream card background so the row reads as
+	   editorial / chips, not as a row of CTAs. */
+	.gallery-filter-pill.is-active {
+		background-color: var(--color-primary);
+		color: var(--color-primary-foreground);
+		border-color: var(--color-primary);
+	}
+
+	.gallery-filter-pill {
+		transition:
+			background-color 200ms ease,
+			border-color 200ms ease,
+			color 200ms ease;
+	}
+
+	.gallery-filter-pill:focus-visible {
+		outline: 3px solid var(--color-primary);
+		outline-offset: 2px;
+	}
+</style>

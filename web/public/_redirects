@@ -1,0 +1,7 @@
+# El mini nou — legacy URLs de la plantilla Klip's cap a /menu/
+/ca/serveis/ /ca/menu/ 302
+/es/servicios/ /es/menu/ 302
+/ca/productes/ /ca/menu/ 302
+/es/productos/ /es/menu/ 302
+/ca/nuvies/ /ca/ 302
+/es/novias/ /es/ 302

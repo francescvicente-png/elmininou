@@ -1,0 +1,133 @@
+---
+/**
+ * LogoVideoSection
+ *
+ * Ambient looped video of the brand logo with the moving hair, sat
+ * between the final CTA banner and the footer. Acts as a brand
+ * "outro" — the visitor scrolls past Reserva → sees the logo
+ * breathing → reaches the footer with the wordmark already top of
+ * mind.
+ *
+ *   - autoplay + loop + muted + playsinline: required combo for
+ *     in-page autoplay across iOS Safari, Chrome and Firefox. Without
+ *     muted the autoplay is blocked; without playsinline iOS opens it
+ *     fullscreen.
+ *   - prefers-reduced-motion: an inline script pauses the video and
+ *     freezes it at its first frame so visitors with the OS-level
+ *     setting still see the brand mark, just static.
+ *   - max-width keeps the video readable but doesn't bleed
+ *     full-width.
+ *
+ * Background match: the section sits on `bg-background-video`
+ * (= #F2ECE4, the EXACT cream that's baked into the .mp4 pixels).
+ * No SVG filter, no mask, no transformation — the section bg equals
+ * the video's own bordering pixels by construction, so the rectangle
+ * is invisible. A lateral-only feather is layered ON TOP for a soft
+ * editorial vignette.
+ */
+import type { Lang } from '../../i18n/config';
+import { business } from '../../data/business';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const ariaLabel =
+	lang === 'ca'
+		? `Logo de ${business.name} amb animació del cabell`
+		: `Logo de ${business.name} con animación del cabello`;
+---
+
+<section
+	class="logo-video-section py-3 md:py-4 bg-background-video"
+	aria-hidden="false"
+>
+	<div class="mx-auto max-w-sm md:max-w-md px-6 flex items-center justify-center">
+		<div class="logo-video-frame">
+			<video
+				class="logo-video w-full h-auto block"
+				src="/logo-animation.mp4"
+				autoplay
+				loop
+				muted
+				playsinline
+				preload="metadata"
+				aria-label={ariaLabel}
+				data-logo-video
+			></video>
+			<div class="logo-video-feather" aria-hidden="true"></div>
+		</div>
+	</div>
+</section>
+
+<style>
+	.logo-video-frame {
+		position: relative;
+		display: block;
+		width: 100%;
+	}
+
+	/* Edge feather. Two stacked gradients:
+	     - horizontal (sides): generous fade 0→14% and 86→100% so
+	       the lateral edges blend softly into the section bg.
+	     - vertical (top + bottom): very narrow fade 0→4% and
+	       96→100% — just enough to soften the hard cut at the top
+	       and bottom edges without reaching the dark logo glyph
+	       (which sits inside the central 8-92% band).
+	   Endpoints on both gradients are the section bg #F2ECE4 (= the
+	   video's baked cream), so the gradient lands on exactly the
+	   colour around the video. */
+	.logo-video-feather {
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background:
+			linear-gradient(
+				to right,
+				#F2ECE4 0%,
+				rgba(242, 236, 228, 0) 20%,
+				rgba(242, 236, 228, 0) 80%,
+				#F2ECE4 100%
+			),
+			linear-gradient(
+				to bottom,
+				#F2ECE4 0%,
+				rgba(242, 236, 228, 0) 6%,
+				rgba(242, 236, 228, 0) 96%,
+				#F2ECE4 100%
+			);
+	}
+</style>
+
+<script>
+	// Respect prefers-reduced-motion: pause the video and rewind to
+	// the first frame so the visitor still sees the brand mark, just
+	// frozen. Idempotent: re-run on every astro:page-load swap.
+	function applyReducedMotion() {
+		if (typeof window === 'undefined') return;
+		const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+		if (!reduced) return;
+		document.querySelectorAll<HTMLVideoElement>('[data-logo-video]').forEach((video) => {
+			video.pause();
+			try {
+				video.currentTime = 0;
+			} catch {
+				// currentTime may throw before metadata is loaded.
+				video.addEventListener(
+					'loadedmetadata',
+					() => {
+						video.currentTime = 0;
+					},
+					{ once: true },
+				);
+			}
+		});
+	}
+
+	if (typeof document !== 'undefined') {
+		applyReducedMotion();
+		document.addEventListener('astro:page-load', applyReducedMotion);
+	}
+</script>

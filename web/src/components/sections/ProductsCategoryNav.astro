@@ -1,0 +1,60 @@
+---
+/**
+ * In-page pills linking to grouped product sections (care, styling, tools).
+ */
+import type { Lang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import {
+	type ProductCategoryKey,
+	type ProductGroup,
+	productCategoryAnchorId,
+} from '../../data/products';
+
+interface Props {
+	lang: Lang;
+	groups: ReadonlyArray<ProductGroup>;
+	class?: string;
+}
+
+const { lang, groups, class: className } = Astro.props;
+const t = useTranslations(lang);
+
+const categoryLabelKey: Record<
+	ProductCategoryKey,
+	| 'products.categoryCare'
+	| 'products.categoryStyling'
+	| 'products.categoryAccessories'
+> = {
+	care: 'products.categoryCare',
+	styling: 'products.categoryStyling',
+	accessories: 'products.categoryAccessories',
+};
+---
+
+<nav
+	class:list={['products-cat-nav', className]}
+	aria-label={t('products.jumpNavAria')}
+>
+	<ul class="flex flex-wrap gap-2 md:gap-2.5">
+		{
+			groups.map(({ category }) => (
+				<li>
+					<a
+						class="products-cat-nav-link inline-flex items-center rounded-full border border-border bg-card px-3.5 py-2 font-body text-xs font-medium uppercase tracking-[0.12em] text-foreground/88 transition-colors hover:border-primary/45 hover:bg-backgroundAlt hover:text-foreground"
+						href={`#${productCategoryAnchorId(category)}`}
+					>
+						{t(categoryLabelKey[category])}
+					</a>
+				</li>
+			))
+		}
+	</ul>
+</nav>
+
+<style>
+	@media (prefers-reduced-motion: reduce) {
+		.products-cat-nav-link {
+			transition: none;
+		}
+	}
+</style>

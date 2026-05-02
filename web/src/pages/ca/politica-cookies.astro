@@ -1,0 +1,162 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import { business } from '../../data/business';
+---
+
+<BaseLayout
+	title={`Política de cookies · ${business.name}`}
+	description={`Política de cookies de ${business.name}. Cookies utilitzades, finalitats i com gestionar-les des del navegador.`}
+	siblingPath="/es/politica-cookies/"
+	breadcrumbs={[
+		{ name: 'Inici', url: '/ca/' },
+		{ name: 'Política de cookies', url: '/ca/politica-cookies/' },
+	]}
+>
+	<Container as="section" class="pt-16 pb-8 md:pt-24 md:pb-10 space-y-4 max-w-3xl">
+		<Heading as="h1">Política de cookies</Heading>
+		<Text variant="lead">
+			Informació sobre l'ús de cookies en aquest lloc web, en compliment de
+			l'article 22.2 de la Llei 34/2002 (LSSI-CE).
+		</Text>
+	</Container>
+
+	<Container as="section" class="pb-20 md:pb-24 space-y-10 max-w-3xl">
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">1. Què són les cookies</Heading>
+			<Text>
+				Les cookies són petits fitxers de text que els llocs web envien al
+				navegador i s'emmagatzemen al dispositiu de l'usuari. Permeten al
+				lloc recordar informació sobre la visita — preferències, idioma
+				seleccionat, estat de sessió — per millorar l'experiència o,
+				segons la seva finalitat, per recollir informació estadística o
+				publicitària.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">2. Cookies utilitzades en aquest lloc</Heading>
+			<Text>
+				Aquest lloc està construït com una web estàtica i, en l'estat actual,
+				<strong> no utilitza cookies de seguiment, publicitàries ni de
+				tercers per defecte</strong>. L'única cookie que pot generar-se com
+				a resultat de la navegació és la que registra la teva decisió sobre
+				el banner de consentiment.
+			</Text>
+			<div class="overflow-x-auto">
+				<table class="w-full text-left text-sm font-body border border-border rounded-md">
+					<thead class="bg-card">
+						<tr>
+							<th class="px-4 py-3 font-semibold">Nom</th>
+							<th class="px-4 py-3 font-semibold">Finalitat</th>
+							<th class="px-4 py-3 font-semibold">Durada</th>
+							<th class="px-4 py-3 font-semibold">Tipus</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr class="border-t border-border">
+							<td class="px-4 py-3 font-mono text-xs">cookie-consent</td>
+							<td class="px-4 py-3">
+								Recordar la decisió de l'usuari respecte al banner de cookies
+								(acceptat / rebutjat).
+							</td>
+							<td class="px-4 py-3">Persistent (localStorage)</td>
+							<td class="px-4 py-3">Tècnica</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<Text variant="small" class="text-muted">
+				Nota tècnica: la decisió del banner es desa al{' '}
+				<code class="font-mono text-xs">localStorage</code> del navegador, no
+				en una cookie HTTP. La distinció és rellevant a efectes tècnics però
+				queda sotmesa a les mateixes obligacions d'informació al usuari.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">3. Cookies de tercers</Heading>
+			<Text>
+				En navegar per aquest lloc no es carreguen scripts de tercers que
+				instal·lin cookies al navegador. Tanmateix, si fas clic en algun
+				dels enllaços externs, accedeixes a serveis amb les seves pròpies
+				polítiques:
+			</Text>
+			<ul class="list-disc pl-6 space-y-2 text-base font-body text-foreground leading-relaxed">
+				<li>
+					<strong>WhatsApp</strong> (enllaç flotant de contacte): en obrir-lo
+					pots accedir al domini o aplicació de WhatsApp (Meta), subjecte a les
+					seves pròpies cookies i polítiques.
+				</li>
+				<li>
+					<strong>Google Maps</strong> (botons d'ubicació): cookies de
+					Google al obrir-se el mapa.
+				</li>
+				<li>
+					<strong>Instagram</strong> (icones de xarxes socials): cookies de
+					Meta al accedir al perfil.
+				</li>
+			</ul>
+			<Text>
+				Les imatges demostratives es serveixen des de la xarxa de Cloudflare
+				i no instal·len cookies en aquest lloc.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">4. Com gestionar les cookies</Heading>
+			<Text>
+				En la primera visita al lloc apareix un banner que et permet{' '}
+				<strong>acceptar</strong> o <strong>rebutjar</strong> les cookies no
+				estrictament tècniques. La decisió queda registrada al teu
+				navegador i no es torna a mostrar fins que netegis l'emmagatzematge
+				local del lloc.
+			</Text>
+			<Text>
+				A més, pots configurar el teu navegador per bloquejar o eliminar les
+				cookies en qualsevol moment. Aquí tens enllaços a les guies oficials
+				dels principals navegadors:
+			</Text>
+			<ul class="list-disc pl-6 space-y-2 text-base font-body text-foreground leading-relaxed">
+				<li>
+					<a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+						Google Chrome
+					</a>
+				</li>
+				<li>
+					<a href="https://support.mozilla.org/ca/kb/cookies-informacio-llocs-web-emmagatzemen-ordinador" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+						Mozilla Firefox
+					</a>
+				</li>
+				<li>
+					<a href="https://support.apple.com/ca-es/guide/safari/sfri11471/mac" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+						Apple Safari
+					</a>
+				</li>
+				<li>
+					<a href="https://support.microsoft.com/ca-es/microsoft-edge/eliminar-cookies-a-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" rel="noopener noreferrer" class="hover:text-primary transition-colors">
+						Microsoft Edge
+					</a>
+				</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">5. Modificacions</Heading>
+			<Text>
+				Aquesta política pot actualitzar-se en cas que el lloc incorpori nous
+				serveis amb tractament de cookies (per exemple, una nova eina
+				d'analítica o un sistema de comentaris). Els canvis es publicaran
+				en aquesta mateixa pàgina abans d'activar el nou tractament.
+			</Text>
+		</div>
+
+		<div class="pt-6 border-t border-border">
+			<Text variant="small" class="text-muted">
+				Última actualització: 27 d'abril de 2026.
+			</Text>
+		</div>
+	</Container>
+</BaseLayout>

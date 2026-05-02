@@ -1,0 +1,50 @@
+---
+import type { HTMLAttributes } from 'astro/types';
+import { Icon } from 'astro-icon/components';
+
+type LinkVariant = 'inline' | 'standalone';
+
+interface Props extends HTMLAttributes<'a'> {
+	href: string;
+	variant?: LinkVariant;
+	external?: boolean;
+}
+
+const {
+	href,
+	variant = 'inline',
+	external = false,
+	class: className,
+	...rest
+} = Astro.props;
+
+const variantClasses: Record<LinkVariant, string> = {
+	inline:
+		'text-primary underline underline-offset-4 decoration-primary/40 hover:opacity-80 hover:decoration-primary/80',
+	standalone:
+		'text-foreground inline-flex items-center gap-1.5 hover:text-primary',
+};
+
+const externalAttrs = external
+	? { target: '_blank', rel: 'noopener noreferrer' }
+	: {};
+---
+
+<a
+	href={href}
+	class:list={[
+		'font-body transition-colors duration-fast rounded-sm',
+		'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background',
+		variantClasses[variant],
+		className,
+	]}
+	{...externalAttrs}
+	{...rest}
+>
+	<slot />
+	{
+		external && variant === 'standalone' && (
+			<Icon name="tabler:arrow-up-right" class="h-4 w-4" aria-hidden="true" />
+		)
+	}
+</a>

@@ -1,0 +1,288 @@
+---
+/**
+ * Replacement home: block-based marketing layout (skill recipe: hero-centric + conversion).
+ * No fixed parallax portrait, no stacked editorial dividers from the old salon template.
+ */
+import { Icon } from 'astro-icon/components';
+import type { Lang } from '../../i18n/config';
+import { business } from '../../data/business';
+import { services } from '../../data/services';
+import { getRoutePair } from '../../i18n/routes';
+import { getBookingCta } from '../../data/site';
+import { useTranslations } from '../../i18n/utils';
+import Button from '../Button.astro';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const copy = {
+	ca: {
+		eyebrow: 'Restaurant · La Ametlla del Vallès',
+		heroTitle: 'Brases, menú del dia i tapes sense complicacions',
+		heroLead:
+			'Reserveu taula per telèfon o WhatsApp; consulteu al·lèrgens al servei (carta impresa fa fe).',
+		heroReserve: 'Reservar',
+		heroMenu: 'Veure carta',
+		heroHighlights: 'Plats destacats',
+		pillBrasa: 'Cuina oberta',
+		pillLocal: 'Ambient local',
+		blockTagline: 'Foc viu i producte treballat',
+		blockBody:
+			'Imatge provisional d’ambient — substituïu-la per fotografia del vostre pit, taules o la cuina; aquest bloc només vol transmetre calidesa i foc mentre arriben les fotos finals.',
+		infoHours: 'Horari',
+		infoPhone: 'Telèfon',
+		infoAddress: 'Adreça',
+		menuSectionTitle: 'Selecció de la carta',
+		menuSectionLead:
+			'Sis plats que resumeixen l’esperit de la cuina: verdura, brasa i tapes per compartir.',
+		menuSeeAll: 'Veure la carta completa',
+		reserveTitle: 'Voleu taula?',
+		reserveBody:
+			'La confirmació és sempre amb el local: truqueu o envieu un WhatsApp i us responem en horari.',
+		reserveWhatsapp: 'WhatsApp',
+		locationTitle: 'On som',
+		locationCta: 'Obrir a Google Maps',
+	},
+	es: {
+		eyebrow: 'Restaurante · La Ametlla del Vallès',
+		heroTitle: 'Brasa, menú del día y tapas sin complicaciones',
+		heroLead:
+			'Reserva mesa por teléfono o WhatsApp; confirma alérgenos en sala (carta impresa manda).',
+		heroReserve: 'Reservar',
+		heroMenu: 'Ver carta',
+		heroHighlights: 'Platos destacados',
+		pillBrasa: 'Cocina abierta',
+		pillLocal: 'Ambiente local',
+		blockTagline: 'Fuego vivo y producto trabajado',
+		blockBody:
+			'Imagen de ambiente provisional — sustitúyela por fotografías de vuestro grill, mesas o cocina; este bloque solo busca calidez mientras llegan las fotos finales.',
+		infoHours: 'Horario',
+		infoPhone: 'Teléfono',
+		infoAddress: 'Dirección',
+		menuSectionTitle: 'Selección de carta',
+		menuSectionLead:
+			'Seis platos que resumen la cocina: verdura, brasa y tapas para compartir.',
+		menuSeeAll: 'Ver la carta completa',
+		reserveTitle: '¿Mesa?',
+		reserveBody:
+			'Siempre confirmamos con el local: llama o escribe por WhatsApp y respondemos en horario.',
+		reserveWhatsapp: 'WhatsApp',
+		locationTitle: 'Dónde estamos',
+		locationCta: 'Abrir en Google Maps',
+	},
+}[lang];
+
+const c = copy;
+const featured = services.filter((s) => s.featured);
+const menuHref = getRoutePair('menu')[lang];
+const booking = getBookingCta();
+
+const euros = new Intl.NumberFormat(lang === 'ca' ? 'ca-ES' : 'es-ES', {
+	style: 'currency',
+	currency: 'EUR',
+});
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp.defaultMessage'))}`;
+---
+
+<div class="bg-background pb-16">
+	<section class="relative overflow-hidden px-4 pt-10 pb-12 sm:px-6 lg:pb-16 lg:pt-14">
+		<div class="mx-auto grid max-w-6xl gap-12 lg:grid-cols-2 lg:items-center lg:gap-14">
+			<div class="order-2 space-y-6 lg:order-1">
+				<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
+					{c.eyebrow}
+				</p>
+				<h1 class="font-display text-4xl font-semibold leading-[1.06] tracking-tight text-foreground md:text-5xl lg:text-6xl">
+					{c.heroTitle}
+				</h1>
+				<p class="max-w-xl text-lg leading-relaxed text-muted">{c.heroLead}</p>
+				<div class="flex flex-wrap items-center gap-3">
+					<Button as="a" href={booking.href} external={booking.external} variant="primary" size="lg">
+						{c.heroReserve}
+					</Button>
+					<Button as="a" href={menuHref} variant="secondary" size="lg">{c.heroMenu}</Button>
+					<a
+						href="#pla-destacats"
+						class="inline-flex items-center gap-2 font-body text-sm font-semibold text-primary underline-offset-4 hover:underline"
+					>
+						{c.heroHighlights}
+						<Icon name="tabler:chevron-down" class="size-4" aria-hidden="true" />
+					</a>
+				</div>
+				<ul class="flex flex-wrap gap-2 pt-2">
+					<li
+						class="rounded-full bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)] px-4 py-1.5 font-body text-xs font-semibold uppercase tracking-wider text-primary"
+					>
+						{c.pillBrasa}
+					</li>
+					<li
+						class="rounded-full border border-border bg-card px-4 py-1.5 font-body text-xs font-semibold uppercase tracking-wider text-foreground"
+					>
+						{c.pillLocal}
+					</li>
+				</ul>
+			</div>
+			<div class="relative order-1 lg:order-2">
+				<div
+					class="relative isolate flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-3xl bg-linear-to-br from-primary via-primary to-accent px-8 py-10 text-primary-foreground shadow-lg ring-2 ring-black/12"
+				>
+					<Icon
+						name="tabler:flame"
+						class="pointer-events-none absolute -right-4 -top-4 size-[11rem] opacity-[0.12]"
+						aria-hidden="true"
+					/>
+					<p class="font-body text-xs font-semibold uppercase tracking-[0.3em] text-primary-foreground/90">
+						{c.blockTagline}
+					</p>
+					<p class="font-display mt-3 text-balance text-2xl leading-snug md:text-3xl">
+						{c.blockBody}
+					</p>
+				</div>
+			</div>
+		</div>
+	</section>
+
+	<section aria-label={lang === 'ca' ? "Informació ràpida" : 'Información rápida'} class="border-y border-border bg-card px-4 py-8 sm:px-6">
+		<div class="mx-auto grid max-w-6xl gap-8 sm:grid-cols-3 sm:gap-6">
+			<div class="space-y-2 text-center sm:text-left">
+				<p class="text-xs font-bold uppercase tracking-[0.2em] text-muted">{c.infoHours}</p>
+				<ul class="space-y-1 text-sm leading-relaxed text-foreground">
+					<li>{t('footer.hours.weekdays')}</li>
+					<li>{t('footer.hours.sunday')}</li>
+					<li>{t('footer.hours.closed')}</li>
+					<li class="text-xs text-muted">{t('footer.hours.note')}</li>
+				</ul>
+			</div>
+			<div class="space-y-2 text-center sm:text-left">
+				<p class="text-xs font-bold uppercase tracking-[0.2em] text-muted">{c.infoPhone}</p>
+				<a
+					href={`tel:${business.phoneTel}`}
+					class="inline-block rounded-lg font-semibold tabular-nums text-foreground underline-offset-4 hover:text-primary hover:underline"
+				>
+					{business.phone}
+				</a>
+			</div>
+			<div class="space-y-2 text-center sm:text-left">
+				<p class="text-xs font-bold uppercase tracking-[0.2em] text-muted">{c.infoAddress}</p>
+				<a
+					href={business.googleMapsUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="text-sm leading-relaxed text-foreground hover:text-primary"
+				>
+					{business.address.street}
+					<br />
+					{business.address.postalCode}
+					{business.address.city}
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<section id="pla-destacats" class="scroll-mt-28 px-4 py-16 sm:px-6 md:scroll-mt-32 md:py-24">
+		<div class="mx-auto max-w-6xl text-center">
+			<h2 class="font-display text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+				{c.menuSectionTitle}
+			</h2>
+			<p class="mx-auto mt-4 max-w-2xl text-muted">{c.menuSectionLead}</p>
+			<ul class="mt-12 grid gap-5 text-left sm:grid-cols-2 xl:grid-cols-3">
+				{
+					featured.map((item) => (
+						<li
+							class="group flex flex-col rounded-3xl border border-border bg-card p-6 shadow-sm transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-md"
+						>
+							<div class="flex items-start justify-between gap-4">
+								<h3 class="font-display text-xl font-semibold text-foreground">
+									{item.name[lang]}
+								</h3>
+								{item.price != null ? (
+									<span class="shrink-0 font-body text-sm font-bold tabular-nums text-primary">
+										{euros.format(item.price)}
+									</span>
+								) : (
+									<span class="shrink-0 font-body text-sm font-semibold text-muted tabular-nums">
+										{lang === 'ca' ? 'A confirmar en sala' : 'Consultar en sala'}
+									</span>
+								)}
+							</div>
+							<p class="mt-3 flex-1 font-body text-sm leading-relaxed text-muted">
+								{item.description[lang]}
+							</p>
+							<Icon name={`tabler:${item.icon}`} class="mt-6 size-6 text-primary opacity-85" aria-hidden="true" />
+						</li>
+					))
+				}
+			</ul>
+			<div class="mt-12">
+				<Button as="a" href={menuHref} variant="primary" size="lg">{c.menuSeeAll}</Button>
+			</div>
+		</div>
+	</section>
+
+	<section class="bg-primary px-4 py-16 text-primary-foreground sm:px-6 md:py-20">
+		<div class="mx-auto flex max-w-3xl flex-col items-center px-4 text-center">
+			<h2 class="font-display text-3xl font-semibold tracking-tight md:text-4xl">{c.reserveTitle}</h2>
+			<p class="mt-4 text-lg leading-relaxed text-[color-mix(in_oklch,var(--color-primary-foreground)_90%,transparent)]">
+				{c.reserveBody}
+			</p>
+			<div class="mt-8 flex flex-wrap justify-center gap-3">
+				<a
+					href={`tel:${business.phoneTel}`}
+					class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-foreground px-8 py-3.5 font-body text-lg font-semibold text-primary shadow-sm transition-colors hover:bg-[color-mix(in_oklch,var(--color-primary-foreground)_92%,black)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+				>
+					<Icon name="tabler:phone" class="size-5 shrink-0" aria-hidden="true" />
+					{t('cta.callToBook')}
+				</a>
+				<a
+					href={waUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-foreground px-8 py-3.5 font-body text-lg font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_oklch,var(--color-primary-foreground)_14%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+				>
+					<Icon name="tabler:brand-whatsapp" class="size-5 shrink-0" aria-hidden="true" />
+					{c.reserveWhatsapp}
+				</a>
+			</div>
+		</div>
+	</section>
+
+	<section id="ubicacio" class="scroll-mt-28 px-4 py-16 sm:px-6 md:scroll-mt-32 md:py-20">
+		<div class="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-start">
+			<div>
+				<h2 class="font-display text-3xl font-semibold text-foreground md:text-4xl">{c.locationTitle}</h2>
+				<address class="mt-6 not-italic leading-relaxed text-muted">
+					<span class="block text-lg font-semibold text-foreground">{business.name}</span>
+					{business.address.street}<br />
+					{business.address.postalCode}
+					{business.address.city}<br />
+					{business.address.region}
+				</address>
+				<a
+					class="mt-6 inline-flex items-center gap-2 font-semibold text-primary underline-offset-4 hover:underline"
+					href={business.googleMapsUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+				>
+					{c.locationCta}
+					<Icon name="tabler:arrow-up-right" class="size-4" aria-hidden="true" />
+				</a>
+			</div>
+			<div
+				class="flex min-h-[220px] items-center justify-center rounded-3xl border-2 border-dashed border-border bg-[color-mix(in_oklch,var(--color-primary)_10%,transparent)] p-10 text-center"
+			>
+				<p class="max-w-sm text-sm leading-relaxed text-muted">
+					{
+						lang === 'ca'
+							? "Mapa incrustat opcional aquí — mantenim només l'enllaç a Google Maps per claredat i velocitat."
+							: 'Mapa incrustado opcional — por ahora sólo enlazamos Google Maps por claridad y rendimiento.'
+					}
+				</p>
+			</div>
+		</div>
+	</section>
+</div>

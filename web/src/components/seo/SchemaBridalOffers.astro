@@ -1,0 +1,101 @@
+---
+/**
+ * SchemaBridalOffers
+ *
+ * Emits Schema.org JSON-LD for the bridal landing: a primary Service
+ * node plus an OfferCatalog listing the three sample packs from
+ * `src/data/bridal.ts` as Offer → itemOffered Service.
+ *
+ * Links `provider` / nested `itemOffered.provider` to the same @id as
+ * SchemaLocalBusiness (`{canonicalUrl}#localbusiness`) so crawlers can
+ * join the graph.
+ *
+ * `set:html={JSON.stringify(...)}` is safe: all strings originate from
+ * our data modules and i18n tables — no user input.
+ */
+import type { Lang } from '../../i18n/config';
+import { useTranslations } from '../../i18n/utils';
+import { bridalPackages } from '../../data/bridal';
+import { business } from '../../data/business';
+
+interface Props {
+	lang: Lang;
+	canonicalUrl: URL;
+}
+
+const { lang, canonicalUrl } = Astro.props;
+const t = useTranslations(lang);
+
+const pageUrl = canonicalUrl.toString();
+const providerId = `${pageUrl}#localbusiness`;
+const serviceId = `${pageUrl}#bridal-hair-service`;
+
+const priceSuffix = t('bridal.schemaOfferPriceSuffix');
+
+function buildOfferDescription(
+	description: string,
+	included: ReadonlyArray<string>,
+): string {
+	const bullets = included.join('; ');
+	return `${description} ${priceSuffix} ${t('bridal.schemaInclusionsLabel')}: ${bullets}.`;
+}
+
+const itemListElement = bridalPackages.map((pkg, index) => ({
+	'@type': 'ListItem' as const,
+	position: index + 1,
+	item: {
+		'@type': 'Offer' as const,
+		name: pkg.name[lang],
+		description: buildOfferDescription(pkg.description[lang], pkg.included[lang]),
+		url: pageUrl,
+		price: String(pkg.priceFromEur),
+		priceCurrency: 'EUR',
+		priceSpecification: {
+			'@type': 'PriceSpecification' as const,
+			price: String(pkg.priceFromEur),
+			priceCurrency: 'EUR',
+			...(pkg.pendingConfirmation
+				? {
+						description: priceSuffix,
+					}
+				: {}),
+		},
+		itemOffered: {
+			'@type': 'Service' as const,
+			name: pkg.name[lang],
+			description: pkg.description[lang],
+			provider: {
+				'@id': providerId,
+			},
+		},
+	},
+}));
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@graph': [
+		{
+			'@type': 'Service',
+			'@id': serviceId,
+			name: `${business.name} — ${t('bridal.schemaServiceName')}`,
+			description: t('bridal.schemaServiceDescription'),
+			serviceType: t('bridal.schemaServiceType'),
+			provider: {
+				'@id': providerId,
+			},
+			url: pageUrl,
+			areaServed: {
+				'@type': 'City',
+				name: business.address.city,
+			},
+			hasOfferCatalog: {
+				'@type': 'OfferCatalog',
+				name: t('bridal.schemaOfferCatalogName'),
+				itemListElement,
+			},
+		},
+	],
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

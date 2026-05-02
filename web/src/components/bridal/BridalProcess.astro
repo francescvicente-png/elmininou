@@ -1,0 +1,240 @@
+---
+/**
+ * BridalProcess — editorial timeline with vertical hairline + dots.
+ *
+ * Anti-card design choice (per `taste-skill` Rule 4 and `redesign-skill`
+ * "no 3-card rows"). Each step is structured by typography and spacing,
+ * not by a bordered card. A single 1px vertical line on the left runs
+ * through the entire section; each step has a circular dot indexed
+ * 01..04 on the line.
+ *
+ * On small viewports the line stays on the left at 1rem, dots stay
+ * aligned, and content shifts to a single column. No horizontal scroll.
+ *
+ * Skills enforced:
+ *   - taste-skill §3 Rule 4 (anti-card overuse, dashboard hardening
+ *     adapted to marketing): use border-t / vertical lines instead of
+ *     boxes
+ *   - soft-skill §C (Spatial Rhythm): py-24+, eyebrow tag, generous
+ *     vertical step spacing
+ */
+import Container from '../Container.astro';
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { bridalProcess } from '../../data/bridal';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+---
+
+<section
+	class="bridal-process relative bg-background py-24 md:py-32 lg:py-40"
+	aria-labelledby="bridal-process-title"
+>
+	<Container>
+		<header class="max-w-2xl mb-16 md:mb-20 fade-in-on-scroll" style="--fade-delay: 0ms; --fade-duration: 700ms;">
+			<p class="bridal-eyebrow">{t('bridal.processEyebrow')}</p>
+			<h2
+				id="bridal-process-title"
+				class="bridal-process-title font-display text-foreground mt-4 mb-5"
+			>
+				{t('bridal.processTitle')}
+			</h2>
+			<p class="bridal-process-intro font-body text-muted leading-relaxed">
+				{t('bridal.processIntro')}
+			</p>
+		</header>
+
+		<ol class="bridal-process-list" aria-label={t('bridal.processTitle')}>
+			{
+				bridalProcess.map((step, idx) => (
+					<li
+						class="bridal-process-step fade-in-on-scroll"
+						style={`--fade-delay: ${100 + idx * 120}ms; --fade-duration: 700ms; --fade-y: 20px;`}
+					>
+						<span
+							class="bridal-process-dot"
+							aria-hidden="true"
+						>
+							<span class="bridal-process-dot-inner" />
+						</span>
+						<div class="bridal-process-content">
+							<div class="bridal-process-meta">
+								<span class="bridal-process-index">
+									{String(idx + 1).padStart(2, '0')}
+								</span>
+								<span class="bridal-process-timing">
+									{step.timing[lang]}
+								</span>
+							</div>
+							<h3 class="bridal-process-step-title font-display text-foreground">
+								{step.title[lang]}
+							</h3>
+							<p class="bridal-process-step-body font-body text-muted leading-relaxed">
+								{step.body[lang]}
+							</p>
+						</div>
+						{idx === bridalProcess.length - 1 && (
+							<Icon
+								name="tabler:heart"
+								class="bridal-process-finale text-accent"
+								aria-hidden="true"
+							/>
+						)}
+					</li>
+				))
+			}
+		</ol>
+	</Container>
+</section>
+
+<style>
+	.bridal-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.bridal-process-title {
+		font-size: clamp(1.875rem, 2.6vw + 0.75rem, 3.25rem);
+		line-height: 1.1;
+		letter-spacing: -0.018em;
+		font-weight: 400;
+		text-wrap: balance;
+		margin-block: 0.5rem 0;
+	}
+
+	.bridal-process-intro {
+		font-size: 1rem;
+		max-width: 50ch;
+		text-wrap: pretty;
+	}
+
+	.bridal-process-list {
+		position: relative;
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	/* Single vertical hairline running down the left, only between dots */
+	.bridal-process-list::before {
+		content: '';
+		position: absolute;
+		left: 0.6875rem;
+		top: 0.75rem;
+		bottom: 1.5rem;
+		width: 1px;
+		background: linear-gradient(
+			to bottom,
+			color-mix(in oklch, var(--color-border) 60%, transparent) 0%,
+			var(--color-border) 30%,
+			var(--color-border) 70%,
+			color-mix(in oklch, var(--color-border) 30%, transparent) 100%
+		);
+	}
+
+	.bridal-process-step {
+		position: relative;
+		padding-left: 2.75rem;
+		padding-block: 1.75rem 2.5rem;
+	}
+	.bridal-process-step + .bridal-process-step {
+		border-top: 1px solid color-mix(in oklch, var(--color-border) 50%, transparent);
+	}
+
+	.bridal-process-dot {
+		position: absolute;
+		left: 0;
+		top: 1.95rem;
+		width: 1.4rem;
+		height: 1.4rem;
+		border-radius: 9999px;
+		background: var(--color-background);
+		border: 1px solid var(--color-border);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		box-shadow: 0 0 0 4px var(--color-background);
+	}
+	.bridal-process-dot-inner {
+		width: 0.5rem;
+		height: 0.5rem;
+		border-radius: 9999px;
+		background: var(--color-accent);
+		box-shadow: 0 0 12px 2px color-mix(in oklch, var(--color-accent) 35%, transparent);
+	}
+
+	.bridal-process-content {
+		max-width: 52ch;
+	}
+
+	.bridal-process-meta {
+		display: flex;
+		align-items: baseline;
+		gap: 0.85rem;
+		margin-bottom: 0.4rem;
+	}
+	.bridal-process-index {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		letter-spacing: 0.18em;
+		color: var(--color-accent);
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+	}
+	.bridal-process-timing {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.75rem;
+		text-transform: uppercase;
+		letter-spacing: 0.22em;
+		color: var(--color-muted);
+	}
+
+	.bridal-process-step-title {
+		font-size: clamp(1.5rem, 1.4vw + 0.75rem, 2rem);
+		font-weight: 400;
+		line-height: 1.15;
+		letter-spacing: -0.012em;
+		margin: 0 0 0.65rem;
+	}
+
+	.bridal-process-step-body {
+		font-size: 1rem;
+		text-wrap: pretty;
+		margin: 0;
+	}
+
+	.bridal-process-finale {
+		position: absolute;
+		left: -0.05rem;
+		bottom: -0.5rem;
+		width: 1.6rem;
+		height: 1.6rem;
+		opacity: 0.85;
+	}
+
+	@media (min-width: 768px) {
+		.bridal-process-step {
+			padding-left: 3.5rem;
+		}
+		.bridal-process-list::before {
+			left: 0.875rem;
+		}
+		.bridal-process-dot {
+			top: 2rem;
+			left: 0.1875rem;
+		}
+		.bridal-process-finale {
+			left: 0.125rem;
+		}
+	}
+</style>

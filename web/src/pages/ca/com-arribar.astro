@@ -1,0 +1,181 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import Button from '../../components/Button.astro';
+import EditorialDivider from '../../components/EditorialDivider.astro';
+import LocationBlock from '../../components/LocationBlock.astro';
+import FadeInOnScroll from '../../components/animations/FadeInOnScroll.astro';
+import { Icon } from 'astro-icon/components';
+import { business } from '../../data/business';
+import { getBookingCta } from '../../data/site';
+import { useTranslations } from '../../i18n/utils';
+
+const lang = 'ca' as const;
+const t = useTranslations(lang);
+const booking = getBookingCta();
+
+/**
+ * Directions from three habitual origins. Each Google Maps deeplink fills
+ * origin + Carrer Jeroni de Moragas 13 — user confirms live traffic locally.
+ */
+const mapsDestination =
+	'Carrer+Jeroni+de+Moragas,+13,+08480+L%27Ametlla+del+Vall%C3%A8s,+Barcelona,+Spain';
+
+const origins = [
+	{
+		from: 'Barcelona',
+		distanceKm: 38,
+		minutes: 38,
+		summary:
+			'Pel Vallès Oriental — via C-58 / xarxa BV habitual cap a zona Granollers i enllaços cap a L’Ametlla del Vallès fins a Jeroni de Moragas. El navegador reordenarà segons congestió; obriu sempre la ruta amb el botó.',
+		mapsUrl: `https://www.google.com/maps/dir/Barcelona/${mapsDestination}/`,
+		bus: 'Diversos operadors interconnecten Vallès Oriental; consulteu la parada més propera a Jeroni de Moragas al planificador de l’operador.',
+		train:
+			'Rodalies fins a la zona Granollers; després autobús interurbà o curt tram privat fins al número 13 (consulteu horaris oficials Renfe/Sagalès).',
+	},
+	{
+		from: 'Granollers',
+		distanceKm: 11,
+		minutes: 14,
+		summary:
+			'Circuleu BV-5473 / zona urbana fins a L’Ametlla del Vallès: Jeroni de Moragas és un carrer relativament cèntric, recorregut clar en navegació.',
+		mapsUrl: `https://www.google.com/maps/dir/Granollers,+Barcelona/${mapsDestination}/`,
+		bus: 'Línies Sagalès / interurbanes habituals Vallès Oriental; confirmeu parades al web de l’operador.',
+		train:
+			'Rodalies fins a Granollers; últim tram amb bus urbà/interurbà o taxi segons disponibilitat i horari.',
+	},
+	{
+		from: 'Cardedeu',
+		distanceKm: 7,
+		minutes: 11,
+		summary:
+			'BV-5474 / BV-5482 segons entrada: L’Ametlla queda poc minuts nord/sud de Cardedeu: seguiu navegació cap al tram Jeroni de Moragas.',
+		mapsUrl: `https://www.google.com/maps/dir/Cardedeu,+Barcelona/${mapsDestination}/`,
+		bus: 'Línia interurbana habitual Cardedeu – L’Ametlla segons horari Sagalès (consultar avui).',
+		train: 'Rodalies fins a Cardedeu; últim tram en bus o cotxe urbà fins al número 13.',
+	},
+];
+---
+
+<BaseLayout
+	title={`Com arribar · ${business.name}`}
+	description={`Com arribar a ${business.name} (${business.address.street}). Rutes orientatives des de Barcelona, Granollers o Cardedeu — cotxe, bus i rodalia.`}
+	siblingPath="/es/como-llegar/"
+	keywords={[
+		'com arribar ametlla vallès',
+		'restaurant jeroni moragas',
+		'el mini nou google maps',
+		'granollers restaurant',
+	]}
+	breadcrumbs={[
+		{ name: 'Inici', url: '/ca/' },
+		{ name: 'Com arribar', url: '/ca/com-arribar/' },
+	]}
+>
+	<EditorialDivider
+		number="—"
+		eyebrow="Com arribar"
+		heading="Com arribar"
+		subheading={`${business.address.street}, ${business.address.postalCode} ${business.address.city}. Tres orígens habituals — Barcelona, Granollers i Cardedeu — en cotxe, bus o tren.`}
+		as="h1"
+		flushTop={false}
+	/>
+
+	<FadeInOnScroll delay={100}>
+		<Container as="section" class="pb-12 md:pb-16">
+			<LocationBlock lang={lang} headingLevel="h2" />
+		</Container>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<Container as="section" class="pb-20 md:pb-24 space-y-8">
+			<Heading as="h2" size="h3">Des de les ciutats properes</Heading>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				{
+					origins.map((origin) => (
+						<article class="rounded-xl border border-border bg-card p-6 space-y-4 flex flex-col">
+							<header class="space-y-1">
+								<p class="text-xs uppercase tracking-widest text-muted">
+									Des de
+								</p>
+								<Heading as="h3" size="h4">{origin.from}</Heading>
+								<p class="text-sm text-muted tabular-nums">
+									{origin.distanceKm} km · ~{origin.minutes} min en cotxe
+								</p>
+							</header>
+
+							<section class="space-y-3 text-sm font-body text-foreground leading-relaxed flex-1">
+								<div class="space-y-1">
+									<p class="flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+										<Icon name="tabler:map-pin" class="h-3.5 w-3.5" aria-hidden="true" />
+										En cotxe
+									</p>
+									<p>{origin.summary}</p>
+								</div>
+								<div class="space-y-1">
+									<p class="flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+										<Icon name="tabler:menu-2" class="h-3.5 w-3.5" aria-hidden="true" />
+										Bus
+									</p>
+									<p class="text-muted">{origin.bus}</p>
+								</div>
+								<div class="space-y-1">
+									<p class="flex items-center gap-2 text-xs uppercase tracking-widest text-primary">
+										<Icon name="tabler:menu-2" class="h-3.5 w-3.5" aria-hidden="true" />
+										Tren
+									</p>
+									<p class="text-muted">{origin.train}</p>
+								</div>
+							</section>
+
+							<footer class="pt-2">
+								<Button as="a" href={origin.mapsUrl} variant="secondary" external size="sm">
+									<Icon
+										slot="icon-leading"
+										name="tabler:map-pin"
+										class="h-4 w-4"
+										aria-hidden="true"
+									/>
+									Obrir ruta a Google Maps
+								</Button>
+							</footer>
+						</article>
+					))
+				}
+			</div>
+		</Container>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<section class="py-16 md:py-20 bg-card">
+			<Container class="max-w-2xl space-y-4">
+				<Heading as="h2" size="h3">Aparcament</Heading>
+				<Text>
+					Places a via pública i zones regulades segons ordenances de L’Ametlla del Vallès.
+					Els vespres i els diumenge en horari esmorzar-dinar és pràctic arribar uns minuts abans si voleu aparcar amb calma.
+				</Text>
+			</Container>
+		</section>
+	</FadeInOnScroll>
+
+	<FadeInOnScroll delay={100}>
+		<section class="py-12 md:py-16">
+			<Container class="text-center max-w-xl space-y-4">
+				<Text variant="lead">Ja teniu taula confirmada?</Text>
+				<div>
+					<Button
+						as="a"
+						href={booking.href}
+						external={booking.external}
+						variant="primary"
+						size="lg"
+					>
+						{t('cta.callToBook')}
+					</Button>
+				</div>
+			</Container>
+		</section>
+	</FadeInOnScroll>
+</BaseLayout>

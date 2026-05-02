@@ -1,0 +1,249 @@
+---
+/**
+ * BeforeAfterSlider
+ *
+ * Drag-to-compare two states of the same shot. The user grabs a
+ * vertical handle and drags left/right; the right portion of the
+ * slider reveals the "after" image (the natural one), the left
+ * portion reveals the "before" (a filtered version of the same
+ * image — desaturated + slightly darker).
+ *
+ * Two modes — controlled by props:
+ *
+ * **Demo (`beforeSrc` omitted)** — Legacy behaviour: same `afterSrc`
+ * twice; left "before" side is a grayscale/dark CSS treatment so we never
+ * fake two unrelated stock photos. Suitable until the salon supplies real
+ * pairs.
+ *
+ * **Real pair (`beforeSrc` provided)** — Before and after are distinct
+ * files; labels still read Avanç / Después but both layers use the real
+ * photos (no faux filter).
+ *
+ * Interaction:
+ *   - Pointer down anywhere in the slider sets the divider to that
+ *     X position; subsequent pointer moves track until release.
+ *   - Pointer capture (`setPointerCapture`) so the drag continues
+ *     even if the cursor leaves the slider rectangle.
+ *   - `touch-action: none` on the slider prevents the browser from
+ *     scrolling the page while the user is dragging on touch.
+ *
+ * Reduced motion: the position transition is removed (still
+ * draggable, just without easing).
+ *
+ * Accessibility: the slider acts as `role="slider"` with
+ * `aria-valuenow`, `aria-valuemin`, `aria-valuemax` and a label, and
+ * supports left/right arrow keys when focused.
+ */
+import { Picture } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	/** Result photo (right-hand / reveal side when dragging rightward). */
+	afterSrc: ImageMetadata;
+	/**
+	 * Real "before" photo. Omit for demo mode: `afterSrc` is duplicated with
+	 * the `.ba-img-before` filter on the clipped overlay layer.
+	 */
+	beforeSrc?: ImageMetadata;
+	/** Alt text for `afterSrc` (full descriptive string). */
+	altAfter: string;
+	/** Alt text for `beforeSrc` when a real pair is used. */
+	beforeAlt?: string;
+	beforeLabel: string;
+	afterLabel: string;
+	ariaLabel: string;
+	/** Aspect ratio (width / height). Default 16/9. */
+	aspectRatio?: string;
+}
+
+const {
+	afterSrc,
+	beforeSrc,
+	altAfter,
+	beforeAlt,
+	beforeLabel,
+	afterLabel,
+	ariaLabel,
+	aspectRatio = '16/9',
+} = Astro.props;
+
+const isRealPair = beforeSrc != null;
+const overlayAlt = isRealPair
+	? (beforeAlt ?? altAfter)
+	: `${altAfter} — ${beforeLabel}`;
+const baseAlt = isRealPair ? altAfter : `${altAfter} — ${afterLabel}`;
+---
+
+<div
+	class="ba-slider"
+	data-ba-slider
+	role="slider"
+	tabindex="0"
+	aria-label={ariaLabel}
+	aria-valuenow="50"
+	aria-valuemin="0"
+	aria-valuemax="100"
+	style={`aspect-ratio: ${aspectRatio};`}
+>
+	{/* Base layer: the natural "after" image, fills the slider. */}
+	<div class="ba-base">
+		<Picture
+			src={afterSrc}
+			alt={baseAlt}
+			formats={['avif', 'webp']}
+			class="ba-img"
+			loading="lazy"
+			decoding="async"
+			sizes="(min-width: 1024px) 800px, 100vw"
+		/>
+	</div>
+
+	{/* Overlay: clipped to the LEFT of the divider — either a filtered
+	   duplicate (`demo`) or the real «before» file. */}
+	<div class="ba-overlay">
+		<Picture
+			src={isRealPair ? beforeSrc! : afterSrc}
+			alt={overlayAlt}
+			formats={['avif', 'webp']}
+			class:list={['ba-img', !isRealPair && 'ba-img-before']}
+			loading="lazy"
+			decoding="async"
+			sizes="(min-width: 1024px) 800px, 100vw"
+		/>
+	</div>
+
+	<span class="ba-label ba-label-before">{beforeLabel}</span>
+	<span class="ba-label ba-label-after">{afterLabel}</span>
+
+	<div class="ba-handle" aria-hidden="true">
+		<span class="ba-handle-knob">
+			<Icon name="tabler:chevron-left" class="h-4 w-4" />
+			<Icon name="tabler:chevron-right" class="h-4 w-4" />
+		</span>
+	</div>
+</div>
+
+<style>
+	.ba-slider {
+		--ba-x: 50%;
+		position: relative;
+		width: 100%;
+		overflow: hidden;
+		border-radius: var(--radius-xl);
+		background: var(--color-foreground);
+		user-select: none;
+		touch-action: none;
+		cursor: ew-resize;
+	}
+
+	.ba-slider:focus-visible {
+		outline: 3px solid var(--color-primary);
+		outline-offset: 3px;
+	}
+
+	.ba-base,
+	.ba-overlay {
+		position: absolute;
+		inset: 0;
+	}
+
+	.ba-overlay {
+		/* `inset(top right bottom left)` — clip from the right edge so
+		   only the LEFT portion remains visible. As --ba-x grows the
+		   right inset shrinks and the overlay covers more of the
+		   image; at 100% the overlay covers everything. */
+		clip-path: inset(0 calc(100% - var(--ba-x)) 0 0);
+		transition: clip-path 80ms linear;
+		will-change: clip-path;
+	}
+
+	.ba-img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+		/* Browsers natively let users drag images out (drag-and-drop
+		   to another window). That hijacks our pointer-* listeners
+		   the moment the cursor moves after pointerdown — `pointermove`
+		   stops firing because the browser entered drag mode.
+		   `pointer-events: none` routes all clicks to the parent
+		   container; `-webkit-user-drag: none` belt-and-braces. */
+		pointer-events: none;
+		-webkit-user-drag: none;
+		user-select: none;
+	}
+
+	/* Labels and handle never block the drag — they sit above the
+	   images visually but transparent to pointer events. */
+	.ba-label,
+	.ba-handle {
+		pointer-events: none;
+	}
+
+	/* "Before" treatment: desaturated + slightly darker, like an old
+	   photo before a fresh cut. Subtle enough that it reads as
+	   "another version of the same image", not as a different image. */
+	.ba-img-before {
+		filter: grayscale(0.75) brightness(0.92) contrast(0.95);
+	}
+
+	.ba-handle {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		left: var(--ba-x);
+		width: 2px;
+		background: rgba(255, 255, 255, 0.9);
+		transform: translateX(-50%);
+		pointer-events: none;
+		box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.15);
+	}
+
+	.ba-handle-knob {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 44px;
+		height: 44px;
+		border-radius: 9999px;
+		background: white;
+		color: var(--color-foreground);
+		box-shadow:
+			0 4px 12px rgba(0, 0, 0, 0.25),
+			0 1px 2px rgba(0, 0, 0, 0.15);
+	}
+
+	.ba-label {
+		position: absolute;
+		top: 1rem;
+		font-family: var(--font-body);
+		font-size: 0.75rem;
+		font-weight: 600;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		padding: 0.375rem 0.75rem;
+		border-radius: 9999px;
+		background: rgba(0, 0, 0, 0.55);
+		color: var(--color-on-image);
+		backdrop-filter: blur(4px);
+	}
+
+	.ba-label-before {
+		left: 1rem;
+	}
+
+	.ba-label-after {
+		right: 1rem;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.ba-overlay {
+			transition: none;
+		}
+	}
+</style>

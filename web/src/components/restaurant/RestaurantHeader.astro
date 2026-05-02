@@ -1,0 +1,168 @@
+---
+/**
+ * Restaurant marketing shell header (UI/UX Pro Max “Restaurant/Food”).
+ * Horizontal bar + mobile sheet — unrelated to the previous floating-pill salon chrome.
+ */
+import { getRoutePair, type RouteKey } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import type { UIKey } from '../../i18n/ui';
+import { business } from '../../data/business';
+import { getBookingCta, site } from '../../data/site';
+import LanguageSwitcher from '../LanguageSwitcher.astro';
+import Button from '../Button.astro';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	lang: Lang;
+	siblingPath?: string;
+}
+
+type RouteNavItem = { kind: 'route'; key: RouteKey; labelKey: UIKey };
+type NavItem = RouteNavItem;
+
+const { lang, siblingPath } = Astro.props;
+const t = useTranslations(lang);
+
+const navItems: ReadonlyArray<NavItem> = [
+	{ kind: 'route', key: 'home', labelKey: 'nav.home' },
+	{ kind: 'route', key: 'menu', labelKey: 'nav.services' },
+	{ kind: 'route', key: 'gallery', labelKey: 'nav.gallery' },
+	{ kind: 'route', key: 'faq', labelKey: 'nav.faq' },
+	{ kind: 'route', key: 'contact', labelKey: 'nav.contact' },
+];
+
+function hrefFor(item: NavItem, lng: Lang): string {
+	return getRoutePair(item.key)[lng];
+}
+
+const homePath = getRoutePair('home')[lang];
+const currentPath = Astro.url.pathname;
+const bookingCta = getBookingCta();
+const bookingLabel = site.features.onlineBooking
+	? t('cta.book')
+	: t('cta.callToBook');
+
+---
+
+<header transition:persist class="restaurant-header">
+	<div class="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:px-6 lg:py-4">
+		<div class="flex items-center justify-between gap-3">
+			<a
+				href={homePath}
+				class="header-brand-link shrink-0 flex items-center gap-3 rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 motion-safe:transition-opacity hover:opacity-90"
+			>
+				<img
+					src="/brand/el-mini-nou-logo.jpg"
+					alt=""
+					width={200}
+					height={60}
+					loading="eager"
+					decoding="async"
+					class="pointer-events-none h-9 w-auto max-h-9 select-none object-contain object-left sm:h-10 sm:max-h-10 md:h-11 md:max-h-11"
+					data-brand-logo
+				/>
+				<span class="sr-only">{business.name}</span>
+			</a>
+
+			<nav class="hidden items-center gap-7 lg:flex" aria-label="Primary">
+				{
+					navItems.map((item) => {
+						const href = hrefFor(item, lang);
+						const isCurrent = item.kind === 'route' && currentPath === href;
+						return (
+							<a
+								href={href}
+								class="nav-link-underline font-body text-sm font-medium text-foreground hover:text-primary transition-colors duration-fast"
+								aria-current={isCurrent ? 'page' : undefined}
+								data-nav-link
+							>
+								{t(item.labelKey)}
+							</a>
+						);
+					})
+				}
+				<a
+					href={`${homePath}#pla-destacats`}
+					class="hidden font-body text-sm font-medium text-foreground hover:text-primary xl:inline"
+				>
+					{lang === 'ca' ? 'Plats destacats' : 'Platos destacados'}
+				</a>
+			</nav>
+
+			<div class="flex items-center gap-2 sm:gap-3">
+				<a
+					href={`tel:${business.phoneTel}`}
+					class="header-phone-link hidden items-center gap-1 font-body text-sm font-semibold tabular-nums text-foreground hover:text-primary sm:inline-flex"
+					aria-label={`Telèfon · ${business.phone}`}
+				>
+					<Icon name="tabler:phone" class="size-4 shrink-0 md:hidden lg:inline" aria-hidden="true" />
+					<span class="hidden lg:inline">{business.phone}</span>
+				</a>
+				<LanguageSwitcher currentLang={lang} siblingPath={siblingPath} />
+				<Button
+					as="a"
+					href={bookingCta.href}
+					external={bookingCta.external}
+					hideExternalIcon
+					variant="primary"
+					size="sm"
+					class="header-book-cta !px-3 !py-1.5 !text-xs sm:!text-sm"
+				>
+					{bookingLabel}
+				</Button>
+				<button
+					type="button"
+					class="mobile-menu-toggle lg:hidden inline-flex size-11 items-center justify-center rounded-full text-foreground hover:bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+					aria-controls="mobile-nav-restaurant"
+					aria-expanded="false"
+					aria-label={lang === 'ca' ? 'Menú de navegació' : 'Menú de navegación'}
+					data-mobile-menu-toggle
+				>
+					<Icon name="tabler:menu-2" class="mobile-menu-icon-open size-6" aria-hidden="true" />
+					<Icon name="tabler:x" class="mobile-menu-icon-close size-6" aria-hidden="true" />
+				</button>
+			</div>
+		</div>
+
+		<nav
+			id="mobile-nav-restaurant"
+			class="hidden border-t border-border pt-2 lg:hidden"
+			aria-label="Mobile navigation"
+			data-mobile-menu
+		>
+			<ul class="flex flex-col gap-0.5 pb-3">
+				{
+					navItems.map((item) => {
+						const href = hrefFor(item, lang);
+						const isCurrent = item.kind === 'route' && currentPath === href;
+						return (
+							<li>
+								<a
+									href={href}
+									class="block rounded-lg px-2 py-2.5 font-body text-base text-foreground hover:bg-[color-mix(in_oklch,var(--color-primary)_10%,transparent)]"
+									aria-current={isCurrent ? 'page' : undefined}
+									data-nav-link
+								>
+									{t(item.labelKey)}
+								</a>
+							</li>
+						);
+					})
+				}
+			</ul>
+		</nav>
+	</div>
+</header>
+
+<style>
+	.mobile-menu-toggle .mobile-menu-icon-close {
+		display: none;
+	}
+	.mobile-menu-toggle[aria-expanded='true'] .mobile-menu-icon-open {
+		display: none;
+	}
+	.mobile-menu-toggle[aria-expanded='true'] .mobile-menu-icon-close {
+		display: inline-block;
+	}
+</style>

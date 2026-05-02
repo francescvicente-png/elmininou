@@ -1,0 +1,116 @@
+---
+/**
+ * FaqItem
+ *
+ * Native HTML accordion using <details>/<summary>. No JS required —
+ * the browser handles toggling. We add CSS-only animation: a
+ * grid-template-rows trick so the answer can transition between
+ * 0fr (collapsed) and 1fr (expanded) without prescribing a fixed
+ * height. The chevron rotates 180deg via the `[open]` attribute
+ * selector.
+ *
+ * The grid-row animation works in all evergreen browsers as of
+ * 2024. Safari < 17 falls back to a hard cut, which is acceptable
+ * (the question still toggles correctly).
+ */
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import type { FaqItemData } from '../data/faq';
+import Heading from './Heading.astro';
+
+type HeadingLevel = 'h2' | 'h3' | 'h4';
+
+interface Props {
+	item: FaqItemData;
+	lang: Lang;
+	class?: string;
+	style?: string;
+	/** Semantic heading level for the question. Default h3. */
+	headingLevel?: HeadingLevel;
+}
+
+const { item, lang, class: className, style, headingLevel = 'h3' } = Astro.props;
+const t = useTranslations(lang);
+
+const question = lang === 'ca' ? item.questionCa : item.questionEs;
+const answer = lang === 'ca' ? item.answerCa : item.answerEs;
+---
+
+<details
+	class:list={['faq-item border-b border-border last:border-b-0', className]}
+	id={`faq-${item.id}`}
+	style={style}
+>
+	<summary class="faq-summary group flex items-center justify-between gap-4 py-5 cursor-pointer list-none">
+		<Heading as={headingLevel} size="h4" class="pr-2">
+			{question}
+		</Heading>
+		<Icon
+			name="tabler:chevron-down"
+			class="faq-chevron h-5 w-5 shrink-0 text-muted group-hover:text-primary transition-colors"
+			aria-hidden="true"
+		/>
+	</summary>
+	<div class="faq-content-wrapper">
+		<div class="faq-content-inner pb-5 pr-8 space-y-2">
+			<p class="text-base font-body text-foreground leading-relaxed">
+				{answer}
+			</p>
+			{
+				item.pendingConfirmation && (
+					<p class="text-xs text-muted italic">
+						* {t('faq.pendingConfirmationNote')}
+					</p>
+				)
+			}
+		</div>
+	</div>
+</details>
+
+<style>
+	/* Hide the default disclosure triangle in WebKit / Blink. The chevron
+	   icon takes its place. */
+	.faq-summary::-webkit-details-marker {
+		display: none;
+	}
+	.faq-summary::marker {
+		content: '';
+	}
+
+	/* Grid-row animation: rows go from 0fr (collapsed) to 1fr (expanded).
+	   The inner element has min-height: 0 so it actually shrinks rather
+	   than capping at content height. */
+	.faq-content-wrapper {
+		display: grid;
+		grid-template-rows: 0fr;
+		transition: grid-template-rows 350ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+
+	.faq-content-inner {
+		min-height: 0;
+		overflow: hidden;
+	}
+
+	.faq-item[open] .faq-content-wrapper {
+		grid-template-rows: 1fr;
+	}
+
+	.faq-item[open] .faq-chevron {
+		transform: rotate(180deg);
+		color: var(--color-primary);
+	}
+
+	.faq-chevron {
+		transition:
+			transform 350ms cubic-bezier(0.22, 1, 0.36, 1),
+			color 200ms ease;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.faq-content-wrapper,
+		.faq-chevron {
+			transition: none;
+		}
+	}
+</style>

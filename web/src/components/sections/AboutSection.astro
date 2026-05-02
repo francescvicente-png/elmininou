@@ -1,0 +1,173 @@
+---
+/**
+ * AboutSection ("Qui som" / "Sobre nosotros")
+ *
+ * Magazine-style long-form piece. Asymmetric on desktop: body column with
+ * drop-cap lead, marginalia quote, and 4:5 portrait slot (placeholder until
+ * the business supplies a hero or team photo).
+ */
+import Container from '../Container.astro';
+import Heading from '../Heading.astro';
+import EditorialDivider from '../EditorialDivider.astro';
+// AboutPlaceholder unused on home — see comment in JSX. Import kept removed to silence Astro warning.
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const copy = {
+	ca: {
+		anchorId: 'qui-som',
+		eyebrow: 'Qui som',
+		heading: "El mini nou · L'Ametlla del Vallès",
+		subheading:
+			"Restaurant i bar al carrer Jeroni de Moragas, 13: brases i tapes amb conversa tranquil·la sobre la carta i els al·lèrgens a la sala.",
+		paragraph1:
+			'El mini nou acull tant veïnat com qui passa pel Vallès Oriental: vindreu per proximitat, perquè algú us ho ha recomanat o perquè una ressenya ha obert dubtes que voleu tancar a la sala. Aquí els plats han de llegir-se amb foc i textura nets, sense ornaments que no aporten.',
+		paragraph2:
+			"La cuina aposta pel producte clar i pel foc quan toca; sala i passi mantenen el vocabulari gastronòmic compartible: cada cambrer pot resumir allò que porta un plat sense girar-lo com una presentació inaccessible.",
+		paragraph3:
+			"Taula i horari els confirmeu per telèfon o WhatsApp: el ritme de la nit el marca coberts reals i temps de menjador, no timers de pantalla. Aquest web resume orientació sobre carta i menú; l'última paraula —al·lèrgens, grups, canvis d'última hora— la dona sempre algú del local.",
+		marginaliaEyebrow: 'En una frase',
+		marginaliaQuote:
+			'El que busques aquí és menjar ben explicat, fet amb gust i sense teatre: carta sobre la taula i preguntes benvingudes.',
+		marginaliaAttribution: 'Línia del local',
+	},
+	es: {
+		anchorId: 'sobre-nosotros',
+		eyebrow: 'Sobre nosotros',
+		heading: 'El mini nou · La Ametlla del Vallès',
+		subheading:
+			'Restaurante y bar en la calle Jeroni de Moragas, 13: brasas y tapas con conversación tranquila sobre carta y alérgenos en sala.',
+		paragraph1:
+			'El mini nou recibe vecinos y viajeros por el Vallès Oriental: llegáis por cercanías, porque alguien lo ha recomendado o porque queréis aclarar en persona lo que vieron las reseñas. Aquí prima el plato claro sobre el slogan; el cliente merece saber qué llega antes de coger cubiertos.',
+		paragraph2:
+			'La cocina apuesta por el producto entendido y por la brasa cuando el plato lo pide; sala y cocina mantienen un lenguaje común sin postureo gastronómico. Lo que ordenas ha de poder explicarlo quien lleva esa servilleta ese mismo día.',
+		paragraph3:
+			'Mesa y horarios se pactan por teléfono o WhatsApp; el tiempo de sala lo marcan cobert reales y el servicio vivo, no contadores de aplicación. La web orienta sobre carta y menú; lo definitivo —alérgenos, grupos, imprevistos— lo cierra siempre alguien del restaurante.',
+		marginaliaEyebrow: 'En una frase',
+		marginaliaQuote:
+			'Lo que buscas aquí es comer con criterio, sin pose: carta a la vista y espacio para preguntar sin miedo.',
+		marginaliaAttribution: 'Línea del local',
+	},
+}[lang];
+---
+
+<section id={copy.anchorId} class="about-section scroll-mt-32">
+	<EditorialDivider
+		number="05"
+		total="05"
+		eyebrow={copy.eyebrow}
+		heading={copy.heading}
+		subheading={copy.subheading}
+		class="!pt-8 md:!pt-11 !pb-5 md:!pb-6"
+	/>
+
+	<Container>
+		<div class="grid grid-cols-12 gap-x-6 md:gap-x-12 gap-y-6 md:gap-y-8">
+			<div class="col-span-12 md:col-span-7 about-body">
+				<p class="about-paragraph about-paragraph-lead">
+					<span class="about-dropcap" aria-hidden="true">{copy.paragraph1[0]}</span><span class="about-paragraph-rest">{copy.paragraph1.slice(1)}</span>
+				</p>
+				<p class="about-paragraph">{copy.paragraph2}</p>
+				<p class="about-paragraph">{copy.paragraph3}</p>
+			</div>
+
+			<aside class="col-span-12 md:col-span-5 space-y-6">
+				<div class="about-marginalia">
+					<p class="about-marginalia-eyebrow">{copy.marginaliaEyebrow}</p>
+					<blockquote class="about-marginalia-quote">
+						“{copy.marginaliaQuote}”
+					</blockquote>
+					<p class="about-marginalia-attribution">
+						— {copy.marginaliaAttribution}
+					</p>
+				</div>
+				<!-- AboutPlaceholder removed for compact home: it added ~500px of decorative SVG with no info. -->
+			</aside>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.about-section {
+		padding-bottom: 2.5rem;
+	}
+
+	@media (min-width: 768px) {
+		.about-section {
+			padding-bottom: 3.25rem;
+		}
+	}
+
+	.about-body {
+		display: flex;
+		flex-direction: column;
+		gap: 1.25rem;
+	}
+
+	.about-paragraph {
+		font-family: var(--font-body);
+		font-size: clamp(1.05rem, 0.4vw + 0.95rem, 1.2rem);
+		line-height: 1.75;
+		color: var(--color-foreground);
+		margin: 0;
+		max-width: 36rem;
+	}
+
+	.about-dropcap {
+		float: left;
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 700;
+		font-size: 3em;
+		line-height: 0.95;
+		color: var(--color-primary);
+		padding: 0.08em 0.12em 0 0;
+		margin: 0.05em 0.02em 0 0;
+	}
+
+	.about-marginalia {
+		border-left: 1px solid var(--color-primary);
+		padding-left: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 0.85rem;
+	}
+
+	.about-marginalia-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.about-marginalia-quote {
+		font-family: var(--font-display), Georgia, serif;
+		font-style: italic;
+		font-size: clamp(1.25rem, 1vw + 0.85rem, 1.65rem);
+		line-height: 1.4;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: balance;
+	}
+
+	.about-marginalia-attribution {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.about-portrait {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+</style>

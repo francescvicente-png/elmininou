@@ -1,0 +1,198 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Heading from '../../components/Heading.astro';
+import Text from '../../components/Text.astro';
+import { legalEntity, serviceProvider, websiteOwner, legalLastUpdated } from '../../data/legal';
+import { business } from '../../data/business';
+
+const lang = 'ca' as const;
+const updatedHuman = '1 de maig de 2026';
+---
+
+<BaseLayout
+	title={`Avís legal · ${business.name}`}
+	description={`Avís legal de ${business.name} a ${business.address.city}. Identificació del prestador, condicions d'ús i drets.`}
+	siblingPath="/es/aviso-legal/"
+	breadcrumbs={[
+		{ name: 'Inici', url: '/ca/' },
+		{ name: 'Avís legal', url: '/ca/avis-legal/' },
+	]}
+>
+	<Container as="section" class="pt-16 pb-8 md:pt-24 md:pb-10 space-y-4 max-w-3xl">
+		<Heading as="h1">Avís legal</Heading>
+		<Text variant="lead">
+			Informació legal d'aquest lloc web en compliment de la Llei 34/2002, de
+			serveis de la societat de la informació i de comerç electrònic (LSSI-CE).
+		</Text>
+	</Container>
+
+	<Container as="section" class="pb-20 md:pb-24 space-y-10 max-w-3xl">
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">1. Identificació del prestador</Heading>
+			{!websiteOwner.isFinalOwner && (
+				<div class="rounded-md border border-border bg-card px-5 py-4 text-sm text-muted">
+					{websiteOwner.note}
+				</div>
+			)}
+			<Text>
+				En compliment de l'article 10 de la LSSI-CE, s'informa que el prestador
+				d'aquest lloc web (servei de la societat de la informació) és:
+			</Text>
+			<ul class="space-y-1 text-base font-body text-foreground leading-relaxed">
+				<li><strong>Nom:</strong> {serviceProvider.fullName}</li>
+				<li><strong>NIF:</strong> {serviceProvider.taxId}</li>
+				<li><strong>Adreça:</strong> {serviceProvider.addressLine}</li>
+				<li>
+					<strong>Correu electrònic:</strong>{' '}
+					<a href={`mailto:${serviceProvider.email}`} class="hover:text-primary transition-colors">{serviceProvider.email}</a>
+				</li>
+			</ul>
+			<Text>
+				El prestador és una persona física. El nom comercial del negoci descrit
+				al lloc — {legalEntity.tradeName} — i la identitat fiscal de la
+				professional del saló són dades diferenciades del prestador del servei
+				web; els continguts informatius sobre el saló es publiquen amb finalitat
+				informativa. Per a cites, preus i tractament de dades en la relació
+				comercial amb el local, utilitzeu les dades de contacte del saló (apartat
+				següent).
+			</Text>
+			<Heading as="h3" size="h4" class="pt-2">1.1. Dades del saló (negoci descrit al lloc)</Heading>
+			<ul class="space-y-1 text-base font-body text-foreground leading-relaxed">
+				<li><strong>Nom comercial:</strong> {legalEntity.tradeName}</li>
+				<li><strong>Titular (nom legal):</strong> {legalEntity.legalName}</li>
+				<li><strong>Adreça del local:</strong> {legalEntity.address}</li>
+				<li>
+					<strong>NIF de la titular del negoci del saló:</strong>{' '}
+					{legalEntity.taxId.startsWith('TODO_') ? (
+						<span class="text-muted italic">[pendent — dades de la titular fiscal del saló]</span>
+					) : (
+						legalEntity.taxId
+					)}
+				</li>
+				<li>
+					<strong>Correu electrònic del saló:</strong>{' '}
+					{legalEntity.email.startsWith('TODO_') ? (
+						<span class="text-muted italic">[pendent]</span>
+					) : (
+						<a href={`mailto:${legalEntity.email}`} class="hover:text-primary transition-colors">{legalEntity.email}</a>
+					)}
+				</li>
+				<li><strong>Telèfon del saló:</strong> {legalEntity.phone}</li>
+			</ul>
+			<Text>
+				Si la titular fiscal del saló actua com a professional autònoma, pot no
+				constar registre mercantil. Les dades de registre que escaiguin figuraran
+				aquí quan estiguin disponibles.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">2. Objecte</Heading>
+			<Text>
+				El present avís legal regula les condicions d'ús del lloc web dedicat a
+				{legalEntity.tradeName}. La navegació pel lloc atribueix la condició
+				d'usuari i implica l'acceptació plena de les condicions aquí recollides
+				en la versió publicada en el moment d'accedir-hi. El prestador es
+				reserva la facultat de modificar-les sense previ avís.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">3. Condicions d'ús</Heading>
+			<Text>
+				L'usuari es compromet a fer un ús diligent del lloc i dels serveis
+				accessibles, conforme a la legalitat vigent, la bona fe, els bons
+				costums i el respecte a tercers. En particular, l'usuari s'absté de:
+			</Text>
+			<ul class="list-disc pl-6 space-y-2 text-base font-body text-foreground leading-relaxed">
+				<li>Utilitzar el lloc web amb finalitats il·lícites o lesives.</li>
+				<li>
+					Reproduir, copiar, distribuir o transformar els continguts del lloc
+					sense autorització expressa del prestador o, si escau, dels titulars dels continguts.
+				</li>
+				<li>
+					Introduir programes informàtics, virus o qualsevol altre element que
+					pugui alterar els sistemes informàtics del prestador o de tercers.
+				</li>
+				<li>
+					Suplantar la identitat de tercers o falsejar la pròpia mitjançant la
+					navegació pel lloc.
+				</li>
+			</ul>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">4. Propietat intel·lectual i industrial</Heading>
+			<Text>
+				Els continguts d'aquest lloc web — incloent-hi textos, marca, logotip,
+				estructura, disseny i programari — són titularitat exclusiva del
+				prestador, del saló o, si escau, dels seus llicenciants, i estan protegits
+				per la normativa espanyola i internacional de propietat intel·lectual i
+				industrial.
+			</Text>
+			<Text>
+				La major part de les fotografies actuals corresponen a una sessió
+				encarregada per al web, amb atribució visible al mateix lloc. Qualsevol
+				altra imatge residual de demostració, si n’hi hagués en el futur, es
+				mostrarà amb la llicència i l’atribució que escaigui.
+			</Text>
+			<Text>
+				Queda prohibida qualsevol reproducció, distribució o comunicació
+				pública dels continguts sense autorització expressa.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">5. Enllaços externs</Heading>
+			<Text>
+				Aquest lloc inclou enllaços a recursos i serveis de tercers,
+				principalment a WhatsApp (Meta), a Google Maps i a les xarxes socials
+				enllaçades. El prestador no controla aquests serveis ni assumeix
+				responsabilitat sobre els seus continguts, polítiques o disponibilitat.
+				L'accés a aquests recursos es regeix per les condicions i polítiques de
+				privacitat pròpies de cada proveïdor.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">6. Limitació de responsabilitat</Heading>
+			<Text>
+				El prestador procura mantenir la informació publicada actualitzada i
+				correcta, però no garanteix l'absència d'errors o la disponibilitat
+				continuada del servei. En cap cas serà responsable dels danys derivats
+				d'una caiguda puntual del servidor, errors de programari de tercers, ni
+				de l'ús indegut del lloc per part de l'usuari.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">7. Llei aplicable i jurisdicció</Heading>
+			<Text>
+				La relació entre el prestador i l'usuari es regeix per la legislació
+				espanyola vigent. Per a la resolució de controvèrsies que puguin
+				sorgir, les parts se sotmeten als jutjats i tribunals que correspongui
+				segons la normativa processal aplicable, amb seu a Catalunya.
+			</Text>
+		</div>
+
+		<div class="space-y-4">
+			<Heading as="h2" size="h3">8. Modificacions</Heading>
+			<Text>
+				El prestador es reserva el dret de modificar el contingut d'aquest avís
+				legal en qualsevol moment per adaptar-lo a canvis normatius o
+				operatius. Les modificacions tindran efecte des del moment de la seva
+				publicació en aquesta mateixa pàgina.
+			</Text>
+		</div>
+
+		<div class="pt-6 border-t border-border">
+			<Text variant="small" class="text-muted">
+				Última actualització: {updatedHuman}.
+				{!websiteOwner.isFinalOwner && (
+					<span class="block mt-2">Identificador intern de la versió del document: {legalLastUpdated}.</span>
+				)}
+			</Text>
+		</div>
+	</Container>
+</BaseLayout>

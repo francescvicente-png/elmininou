@@ -1,0 +1,155 @@
+---
+/**
+ * TypographicInterlude
+ *
+ * A purely decorative typographic moment between two heavy sections.
+ * One massive word in Cormorant Garamond with `-webkit-text-stroke`
+ * (outline, no fill) takes up the row, sangrando ligeramente fuera del
+ * contenedor para sentirse como una pausa editorial / "magazine
+ * spread divider".
+ *
+ * Same visual recipe as the footer mega-wordmark (the user loved
+ * that one), so the home gets two anchored moments of oversized
+ * type — one mid-page (this) and one at the outro (footer).
+ *
+ * The word is `aria-hidden="true"` because it's purely ornamental;
+ * the surrounding sections already convey the meaning.
+ *
+ * Reduced-motion: nothing to disable — the interlude is static.
+ */
+
+interface Props {
+	/** The word displayed in massive outline type. Choose ONE word
+	 *  per interlude — e.g. "BRASA", "LA AMETLLA". */
+	word?: string;
+	/** Optional eyebrow caption above the word (mono, uppercase,
+	 *  letter-spaced wide). Use sparingly — most interludes work
+	 *  better with just the word. */
+	eyebrow?: string;
+	/** Optional small caption below the word (italic Cormorant Garamond). */
+	caption?: string;
+	/** Vertical breathing room — `lg` for breakpoints between major
+	 *  sections, `md` for closer punctuation. */
+	size?: 'md' | 'lg';
+	class?: string;
+}
+
+const {
+	word = 'El mini nou',
+	eyebrow,
+	caption,
+	size = 'lg',
+	class: className,
+} = Astro.props;
+---
+
+<section
+	class:list={[
+		'typographic-interlude',
+		`size-${size}`,
+		className,
+	]}
+	aria-hidden="true"
+>
+	{eyebrow && <p class="ti-eyebrow">{eyebrow}</p>}
+	<div class="ti-word-row">
+		<span class="ti-word">{word}</span>
+	</div>
+	{caption && <p class="ti-caption">{caption}</p>}
+</section>
+
+<style>
+	.typographic-interlude {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 1rem;
+		text-align: center;
+		overflow: hidden;
+		padding-left: 1.5rem;
+		padding-right: 1.5rem;
+		user-select: none;
+		pointer-events: none;
+	}
+
+	.typographic-interlude.size-md {
+		padding-top: 4rem;
+		padding-bottom: 4rem;
+	}
+
+	/* Tighter than the original “magazine spread” — the home is long; huge
+	   padding read as empty scroll with no new information. */
+	.typographic-interlude.size-lg {
+		padding-top: 3.5rem;
+		padding-bottom: 3.5rem;
+	}
+
+	@media (min-width: 768px) {
+		.typographic-interlude.size-md {
+			padding-top: 4.5rem;
+			padding-bottom: 4.5rem;
+		}
+		.typographic-interlude.size-lg {
+			padding-top: 4.5rem;
+			padding-bottom: 4.5rem;
+		}
+	}
+
+	.ti-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	/* The row clips the wordmark so that on narrow viewports the
+	   massive word can be even larger than the viewport without
+	   breaking the layout. The text itself stays nowrap. */
+	.ti-word-row {
+		width: 100%;
+		display: flex;
+		justify-content: center;
+		overflow: hidden;
+	}
+
+	.ti-word {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 700;
+		/* Mobile: smaller clamp so the longest word used in interludes
+		   ("LA AMETLLA", ≈13 chars incl. space) fits inside the viewport without
+		   bleeding off-screen. The `md:` override below restores the
+		   editorial bleed feel from 768 px upwards. */
+		font-size: clamp(2.25rem, 10vw, 4rem);
+		line-height: 0.85;
+		letter-spacing: -0.04em;
+		color: transparent;
+		/* Light outline on the dark page shell (was hardcoded deep plum for cream UI). */
+		-webkit-text-stroke: 1px oklch(93% 0.012 85 / 0.32);
+		white-space: nowrap;
+	}
+
+	@media (min-width: 768px) {
+		.ti-word {
+			font-size: clamp(4rem, 18vw, 16rem);
+		}
+	}
+
+	@supports not (-webkit-text-stroke: 1px black) {
+		.ti-word {
+			color: oklch(93% 0.012 85 / 0.45);
+		}
+	}
+
+	.ti-caption {
+		font-family: var(--font-display), Georgia, serif;
+		font-style: italic;
+		font-size: clamp(0.95rem, 0.5vw + 0.85rem, 1.15rem);
+		color: var(--color-muted);
+		margin: 0;
+		max-width: 36ch;
+	}
+</style>

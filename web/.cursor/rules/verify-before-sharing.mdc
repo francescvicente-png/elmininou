@@ -1,0 +1,21 @@
+---
+description: Verificar en el entorno local (curl/servidor/navegador) antes de dar URLs o pasos al usuario
+alwaysApply: true
+---
+
+# Verificar antes de enseñar
+
+Cuando vayas a **mostrar al usuario** cualquiera de esto, **primero compruébalo tú** en el repo / terminal / navegador MCP (no basta asumir):
+
+- URLs `localhost` / `127.0.0.1` y puertos (previews estáticos, `pnpm dev`, etc.).
+- Rutas tipo “abre X en el navegador” si dependen de un servidor en marcha.
+- Comandos que “deberían” servir contenido (p. ej. `python3 -m http.server`).
+
+**Flujo mínimo:**
+
+1. Comprueba que existen los artefactos (p. ej. `preview-palettes-k12/k3/ca/index.html`).
+2. Si hace falta servidor: arrácalo (p. ej. en segundo plano) o documenta explícitamente que **sin ese proceso la URL fallará** — pero **antes** intenta `curl -sI` o herramienta de navegador para obtener `HTTP 200` o el estado real.
+3. En la respuesta al usuario, indica **qué verificaste** (p. ej. “`curl` → 200”, “snapshot del navegador con título Y”).
+4. **No** digas “abre esta URL” como si funcionara sin más si no has comprobado que algo escucha el puerto.
+
+Objetivo: evitar iteraciones vacías (ERR_CONNECTION_REFUSED, rutas malas, carpetas no generadas).

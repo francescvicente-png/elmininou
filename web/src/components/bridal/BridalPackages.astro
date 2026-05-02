@@ -1,0 +1,850 @@
+---
+/**
+ * BridalPackages — spotlight + supporting layout.
+ *
+ * Replaces the previous 3-equal-cards grid (anti-pattern flagged by
+ * `taste-skill` Rule 4 and `redesign-skill` "no 3 equal columns").
+ *
+ * On lg+ viewports:
+ *   - The "featured" package (one and only one) takes a wide tile on
+ *     the left (col-span-7) with its illustration as a tall hero.
+ *   - The two supporting packages stack on the right (col-span-5),
+ *     each as a compact horizontal card.
+ *
+ * On mobile everything stacks vertically with consistent spacing.
+ *
+ * Each package shows: tagline (eyebrow), name (display serif), short
+ * description, "what's included" 3-5 bullets, price-from line. Desktop
+ * users can open a native `<dialog>` (larger art + extra note + pack-
+ * specific WhatsApp). The budget pill opens WhatsApp like the intro
+ * trust pill. The pendingConfirmation flag still surfaces a Badge.
+ *
+ * Skills enforced:
+ *   - taste-skill §3 Rule 3 (anti-center) + Rule 4 (anti-card overuse)
+ *   - soft-skill §B (Doppelrand on the spotlight tile, button-in-button
+ *     trailing icon on the spotlight CTA)
+ *   - ui-ux-pro-max §6 (color tokens), §8 (clear primary/secondary CTA
+ *     hierarchy), §1 (semantic h2 → h3 inside)
+ */
+import { Picture } from 'astro:assets';
+import Container from '../Container.astro';
+import Badge from '../Badge.astro';
+import Button from '../Button.astro';
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { business } from '../../data/business';
+import { bridalPackages } from '../../data/bridal';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const featured = bridalPackages.find((p) => p.featured) ?? bridalPackages[0];
+const supporting = bridalPackages.filter((p) => p.id !== featured?.id);
+
+if (!featured || supporting.length !== 2) {
+	throw new Error('BridalPackages expects exactly one featured pack and two supporting packs');
+}
+
+const priceFmt = new Intl.NumberFormat(lang === 'ca' ? 'ca-ES' : 'es-ES', {
+	style: 'currency',
+	currency: 'EUR',
+	maximumFractionDigits: 0,
+});
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+
+function packWhatsAppUrl(pkg: (typeof bridalPackages)[number]): string {
+	const msg =
+		t('bridal.packDialogWhatsAppMessagePrefix') +
+		` «${pkg.name[lang]}»` +
+		t('bridal.packDialogWhatsAppMessageSuffix');
+	return `https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`;
+}
+
+const budgetWaMessage = t('bridal.packagesBudgetWhatsAppMessage');
+const budgetWaUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(budgetWaMessage)}`;
+---
+
+<section
+	class="bridal-packages relative bg-card border-y border-border py-24 md:py-32 lg:py-40 overflow-hidden"
+	aria-labelledby="bridal-packages-title"
+	data-bridal-packages-root
+>
+	<Container>
+		<header class="max-w-2xl mb-14 md:mb-20 fade-in-on-scroll" style="--fade-delay: 0ms; --fade-duration: 700ms;">
+			<p class="bridal-eyebrow">{t('bridal.packagesEyebrowNew')}</p>
+			<h2
+				id="bridal-packages-title"
+				class="bridal-packages-title font-display text-foreground mt-4 mb-5"
+			>
+				{t('bridal.packagesTitleNew')}
+			</h2>
+			<p class="bridal-packages-intro font-body text-muted leading-relaxed">
+				{t('bridal.packagesIntroNew')}
+			</p>
+		</header>
+
+		<div class="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+			{/* SPOTLIGHT — featured package */}
+			<article
+				class="bridal-pack-spotlight bridal-pack-card-interactive lg:col-span-7 fade-in-on-scroll"
+				style="--fade-delay: 100ms; --fade-duration: 800ms; --fade-y: 24px;"
+				aria-labelledby={`pack-${featured.id}-name`}
+				data-pack-id={featured.id}
+			>
+				<div class="bridal-pack-spotlight-frame">
+					<div class="bridal-pack-spotlight-image-wrap">
+						<Picture
+							src={featured.illustration}
+							alt={featured.illustrationAlt[lang]}
+							formats={['avif', 'webp']}
+							widths={[480, 720, 960]}
+							sizes="(min-width: 1024px) 50vw, 100vw"
+							loading="lazy"
+							decoding="async"
+							class="bridal-pack-spotlight-image"
+						/>
+						<div class="bridal-pack-spotlight-image-veil" aria-hidden="true" />
+						<div class="bridal-pack-spotlight-badge-row">
+							<Badge class="!bg-accent !text-accent-foreground">
+								<Icon name="tabler:bookmark-filled" class="h-3.5 w-3.5 mr-1.5 inline-block align-[-2px]" aria-hidden="true" />
+								{t('bridal.packagesFeaturedBadge')}
+							</Badge>
+							{featured.pendingConfirmation && (
+								<Badge variant="outline" class="!border-on-image/40 !text-on-image">
+									{t('packs.pendingBadge')}
+								</Badge>
+							)}
+						</div>
+					</div>
+					<div class="bridal-pack-spotlight-body">
+						<p class="bridal-pack-tagline">{featured.tagline[lang]}</p>
+						<h3
+							id={`pack-${featured.id}-name`}
+							class="bridal-pack-name font-display text-foreground"
+						>
+							{featured.name[lang]}
+						</h3>
+						<p class="bridal-pack-description font-body text-muted leading-relaxed">
+							{featured.description[lang]}
+						</p>
+						<div class="bridal-pack-included">
+							<p class="bridal-pack-included-label">
+								{t('bridal.packagesIncludedLabel')}
+							</p>
+							<ul class="bridal-pack-included-list">
+								{
+									featured.included[lang].map((item) => (
+										<li>
+											<Icon
+												name="tabler:check"
+												class="h-4 w-4 text-accent shrink-0 mt-1"
+												aria-hidden="true"
+											/>
+											<span>{item}</span>
+										</li>
+									))
+								}
+							</ul>
+						</div>
+						<div class="bridal-pack-spotlight-footer">
+							<p class="bridal-pack-price">
+								<span class="bridal-pack-price-from">{t('bridal.packagesPriceFromShort')}</span>
+								<span class="bridal-pack-price-amount tabular-nums">{priceFmt.format(featured.priceFromEur)}</span>
+							</p>
+							<div class="bridal-pack-spotlight-actions">
+								<Button
+									variant="secondary"
+									size="md"
+									type="button"
+									class="bridal-pack-detail-trigger"
+									data-bridal-pack-open={featured.id}
+								>
+									{t('bridal.packOpenDetail')}
+									<Icon
+										slot="icon-trailing"
+										name="tabler:chevron-right"
+										class="h-4 w-4 shrink-0"
+										aria-hidden="true"
+									/>
+								</Button>
+								<Button as="a" href={packWhatsAppUrl(featured)} variant="primary" size="md" external>
+									{t('bridal.whatsappCta')}
+									<Icon
+										slot="icon-trailing"
+										name="tabler:arrow-up-right"
+										class="h-4 w-4 shrink-0"
+										aria-hidden="true"
+									/>
+								</Button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</article>
+
+			{/* SUPPORTING — two compact tiles stacked */}
+			<div class="lg:col-span-5 flex flex-col gap-6 md:gap-8">
+				{
+					supporting.map((pkg, idx) => (
+						<article
+							class="bridal-pack-support bridal-pack-card-interactive fade-in-on-scroll"
+							style={`--fade-delay: ${250 + idx * 130}ms; --fade-duration: 800ms; --fade-y: 20px;`}
+							aria-labelledby={`pack-${pkg.id}-name`}
+							data-pack-id={pkg.id}
+						>
+							<div class="bridal-pack-support-image-wrap">
+								<Picture
+									src={pkg.illustration}
+									alt={pkg.illustrationAlt[lang]}
+									formats={['avif', 'webp']}
+									widths={[360, 480, 640]}
+									sizes="(min-width: 1024px) 24vw, 38vw"
+									loading="lazy"
+									decoding="async"
+									class="bridal-pack-support-image"
+								/>
+							</div>
+							<div class="bridal-pack-support-body">
+								{pkg.pendingConfirmation && (
+									<Badge variant="outline" class="!text-[0.65rem] !py-0.5 !px-2 mb-1.5">
+										{t('packs.pendingBadge')}
+									</Badge>
+								)}
+								<p class="bridal-pack-tagline">{pkg.tagline[lang]}</p>
+								<h3
+									id={`pack-${pkg.id}-name`}
+									class="bridal-pack-support-name font-display text-foreground"
+								>
+									{pkg.name[lang]}
+								</h3>
+								<p class="bridal-pack-support-description font-body text-muted leading-relaxed">
+									{pkg.description[lang]}
+								</p>
+								<ul class="bridal-pack-support-included-list">
+									{
+										pkg.included[lang].map((item) => (
+											<li>
+												<Icon
+													name="tabler:check"
+													class="h-3.5 w-3.5 text-accent shrink-0 mt-[3px]"
+													aria-hidden="true"
+												/>
+												<span>{item}</span>
+											</li>
+										))
+									}
+								</ul>
+								<div class="bridal-pack-support-footer">
+									<p class="bridal-pack-support-price">
+										<span class="bridal-pack-price-from">{t('bridal.packagesPriceFromShort')}</span>
+										<span class="bridal-pack-price-amount tabular-nums">{priceFmt.format(pkg.priceFromEur)}</span>
+									</p>
+									<Button
+										variant="secondary"
+										size="sm"
+										type="button"
+										class="bridal-pack-detail-trigger mt-2 w-full sm:w-auto"
+										data-bridal-pack-open={pkg.id}
+									>
+										{t('bridal.packOpenDetail')}
+										<Icon
+											slot="icon-trailing"
+											name="tabler:chevron-right"
+											class="h-3.5 w-3.5 shrink-0"
+											aria-hidden="true"
+										/>
+									</Button>
+								</div>
+							</div>
+						</article>
+					))
+				}
+			</div>
+		</div>
+
+		<a
+			href={budgetWaUrl}
+			target="_blank"
+			rel="noopener noreferrer"
+			class="bridal-packages-budget-note fade-in-on-scroll"
+			style="--fade-delay: 600ms; --fade-duration: 700ms;"
+			aria-label={t('bridal.packagesBudgetWhatsAppAriaLabel')}
+		>
+			<Icon name="tabler:message-circle" class="h-4 w-4 text-accent shrink-0" aria-hidden="true" />
+			<span>{t('bridal.packagesAskForBudget')}</span>
+		</a>
+
+		{
+			bridalPackages.map((pkg) => (
+				<dialog
+					id={`bridal-pack-dialog-${pkg.id}`}
+					class="bridal-pack-dialog"
+					data-bridal-pack-dialog
+					aria-labelledby={`bridal-pack-dialog-title-${pkg.id}`}
+				>
+					<div class="bridal-pack-dialog-panel">
+						<button
+							type="button"
+							class="bridal-pack-dialog-close"
+							data-bridal-pack-dialog-close
+							aria-label={t('gallery.closeImage')}
+						>
+							<Icon name="tabler:x" class="h-5 w-5" aria-hidden="true" />
+						</button>
+						<div class="bridal-pack-dialog-grid">
+							<div class="bridal-pack-dialog-visual">
+								<Picture
+									src={pkg.illustration}
+									alt={pkg.illustrationAlt[lang]}
+									formats={['avif', 'webp']}
+									widths={[640, 880, 1200]}
+									sizes="(min-width: 900px) 42vw, 100vw"
+									loading="lazy"
+									decoding="async"
+									class="bridal-pack-dialog-image"
+								/>
+							</div>
+							<div class="bridal-pack-dialog-main">
+								<div class="bridal-pack-dialog-badges">
+									{pkg.featured && (
+										<Badge class="!bg-accent !text-accent-foreground">
+											<Icon name="tabler:bookmark-filled" class="h-3.5 w-3.5 mr-1.5 inline-block align-[-2px]" aria-hidden="true" />
+											{t('bridal.packagesFeaturedBadge')}
+										</Badge>
+									)}
+									{pkg.pendingConfirmation && (
+										<Badge variant="outline">{t('packs.pendingBadge')}</Badge>
+									)}
+								</div>
+								<p class="bridal-pack-tagline">{pkg.tagline[lang]}</p>
+								<h2 id={`bridal-pack-dialog-title-${pkg.id}`} class="bridal-pack-dialog-title font-display text-foreground">
+									{pkg.name[lang]}
+								</h2>
+								<p class="bridal-pack-dialog-description font-body text-muted leading-relaxed">
+									{pkg.description[lang]}
+								</p>
+								<div class="bridal-pack-dialog-more">
+									<p class="bridal-pack-dialog-more-label">{t('bridal.packDialogMoreLabel')}</p>
+									<p class="bridal-pack-dialog-more-body font-body text-foreground/90 leading-relaxed">
+										{pkg.expandedNote[lang]}
+									</p>
+								</div>
+								<div class="bridal-pack-included bridal-pack-dialog-included">
+									<p class="bridal-pack-included-label">{t('bridal.packagesIncludedLabel')}</p>
+									<ul class="bridal-pack-included-list">
+										{
+											pkg.included[lang].map((item) => (
+												<li>
+													<Icon name="tabler:check" class="h-4 w-4 text-accent shrink-0 mt-1" aria-hidden="true" />
+													<span>{item}</span>
+												</li>
+											))
+										}
+									</ul>
+								</div>
+								<div class="bridal-pack-dialog-actions">
+									<p class="bridal-pack-price bridal-pack-dialog-price">
+										<span class="bridal-pack-price-from">{t('bridal.packagesPriceFromShort')}</span>
+										<span class="bridal-pack-price-amount tabular-nums">{priceFmt.format(pkg.priceFromEur)}</span>
+									</p>
+									<Button as="a" href={packWhatsAppUrl(pkg)} variant="primary" size="md" external class="w-full sm:w-auto">
+										{t('bridal.whatsappCta')}
+										<Icon slot="icon-trailing" name="tabler:arrow-up-right" class="h-4 w-4 shrink-0" aria-hidden="true" />
+									</Button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</dialog>
+			))
+		}
+	</Container>
+</section>
+
+<script is:inline>
+	(function () {
+		if (window.__miniNouPackDialogsBound) return;
+		window.__miniNouPackDialogsBound = true;
+
+		document.addEventListener(
+			'click',
+			function (e) {
+				var t = e.target;
+				if (!t || !t.closest) return;
+
+				var closeBtn = t.closest('[data-bridal-pack-dialog-close]');
+				if (closeBtn) {
+					var dlgClose = closeBtn.closest('dialog');
+					if (dlgClose && typeof dlgClose.close === 'function') dlgClose.close();
+					return;
+				}
+
+				var openBtn = t.closest('[data-bridal-pack-open]');
+				if (openBtn) {
+					var openId = openBtn.getAttribute('data-bridal-pack-open');
+					if (openId) {
+						var dOpen = document.getElementById('bridal-pack-dialog-' + openId);
+						if (dOpen && typeof dOpen.showModal === 'function') dOpen.showModal();
+					}
+					return;
+				}
+
+				var article = t.closest('article[data-pack-id]');
+				if (article && !t.closest('a[href]') && !t.closest('button')) {
+					var pid = article.getAttribute('data-pack-id');
+					if (pid) {
+						var dArt = document.getElementById('bridal-pack-dialog-' + pid);
+						if (dArt && typeof dArt.showModal === 'function') dArt.showModal();
+					}
+				}
+			},
+			true,
+		);
+
+		document.addEventListener('click', function (e) {
+			var el = e.target;
+			if (el instanceof HTMLDialogElement && el.hasAttribute('data-bridal-pack-dialog')) {
+				el.close();
+			}
+		});
+	})();
+</script>
+
+<style>
+	.bridal-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.bridal-packages-title {
+		font-size: clamp(1.875rem, 2.6vw + 0.75rem, 3.25rem);
+		line-height: 1.1;
+		letter-spacing: -0.018em;
+		font-weight: 400;
+		text-wrap: balance;
+		margin-block: 0.5rem 0;
+	}
+	.bridal-packages-intro {
+		font-size: 1rem;
+		max-width: 56ch;
+		text-wrap: pretty;
+	}
+
+	/* SPOTLIGHT */
+	.bridal-pack-spotlight-frame {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		background: var(--color-background);
+		border: 1px solid var(--color-border);
+		border-radius: 1.75rem;
+		overflow: hidden;
+		box-shadow: 0 30px 70px -30px oklch(0% 0 0 / 0.45);
+		height: 100%;
+	}
+	.bridal-pack-spotlight-image-wrap {
+		position: relative;
+		aspect-ratio: 16 / 11;
+		background: color-mix(in oklch, var(--color-muted) 8%, var(--color-background));
+		overflow: hidden;
+	}
+	.bridal-pack-spotlight-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.bridal-pack-spotlight-image-veil {
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(180deg, transparent 55%, oklch(13% 0.011 300 / 0.55) 100%);
+		pointer-events: none;
+	}
+	.bridal-pack-spotlight-badge-row {
+		position: absolute;
+		left: 1.25rem;
+		top: 1.25rem;
+		display: flex;
+		gap: 0.5rem;
+		flex-wrap: wrap;
+	}
+
+	.bridal-pack-spotlight-body {
+		padding: 2rem 2rem 2.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		flex: 1;
+	}
+	.bridal-pack-tagline {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		text-transform: uppercase;
+		letter-spacing: 0.28em;
+		color: var(--color-accent);
+		margin: 0;
+	}
+	.bridal-pack-name {
+		font-size: clamp(1.75rem, 1.4vw + 1rem, 2.5rem);
+		line-height: 1.1;
+		letter-spacing: -0.012em;
+		font-weight: 400;
+		margin: 0;
+	}
+	.bridal-pack-description {
+		font-size: 0.95rem;
+		text-wrap: pretty;
+		max-width: 52ch;
+		margin: 0;
+	}
+	.bridal-pack-included {
+		margin-top: 0.25rem;
+		padding-top: 1rem;
+		border-top: 1px solid color-mix(in oklch, var(--color-border) 60%, transparent);
+	}
+	.bridal-pack-included-label {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.65rem;
+		letter-spacing: 0.28em;
+		text-transform: uppercase;
+		color: var(--color-muted);
+		margin: 0 0 0.65rem;
+	}
+	.bridal-pack-included-list,
+	.bridal-pack-support-included-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+	.bridal-pack-included-list li,
+	.bridal-pack-support-included-list li {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.65rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.92rem;
+		color: var(--color-foreground);
+	}
+
+	.bridal-pack-spotlight-footer {
+		margin-top: auto;
+		padding-top: 1.25rem;
+		display: flex;
+		flex-wrap: wrap;
+		align-items: flex-end;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+	.bridal-pack-spotlight-actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.65rem;
+		justify-content: flex-end;
+	}
+	.bridal-pack-price {
+		margin: 0;
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+	}
+	.bridal-pack-price-from {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		letter-spacing: 0.22em;
+		text-transform: uppercase;
+		color: var(--color-muted);
+	}
+	.bridal-pack-price-amount {
+		font-family: var(--font-display), Georgia, serif;
+		font-size: 1.65rem;
+		color: var(--color-foreground);
+		letter-spacing: -0.01em;
+	}
+
+	/* SUPPORT */
+	.bridal-pack-support {
+		display: flex;
+		gap: 1.25rem;
+		padding: 1.5rem;
+		background: var(--color-background);
+		border: 1px solid color-mix(in oklch, var(--color-border) 70%, transparent);
+		border-radius: 1.25rem;
+		transition: border-color 280ms cubic-bezier(0.22, 1, 0.36, 1);
+	}
+	.bridal-pack-support:hover {
+		border-color: color-mix(in oklch, var(--color-accent) 35%, var(--color-border));
+	}
+	.bridal-pack-support-image-wrap {
+		flex: 0 0 7.5rem;
+		aspect-ratio: 1 / 1;
+		border-radius: 0.85rem;
+		overflow: hidden;
+		background: color-mix(in oklch, var(--color-muted) 8%, var(--color-background));
+	}
+	@media (min-width: 1024px) {
+		.bridal-pack-support-image-wrap {
+			flex: 0 0 11rem;
+		}
+	}
+	@media (max-width: 380px) {
+		.bridal-pack-support-image-wrap {
+			flex-basis: 5.5rem;
+		}
+	}
+	.bridal-pack-support-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+	}
+	.bridal-pack-support-body {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		min-width: 0;
+	}
+	.bridal-pack-support-name {
+		font-size: 1.4rem;
+		line-height: 1.15;
+		letter-spacing: -0.01em;
+		font-weight: 400;
+		margin: 0;
+	}
+	.bridal-pack-support-description {
+		font-size: 0.9rem;
+		text-wrap: pretty;
+		margin: 0;
+	}
+	.bridal-pack-support-included-list li {
+		font-size: 0.85rem;
+		gap: 0.55rem;
+	}
+	.bridal-pack-support-footer {
+		margin-top: 0.25rem;
+		padding-top: 0.65rem;
+		border-top: 1px solid color-mix(in oklch, var(--color-border) 60%, transparent);
+	}
+	.bridal-pack-support-price {
+		margin: 0;
+		display: flex;
+		align-items: baseline;
+		gap: 0.5rem;
+	}
+
+	.bridal-packages-budget-note {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		margin-top: 2.5rem;
+		padding: 0.65rem 1.1rem;
+		border: 1px solid color-mix(in oklch, var(--color-accent) 30%, var(--color-border));
+		border-radius: 9999px;
+		background: color-mix(in oklch, var(--color-accent) 6%, var(--color-background));
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.875rem;
+		color: var(--color-foreground);
+		text-decoration: none;
+		cursor: pointer;
+		transition:
+			border-color 200ms ease,
+			background-color 200ms ease;
+	}
+	.bridal-packages-budget-note:hover {
+		border-color: color-mix(in oklch, var(--color-accent) 55%, var(--color-border));
+		background: color-mix(in oklch, var(--color-accent) 11%, var(--color-background));
+	}
+	.bridal-packages-budget-note:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+
+	/* Clickable pack cards (dialog) — desktop affordance */
+	@media (min-width: 1024px) {
+		.bridal-pack-card-interactive .bridal-pack-spotlight-frame,
+		.bridal-pack-card-interactive.bridal-pack-support {
+			transition:
+				border-color 280ms cubic-bezier(0.22, 1, 0.36, 1),
+				box-shadow 280ms cubic-bezier(0.22, 1, 0.36, 1),
+				transform 280ms cubic-bezier(0.22, 1, 0.36, 1);
+		}
+		.bridal-pack-card-interactive:hover .bridal-pack-spotlight-frame,
+		.bridal-pack-card-interactive.bridal-pack-support:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 34px 80px -36px oklch(0% 0 0 / 0.5);
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		@media (min-width: 1024px) {
+			.bridal-pack-card-interactive:hover .bridal-pack-spotlight-frame,
+			.bridal-pack-card-interactive.bridal-pack-support:hover {
+				transform: none;
+			}
+		}
+	}
+
+	/* Pack detail dialog */
+	.bridal-pack-dialog {
+		margin: auto;
+		padding: 0;
+		border: none;
+		max-width: 1120px;
+		width: min(1120px, calc(100vw - 1.5rem));
+		max-height: calc(100vh - 2rem);
+		overflow: hidden;
+		border-radius: 1.35rem;
+		background: var(--color-background);
+		color: var(--color-foreground);
+		box-shadow: 0 40px 100px -40px oklch(0% 0 0 / 0.55);
+	}
+	.bridal-pack-dialog::backdrop {
+		background: oklch(0% 0 0 / 0.55);
+		backdrop-filter: blur(6px);
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.bridal-pack-dialog::backdrop {
+			backdrop-filter: none;
+		}
+	}
+	.bridal-pack-dialog-panel {
+		position: relative;
+		max-height: calc(100vh - 2rem);
+		overflow-y: auto;
+	}
+	.bridal-pack-dialog-close {
+		position: absolute;
+		top: 1rem;
+		right: 1rem;
+		z-index: 2;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.75rem;
+		height: 2.75rem;
+		border-radius: 9999px;
+		border: 1px solid color-mix(in oklch, var(--color-border) 80%, transparent);
+		background: color-mix(in oklch, var(--color-background) 92%, var(--color-muted));
+		color: var(--color-foreground);
+		cursor: pointer;
+		transition: background-color 180ms ease, border-color 180ms ease;
+	}
+	.bridal-pack-dialog-close:hover {
+		border-color: var(--color-accent);
+		background: color-mix(in oklch, var(--color-accent) 12%, var(--color-background));
+	}
+	.bridal-pack-dialog-close:focus-visible {
+		outline: 2px solid var(--color-accent);
+		outline-offset: 2px;
+	}
+	.bridal-pack-dialog-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		min-height: 0;
+	}
+	@media (min-width: 900px) {
+		.bridal-pack-dialog-grid {
+			grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+		}
+	}
+	.bridal-pack-dialog-visual {
+		position: relative;
+		min-height: 14rem;
+		max-height: 38vh;
+		background: color-mix(in oklch, var(--color-muted) 10%, var(--color-background));
+	}
+	@media (min-width: 900px) {
+		.bridal-pack-dialog-visual {
+			min-height: min(100%, 28rem);
+			max-height: none;
+		}
+	}
+	.bridal-pack-dialog-image {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		display: block;
+	}
+	.bridal-pack-dialog-main {
+		padding: 2rem 2rem 2.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+	}
+	@media (min-width: 900px) {
+		.bridal-pack-dialog-main {
+			padding: 2.5rem 2.75rem 2.5rem 0.5rem;
+		}
+	}
+	.bridal-pack-dialog-badges {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+	}
+	.bridal-pack-dialog-title {
+		font-size: clamp(2rem, 2.2vw + 1rem, 2.85rem);
+		line-height: 1.08;
+		letter-spacing: -0.02em;
+		font-weight: 400;
+		margin: 0;
+		text-wrap: balance;
+	}
+	.bridal-pack-dialog-description {
+		font-size: 0.98rem;
+		margin: 0;
+		max-width: 58ch;
+		text-wrap: pretty;
+	}
+	.bridal-pack-dialog-more {
+		padding: 1rem 0 0.25rem;
+		margin-top: 0.25rem;
+		border-top: 1px solid color-mix(in oklch, var(--color-border) 60%, transparent);
+	}
+	.bridal-pack-dialog-more-label {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.65rem;
+		letter-spacing: 0.28em;
+		text-transform: uppercase;
+		color: var(--color-accent);
+		margin: 0 0 0.5rem;
+	}
+	.bridal-pack-dialog-more-body {
+		font-size: 0.95rem;
+		margin: 0;
+		max-width: 58ch;
+		text-wrap: pretty;
+	}
+	.bridal-pack-dialog-included {
+		border-top-color: color-mix(in oklch, var(--color-border) 50%, transparent);
+	}
+	.bridal-pack-dialog-actions {
+		margin-top: auto;
+		padding-top: 1.25rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		align-items: flex-start;
+	}
+	@media (min-width: 640px) {
+		.bridal-pack-dialog-actions {
+			flex-direction: row;
+			flex-wrap: wrap;
+			align-items: center;
+			justify-content: space-between;
+		}
+	}
+	.bridal-pack-dialog-price {
+		margin: 0;
+	}
+</style>

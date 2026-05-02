@@ -1,0 +1,210 @@
+---
+/**
+ * CookieBanner
+ *
+ * LSSI cookie consent banner. Bilingual (reads the active language from
+ * the URL via getLangFromUrl). Hidden by default (`hidden` attribute on
+ * the root); the script in src/scripts/cookie-banner.ts decides whether
+ * to reveal it based on localStorage state.
+ *
+ * Important: this banner currently has NO functional gating effect —
+ * the site doesn't load any tracking script that requires consent. The
+ * banner exists for LSSI compliance and to record the user's stated
+ * preference *now* so that, when analytics or other non-essential
+ * cookies are added in the future, the consent infrastructure is
+ * already in place. See cookie-banner.ts for the gating TODO.
+ *
+ * Rendered inside `<body transition:persist>` from BaseLayout so the
+ * banner doesn't flash on every page change.
+ */
+import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import { getRoutePair } from '../i18n/routes';
+
+const lang = getLangFromUrl(Astro.url);
+const t = useTranslations(lang);
+const cookiesPolicyHref = getRoutePair('cookiesPolicy')[lang];
+---
+
+<div
+	class="cookie-banner"
+	role="region"
+	aria-label={t('cookies.bannerLabel')}
+	data-cookie-banner
+	hidden
+>
+	<div class="cookie-banner-inner">
+		<p class="cookie-banner-text">
+			{t('cookies.bannerText')}
+		</p>
+		<div class="cookie-banner-actions">
+			<a
+				href={cookiesPolicyHref}
+				class="cookie-banner-link"
+			>
+				{t('cookies.moreInfo')}
+			</a>
+			<button
+				type="button"
+				class="cookie-banner-button cookie-banner-button-secondary"
+				data-cookie-action="reject"
+			>
+				{t('cookies.reject')}
+			</button>
+			<button
+				type="button"
+				class="cookie-banner-button cookie-banner-button-primary"
+				data-cookie-action="accept"
+			>
+				{t('cookies.accept')}
+			</button>
+		</div>
+	</div>
+</div>
+
+<style>
+	.cookie-banner {
+		position: fixed;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		z-index: 9000;
+		background-color: var(--color-primary);
+		color: var(--color-primary-foreground);
+		border-top: 1px solid
+			color-mix(in oklch, var(--color-primary-foreground) 22%, transparent);
+		box-shadow: 0 -8px 24px -12px rgb(0 0 0 / 0.25);
+		transform: translateY(100%);
+		opacity: 0;
+		transition:
+			transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			opacity 300ms ease;
+	}
+
+	.cookie-banner.is-visible {
+		transform: translateY(0);
+		opacity: 1;
+	}
+
+	.cookie-banner.is-leaving {
+		transform: translateY(20%);
+		opacity: 0;
+		transition:
+			transform 300ms ease,
+			opacity 300ms ease;
+	}
+
+	.cookie-banner-inner {
+		max-width: 72rem;
+		margin: 0 auto;
+		padding: 1.25rem 1.5rem;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		align-items: stretch;
+	}
+
+	.cookie-banner-text {
+		font-family: var(--font-body);
+		/* 1 rem (16 px). UI audit (April 2026): banner es UI legal, el
+		   usuario tomando una decisión de consentimiento — el texto
+		   debe leerse sin esfuerzo. Antes 0.875rem (14 px) lo dejaba
+		   apretado en mobile y bordeaba el umbral iOS Safari de
+		   auto-zoom al hacer focus. */
+		font-size: 1rem;
+		line-height: 1.6;
+		margin: 0;
+		flex: 1;
+	}
+
+	.cookie-banner-actions {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.cookie-banner-link {
+		font-family: var(--font-body);
+		font-size: 0.875rem;
+		color: var(--color-primary-foreground);
+		text-decoration: underline;
+		align-self: center;
+		padding: 0.25rem 0.5rem;
+	}
+
+	.cookie-banner-link:hover {
+		color: color-mix(in oklch, var(--color-primary-foreground) 85%, var(--color-accent) 15%);
+	}
+
+	.cookie-banner-button {
+		font-family: var(--font-body);
+		font-weight: 600;
+		font-size: 0.875rem; /* matches text-sm */
+		padding: 0.625rem 1.25rem;
+		border-radius: var(--radius-md);
+		border: 1px solid transparent;
+		cursor: pointer;
+		transition:
+			background-color 200ms ease,
+			border-color 200ms ease,
+			color 200ms ease;
+	}
+
+	.cookie-banner-button-primary {
+		background-color: var(--color-primary);
+		color: var(--color-primary-foreground);
+	}
+
+	.cookie-banner-button-primary:hover {
+		opacity: 0.9;
+	}
+
+	.cookie-banner-button-secondary {
+		background-color: transparent;
+		color: var(--color-primary-foreground);
+		border-color: color-mix(
+			in oklch,
+			var(--color-primary-foreground) 55%,
+			transparent
+		);
+	}
+
+	.cookie-banner-button-secondary:hover {
+		background-color: color-mix(
+			in oklch,
+			var(--color-primary-foreground) 14%,
+			transparent
+		);
+		color: var(--color-primary-foreground);
+	}
+
+	.cookie-banner-button:focus-visible,
+	.cookie-banner-link:focus-visible {
+		outline: 3px solid var(--color-primary);
+		outline-offset: 2px;
+	}
+
+	@media (min-width: 768px) {
+		.cookie-banner-inner {
+			flex-direction: row;
+			align-items: center;
+			padding: 1.5rem 2rem;
+		}
+
+		.cookie-banner-actions {
+			flex-direction: row;
+			align-items: center;
+			gap: 0.75rem;
+		}
+
+		.cookie-banner-link {
+			align-self: auto;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.cookie-banner,
+		.cookie-banner.is-leaving {
+			transition: none;
+		}
+	}
+</style>

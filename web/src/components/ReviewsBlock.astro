@@ -1,0 +1,126 @@
+---
+/**
+ * ReviewsBlock
+ *
+ * Heading + optional 3-column grid of ReviewCards + footer link to the full
+ * Google listing. Reads the snapshot rating/count from
+ * src/data/business.ts and the verbatim review texts from
+ * src/data/reviews.ts.
+ *
+ * Wrap this in a <FadeInOnScroll> from the page that uses it; the
+ * component itself doesn't fade — keeping the wrapper at the page
+ * level matches how the rest of the home/contact sections animate.
+ */
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import { googleReviews } from '../data/business';
+import { reviews, googleReviewsPublicUrl } from '../data/reviews';
+import Heading from './Heading.astro';
+import Text from './Text.astro';
+import Link from './Link.astro';
+import ReviewCard from './ReviewCard.astro';
+import FeaturedReviewQuote from './FeaturedReviewQuote.astro';
+
+interface Props {
+	lang: Lang;
+	class?: string;
+	/** When true, the review marked `featured: true` in
+	 *  src/data/reviews.ts is rendered as a full-width editorial
+	 *  pull-quote ABOVE the standard 3-card grid. The remaining
+	 *  reviews appear in the grid as supports. Used by the home
+	 *  page; off (default) on the contact page where space is
+	 *  tighter and the 3-card grid alone is enough. */
+	featuredFirst?: boolean;
+	/** Exclude these authors from the supporting grid (e.g. already
+	 *  shown in PostGalleryHeroSection). Featured review is never omitted. */
+	omitAuthorNames?: ReadonlyArray<string>;
+	/** When false, only header + optional featured quote + CTA (no card grid). */
+	showSupportingGrid?: boolean;
+}
+
+const {
+	lang,
+	class: className,
+	featuredFirst = false,
+	omitAuthorNames = [],
+	showSupportingGrid = true,
+} = Astro.props;
+const t = useTranslations(lang);
+
+const omit = new Set(omitAuthorNames);
+
+const featuredReview = featuredFirst
+	? reviews.find((r) => r.featured)
+	: undefined;
+const supportingReviews = (
+	featuredReview ? reviews.filter((r) => r !== featuredReview) : reviews
+).filter((r) => !omit.has(r.authorName));
+
+const displayedReviewCount =
+	(featuredReview ? 1 : 0) + supportingReviews.length;
+
+const locale = lang === 'ca' ? 'ca-ES' : 'es-ES';
+const ratingLabel = googleReviews.rating.toLocaleString(locale, {
+	minimumFractionDigits: 1,
+	maximumFractionDigits: 1,
+});
+---
+
+<section class:list={['space-y-7 md:space-y-8', className]}>
+	<header class="space-y-3 max-w-2xl">
+		<Heading as="h2">{t('reviews.sectionTitle')}</Heading>
+		<Text variant="lead">
+			<span class="tabular-nums font-semibold text-foreground">
+				{ratingLabel} ★
+			</span>{' '}
+			{t('reviews.sectionSubtitlePrefix')}{' '}
+			<span class="tabular-nums">{googleReviews.count}</span>{' '}
+			{t('reviews.sectionSubtitleSuffix')}.
+		</Text>
+		{
+			showSupportingGrid ? (
+				<Text variant="small" class="text-muted">
+					{t('reviews.sectionDisplayedCount').replace(
+						'{count}',
+						String(displayedReviewCount),
+					)}
+				</Text>
+			) : (
+				<Text variant="small" class="text-muted">
+					{t('reviews.sectionSeeAbove')}
+				</Text>
+			)
+		}
+	</header>
+
+	{
+		featuredReview && (
+			<FeaturedReviewQuote review={featuredReview} lang={lang} />
+		)
+	}
+
+	{
+		showSupportingGrid && (
+			<div
+				class:list={[
+					'grid grid-cols-1 gap-4',
+					featuredReview
+						? supportingReviews.length >= 3
+							? 'md:grid-cols-3'
+							: 'md:grid-cols-2'
+						: 'md:grid-cols-3',
+				]}
+			>
+				{supportingReviews.map((review) => (
+					<ReviewCard review={review} lang={lang} />
+				))}
+			</div>
+		)
+	}
+
+	<div>
+		<Link href={googleReviewsPublicUrl} variant="standalone" external>
+			{t('reviews.viewAll')}
+		</Link>
+	</div>
+</section>

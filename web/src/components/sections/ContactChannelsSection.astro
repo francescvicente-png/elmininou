@@ -1,0 +1,215 @@
+---
+/**
+ * ContactChannelsSection
+ *
+ * Contact page block: primary tap targets (call, WhatsApp, directions),
+ * plus secondary channels (Instagram, email) as full-card links.
+ * Structured for WCAG touch size, focus-visible rings, and clear hierarchy.
+ */
+import Container from '../Container.astro';
+import Heading from '../Heading.astro';
+import Text from '../Text.astro';
+import Button from '../Button.astro';
+import { Icon } from 'astro-icon/components';
+import { business, getInstagramDisplayHandle } from '../../data/business';
+import { legalEntity } from '../../data/legal';
+import { getRoutePair } from '../../i18n/routes';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waMessage = t('whatsapp.defaultMessage');
+const whatsappUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+
+const instagramUrl = business.socialLinks.instagram;
+const instagramHandle = instagramUrl ? getInstagramDisplayHandle() : '';
+const publicEmail = legalEntity.email.startsWith('TODO_') ? '' : legalEntity.email;
+const directionsHref = getRoutePair('directions')[lang];
+---
+
+<section
+	class="py-16 md:py-20 bg-card"
+	aria-labelledby="contact-channels-heading"
+>
+	<Container class="space-y-8">
+		<header class="max-w-2xl space-y-2">
+			<Heading as="h2" size="h3" id="contact-channels-heading">
+				{t('contact.channelsHeading')}
+			</Heading>
+			<Text variant="body" class="text-muted">
+				{t('contact.channelsLead')}
+			</Text>
+		</header>
+
+		<!-- Primary actions: explicit CTAs, ≥44px height, full width on small viewports -->
+		<div
+			class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4"
+		>
+			<Button
+				as="a"
+				href={`tel:${business.phoneTel}`}
+				variant="primary"
+				size="lg"
+				class="w-full min-h-11 touch-manipulation justify-center sm:w-auto sm:min-w-[12rem] sm:flex-1"
+			>
+				<Icon
+					slot="icon-leading"
+					name="tabler:phone"
+					class="h-5 w-5 shrink-0"
+					aria-hidden="true"
+				/>
+				{t('contact.callNow')}
+			</Button>
+			<Button
+				as="a"
+				href={whatsappUrl}
+				variant="secondary"
+				external
+				size="lg"
+				class="w-full min-h-11 touch-manipulation justify-center sm:w-auto sm:min-w-[12rem] sm:flex-1"
+			>
+				<Icon
+					slot="icon-leading"
+					name="tabler:brand-whatsapp"
+					class="h-5 w-5 shrink-0 text-[#25d366]"
+					aria-hidden="true"
+				/>
+				{t('contact.openWhatsApp')}
+			</Button>
+			<Button
+				as="a"
+				href={directionsHref}
+				variant="secondary"
+				size="lg"
+				class="w-full min-h-11 touch-manipulation justify-center sm:w-auto sm:min-w-[12rem] sm:flex-1"
+			>
+				<Icon
+					slot="icon-leading"
+					name="tabler:map-pin"
+					class="h-5 w-5 shrink-0"
+					aria-hidden="true"
+				/>
+				{t('nav.directions')}
+			</Button>
+		</div>
+
+		<!-- Secondary channels: entire card is the hit target -->
+		<ul
+			class="m-0 grid list-none gap-4 p-0 sm:grid-cols-2"
+			role="list"
+		>
+			{
+				instagramUrl ? (
+					<li>
+						<a
+							href={instagramUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="contact-channel-card"
+						>
+							<span
+								class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-card text-primary"
+								aria-hidden="true"
+							>
+								<Icon
+									name="tabler:brand-instagram"
+									class="h-5 w-5"
+									aria-hidden="true"
+								/>
+							</span>
+							<div class="min-w-0 flex-1 space-y-1">
+								<p class="font-body text-sm font-semibold text-foreground">
+									{t('contact.instagramTitle')}
+								</p>
+								<p class="truncate font-body text-sm text-muted">
+									{instagramHandle}
+								</p>
+							</div>
+							<Icon
+								name="tabler:external-link"
+								class="h-4 w-4 shrink-0 text-muted opacity-70"
+								aria-hidden="true"
+							/>
+						</a>
+					</li>
+				) : null
+			}
+			{
+				publicEmail ? (
+					<li>
+						<a href={`mailto:${publicEmail}`} class="contact-channel-card">
+							<span
+								class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-card text-primary"
+								aria-hidden="true"
+							>
+								<Icon name="tabler:mail" class="h-5 w-5" aria-hidden="true" />
+							</span>
+							<div class="min-w-0 flex-1 space-y-1">
+								<p class="font-body text-sm font-semibold text-foreground">
+									{t('contact.emailTitle')}
+								</p>
+								<p class="truncate font-body text-sm text-muted">{publicEmail}</p>
+							</div>
+							<Icon
+								name="tabler:chevron-right"
+								class="h-4 w-4 shrink-0 text-muted opacity-70"
+								aria-hidden="true"
+							/>
+						</a>
+					</li>
+				) : null
+			}
+		</ul>
+	</Container>
+</section>
+
+<style>
+	.contact-channel-card {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		min-height: 3.5rem;
+		padding: 1rem 1.25rem;
+		border-radius: 0.75rem;
+		border: 1px solid var(--color-border);
+		background-color: var(--color-background);
+		text-decoration: none;
+		color: inherit;
+		transition:
+			border-color 200ms ease,
+			box-shadow 200ms ease,
+			transform 250ms cubic-bezier(0.22, 1, 0.36, 1);
+		touch-action: manipulation;
+	}
+
+	.contact-channel-card:hover {
+		border-color: var(--color-primary);
+		box-shadow: 0 8px 28px -6px oklch(30% 0.075 320 / 0.12);
+	}
+
+	.contact-channel-card:focus-visible {
+		outline: none;
+		box-shadow:
+			0 0 0 2px var(--color-background),
+			0 0 0 4px var(--color-primary);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.contact-channel-card {
+			transition: border-color 200ms ease, box-shadow 200ms ease;
+		}
+	}
+
+	@media (prefers-reduced-motion: no-preference) {
+		.contact-channel-card:hover {
+			transform: translateY(-2px);
+		}
+	}
+</style>

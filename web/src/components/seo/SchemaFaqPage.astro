@@ -1,0 +1,48 @@
+---
+/**
+ * SchemaFaqPage
+ *
+ * Emits a Schema.org FAQPage JSON-LD payload built from
+ * src/data/faq.ts in the active language. Google can use this to
+ * render rich-snippet FAQs in search results when the page itself
+ * has matching content (which it does — the FaqList component
+ * renders the same Q/A pairs).
+ *
+ * `set:html={JSON.stringify(...)}` is safe here because every value
+ * comes from our own data module — no user input reaches this
+ * payload.
+ */
+import type { Lang } from '../../i18n/config';
+import {
+	faqs as defaultFaqs,
+	type FaqItemData,
+	getFaqAnswerForSchema,
+	getFaqQuestionForSchema,
+} from '../../data/faq';
+
+interface Props {
+	lang: Lang;
+	items?: ReadonlyArray<FaqItemData>;
+}
+
+const { lang, items } = Astro.props;
+
+const list = items ?? defaultFaqs;
+
+const mainEntity = list.map((item) => ({
+	'@type': 'Question',
+	name: getFaqQuestionForSchema(item, lang),
+	acceptedAnswer: {
+		'@type': 'Answer',
+		text: getFaqAnswerForSchema(item, lang),
+	},
+}));
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'FAQPage',
+	mainEntity,
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

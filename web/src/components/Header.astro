@@ -1,0 +1,248 @@
+---
+import { getImage } from 'astro:assets';
+import { getRoutePair, type RouteKey } from '../i18n/routes';
+import { useTranslations } from '../i18n/utils';
+import type { Lang } from '../i18n/config';
+import type { UIKey } from '../i18n/ui';
+import { business } from '../data/business';
+import { getBookingCta, site } from '../data/site';
+import { galleryImages } from '../data/gallery';
+import LanguageSwitcher from './LanguageSwitcher.astro';
+import Button from './Button.astro';
+import { Icon } from 'astro-icon/components';
+
+interface Props {
+	lang: Lang;
+	siblingPath?: string;
+}
+
+const { lang, siblingPath } = Astro.props;
+const t = useTranslations(lang);
+
+/**
+ * Nav items come in two shapes:
+ *
+ *   - `RouteNavItem`: a real page reachable via the routeMap. The
+ *     header-state.ts script attaches `aria-current="page"` to it
+ *     when its href matches the current pathname. Carries the
+ *     `data-nav-link` attribute.
+ *
+ *   - `AnchorNavItem`: a link to an in-page anchor on a specific
+ *     route (e.g. "Qui som" → `/ca/#qui-som`). It deliberately does
+ *     NOT carry `data-nav-link` — we don't want header-state.ts to
+ *     attach `aria-current="page"` to it, since the anchor is a
+ *     section *within* the home, not a separate page.
+ */
+type RouteNavItem = { kind: 'route'; key: RouteKey; labelKey: UIKey };
+type AnchorNavItem = {
+	kind: 'anchor';
+	hrefPerLang: Record<Lang, string>;
+	labelKey: UIKey;
+};
+type NavItem = RouteNavItem | AnchorNavItem;
+
+const navItems: ReadonlyArray<NavItem> = [
+	{ kind: 'route', key: 'home', labelKey: 'nav.home' },
+	{ kind: 'route', key: 'menu', labelKey: 'nav.services' },
+	{ kind: 'route', key: 'gallery', labelKey: 'nav.gallery' },
+	{ kind: 'route', key: 'faq', labelKey: 'nav.faq' },
+	{ kind: 'route', key: 'contact', labelKey: 'nav.contact' },
+];
+
+function hrefFor(item: NavItem, lang: Lang): string {
+	return item.kind === 'route' ? getRoutePair(item.key)[lang] : item.hrefPerLang[lang];
+}
+
+const homePath = getRoutePair('home')[lang];
+const currentPath = Astro.url.pathname;
+const bookingCta = getBookingCta();
+const bookingLabel = site.features.onlineBooking
+	? t('cta.book')
+	: t('cta.callToBook');
+
+// Pre-process 5 gallery thumbnails (AVIF, 200 px wide) for the nav
+// image-trail effect. The script reads the resolved URLs from a JSON
+// `data-trail-images` attribute on the gallery link. Generating them
+// here means each header instance ships ready-to-use URLs — no
+// runtime image processing, no extra requests per hover.
+const trailImageUrls = await Promise.all(
+	galleryImages.slice(0, 5).map(async (img) => {
+		const processed = await getImage({
+			src: img.src,
+			format: 'avif',
+			width: 200,
+		});
+		return processed.src;
+	}),
+);
+const trailImagesJson = JSON.stringify(trailImageUrls);
+
+/** Raster logo opcional (`/brand/logo.jpg`): carregar quan existeixi al dossier públic. */
+const brandLogoSrc = '';
+---
+
+<header transition:persist class="sticky top-0 z-40 border-0 bg-transparent shadow-none">
+	<div class="pt-4 md:pt-5 pb-2">
+		<div
+			class="mx-auto flex max-w-5xl flex-col gap-2 px-4 md:px-6 pointer-events-auto"
+		>
+			<div
+				class="header-floating-inner flex min-h-[3.125rem] items-center justify-between gap-2 rounded-full border border-[color-mix(in_oklch,var(--color-border)_60%,transparent)] bg-[color-mix(in_oklch,var(--color-card)_87%,transparent)] px-4 py-2 shadow-[0_10px_40px_-14px_oklch(12%_0.06_42_/_0.5)] md:min-h-[3.5rem] md:gap-4 md:px-5 md:py-2.5"
+			>
+		<a
+			href={homePath}
+			class="header-brand-link flex min-w-0 items-center gap-2 md:gap-3 font-display text-lg md:text-2xl tracking-tight text-foreground hover:text-primary transition-colors duration-fast"
+		>
+			{
+				brandLogoSrc ? (
+					<img
+						data-brand-logo
+						src={brandLogoSrc}
+						alt=""
+						width={1080}
+						height={1080}
+						class="h-14 md:h-[72px] w-auto object-contain shrink-0"
+						aria-hidden="true"
+						loading="eager"
+						decoding="async"
+					/>
+				) : null
+			}
+			<span class="header-brand-wordmark text-left leading-none">{business.name}</span>
+		</a>
+
+		<nav class="hidden md:flex shrink-0 items-center gap-6 lg:gap-8" aria-label="Primary">
+			{
+				navItems.map((item) => {
+					const href = hrefFor(item, lang);
+					const isCurrent = item.kind === 'route' && currentPath === href;
+					const isGallery = item.kind === 'route' && item.key === 'gallery';
+					return (
+						<a
+							href={href}
+							class="nav-link-underline text-sm font-body text-foreground hover:text-primary transition-colors duration-fast"
+							aria-current={isCurrent ? 'page' : undefined}
+							{...(item.kind === 'route' ? { 'data-nav-link': true } : {})}
+							{...(isGallery
+								? {
+										'data-nav-trail': '',
+										'data-trail-images': trailImagesJson,
+									}
+								: {})}
+						>
+							{t(item.labelKey)}
+						</a>
+					);
+				})
+			}
+		</nav>
+
+		<div class="flex shrink-0 items-center gap-2 md:gap-4 lg:gap-5">
+			{/* Direct phone link, visible only on lg+ (≥1024 px).
+			    For a local business "call us" is the second-most-used
+			    channel after booking — having the number in the header
+			    saves recurring visitors a hop to /contacte/ or the
+			    footer. Hidden on tablet to keep the header from
+			    crowding when the desktop nav and CTA are both
+			    visible. */}
+			<a
+				href={`tel:${business.phoneTel}`}
+				class="header-phone-link hidden lg:inline-flex items-center gap-2 text-sm font-body tabular-nums text-foreground hover:text-primary transition-colors duration-fast"
+				aria-label={`Telèfon · ${business.phone}`}
+			>
+				<Icon name="tabler:phone" class="h-4 w-4" aria-hidden="true" />
+				<span>{business.phone}</span>
+			</a>
+			<LanguageSwitcher currentLang={lang} siblingPath={siblingPath} />
+			<Button
+				as="a"
+				href={bookingCta.href}
+				external={bookingCta.external}
+				hideExternalIcon
+				variant="primary"
+				size="sm"
+				class="header-book-cta !px-2.5 !py-1 !text-xs md:!px-3 md:!py-1.5 md:!text-sm"
+			>
+				{bookingLabel}
+			</Button>
+			<button
+				type="button"
+				class="mobile-menu-toggle md:hidden inline-flex items-center justify-center rounded-full p-2 text-foreground hover:bg-[color-mix(in_oklch,var(--color-foreground)_8%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-page-canvas)]"
+				aria-controls="mobile-nav"
+				aria-expanded="false"
+				aria-label="Menú"
+				data-mobile-menu-toggle
+			>
+				{/* Two icons alternated by aria-expanded — see <style>
+				    block at the bottom. Keeping both in the markup
+				    (instead of swapping in JS) lets the visual change
+				    track aria-expanded automatically and survives
+				    persistence across View Transitions. */}
+				<Icon name="tabler:menu-2" class="mobile-menu-icon-open h-6 w-6" aria-hidden="true" />
+				<Icon name="tabler:x" class="mobile-menu-icon-close h-6 w-6" aria-hidden="true" />
+			</button>
+		</div>
+			</div>
+
+			<nav
+				id="mobile-nav"
+				class="header-mobile-panel hidden rounded-3xl border border-[color-mix(in_oklch,var(--color-border)_55%,transparent)] bg-[color-mix(in_oklch,var(--color-card)_92%,transparent)] shadow-[0_20px_50px_-20px_oklch(8%_0.05_40_/_0.55)] backdrop-blur-xl md:hidden"
+				aria-label="Mobile navigation"
+				data-mobile-menu
+			>
+		<ul class="flex flex-col gap-1 px-6 py-4">
+			{
+				navItems.map((item) => {
+					const href = hrefFor(item, lang);
+					const isCurrent = item.kind === 'route' && currentPath === href;
+					return (
+						<li>
+							<a
+								href={href}
+								class="block py-2 text-base font-body text-foreground hover:text-primary transition-colors"
+								aria-current={isCurrent ? 'page' : undefined}
+								{...(item.kind === 'route' ? { 'data-nav-link': true } : {})}
+							>
+								{t(item.labelKey)}
+							</a>
+						</li>
+					);
+				})
+			}
+			<li class="pt-2">
+				<Button
+					as="a"
+					href={bookingCta.href}
+					external={bookingCta.external}
+					variant="primary"
+					size="md"
+					class="w-full"
+				>
+					{bookingLabel}
+				</Button>
+			</li>
+		</ul>
+			</nav>
+		</div>
+	</div>
+</header>
+
+<style>
+	/* Alternate the hamburger icons based on the button's
+	   `aria-expanded` state — open (menu glyph) when collapsed,
+	   close (X glyph) when expanded. The script in
+	   src/scripts/mobile-menu.ts toggles the attribute, the CSS does
+	   the rest. */
+	.mobile-menu-toggle .mobile-menu-icon-close {
+		display: none;
+	}
+
+	.mobile-menu-toggle[aria-expanded='true'] .mobile-menu-icon-open {
+		display: none;
+	}
+
+	.mobile-menu-toggle[aria-expanded='true'] .mobile-menu-icon-close {
+		display: inline-block;
+	}
+</style>
+

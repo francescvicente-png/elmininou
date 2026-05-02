@@ -1,0 +1,23 @@
+---
+/**
+ * MarqueeSection
+ *
+ * Slow-scroll horizontal strip listing the salon's services.
+ * Sits after highlights as an ambient "what we offer" cue.
+ *
+ * Items come from `services.ts` so this stays in sync with the
+ * canonical service catalogue.
+ */
+import Marquee from '../Marquee.astro';
+import { services, getServiceName } from '../../data/services';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const items = services.map((s) => getServiceName(s, lang));
+---
+
+<Marquee items={items} />

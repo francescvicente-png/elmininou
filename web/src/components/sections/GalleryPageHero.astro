@@ -1,0 +1,101 @@
+---
+/**
+ * Full-bleed gallery landing hero — uses the commissioned salon portrait (`heroImage`)
+ * separately from mosaic tiles so the grid does not duplicate the marquee shot.
+ */
+import { Picture } from 'astro:assets';
+import Container from '../Container.astro';
+import type { Lang } from '../../i18n/config';
+import type { HeroImage } from '../../data/gallery';
+
+interface Props {
+	lang: Lang;
+	heroImage: HeroImage;
+	eyebrow: string;
+	title: string;
+	subtitle: string;
+}
+
+const { lang, heroImage, eyebrow, title, subtitle } = Astro.props;
+const alt = heroImage.alt[lang];
+const objectPositionStyle = heroImage.objectPosition ?? 'center center';
+---
+
+<section
+	class="relative isolate min-h-[min(74vh,46rem)] w-full overflow-hidden bg-foreground"
+	aria-labelledby="gallery-page-hero-title"
+>
+	<div class="absolute inset-0" aria-hidden="true">
+		<Picture
+			src={heroImage.src}
+			alt={alt}
+			class="h-full w-full object-cover opacity-92"
+			style={{ objectPosition: objectPositionStyle }}
+			formats={['avif', 'webp']}
+			loading="eager"
+			decoding="async"
+			fetchpriority="high"
+			sizes="100vw"
+		/>
+		<!-- Layered veil: vignette + bottom lift for serif titles (Le Labo / Aēsop legibility pattern). -->
+		<div class="gallery-hero-overlay"></div>
+	</div>
+
+	<Container class="relative z-[1] flex min-h-[min(74vh,46rem)] flex-col justify-end pb-14 pt-32 md:pb-20 md:pt-36">
+		<div class="max-w-3xl pb-6">
+			<p
+				id="gallery-hero-kicker"
+				class="gallery-hero-eyebrow font-body uppercase tracking-[0.35em]"
+			>
+				{eyebrow}
+			</p>
+			<h1
+				id="gallery-page-hero-title"
+				class="mt-6 font-display text-[clamp(2.25rem,2.5vw+1.85rem,3.75rem)] font-medium leading-[1.08] text-[var(--gallery-hero-display)] drop-shadow-[0_2px_28px_oklch(8%_0.02_300/0.55)]"
+			>
+				{title}
+			</h1>
+			<p
+				class="mt-5 max-w-[38ch] font-body text-base leading-relaxed text-[var(--gallery-hero-body)] drop-shadow-[0_1px_18px_oklch(8%_0.02_300/0.45)] md:text-lg"
+			>
+				{subtitle}
+			</p>
+		</div>
+	</Container>
+</section>
+
+<style>
+	.gallery-hero-overlay {
+		position: absolute;
+		inset: 0;
+		background:
+			linear-gradient(
+				180deg,
+				oklch(12% 0.02 310 / 0.35) 0%,
+				transparent 38%,
+				transparent 58%,
+				oklch(11% 0.03 310 / 0.78) 100%
+			),
+			radial-gradient(
+				120% 90% at 50% 18%,
+				oklch(18% 0.02 300 / 0.25),
+				transparent 55%
+			);
+		pointer-events: none;
+	}
+
+	.gallery-hero-eyebrow {
+		font-size: 0.68rem;
+		font-weight: 600;
+		color: var(--color-accent);
+		letter-spacing: 0.35em;
+	}
+
+	/**
+	 * Local tokens: hero sits on near-black photo — use on-image cream with a hair more contrast for subtitles.
+	 */
+	:root {
+		--gallery-hero-display: color-mix(in oklch, var(--color-on-image) 96%, white);
+		--gallery-hero-body: color-mix(in oklch, var(--color-on-image) 88%, oklch(70% 0.02 80));
+	}
+</style>

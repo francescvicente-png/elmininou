@@ -1,0 +1,103 @@
+---
+import {
+	business,
+	openingHours,
+	googleReviews,
+	type DayKey,
+} from '../../data/business';
+import { site } from '../../data/site';
+
+interface Props {
+	canonicalUrl: URL;
+}
+
+const { canonicalUrl } = Astro.props;
+
+const siteUrlBase = new URL('/', Astro.site).toString().replace(/\/$/, '');
+const ogImageUrl = `${siteUrlBase}/og/default.jpg?v=${site.ogImageCacheBust}`;
+const menuCaUrl = `${siteUrlBase}/ca/menu/`;
+
+const dayMap: Record<DayKey, string> = {
+	monday: 'Monday',
+	tuesday: 'Tuesday',
+	wednesday: 'Wednesday',
+	thursday: 'Thursday',
+	friday: 'Friday',
+	saturday: 'Saturday',
+	sunday: 'Sunday',
+};
+
+interface OHSpec {
+	'@type': 'OpeningHoursSpecification';
+	dayOfWeek: string;
+	opens: string;
+	closes: string;
+}
+
+const openingHoursSpec: OHSpec[] = [];
+for (const day of Object.keys(openingHours) as DayKey[]) {
+	const slots = openingHours[day];
+	if (slots === null) continue;
+	for (const [opens, closes] of slots) {
+		openingHoursSpec.push({
+			'@type': 'OpeningHoursSpecification',
+			dayOfWeek: dayMap[day],
+			opens,
+			closes,
+		});
+	}
+}
+
+const sameAs: string[] = [
+	business.socialLinks.instagram,
+	business.socialLinks.facebook,
+	business.socialLinks.tiktok,
+	business.socialLinks.x,
+	business.freshaUrl,
+	business.googleMapsUrl,
+].filter((u): u is string => typeof u === 'string' && u.length > 0);
+
+const description =
+	'Restaurant and bar in L’Ametlla del Vallès (Barcelona): grills, combined plates, sandwiches and tapas — check the online menu and confirm allergens on site.';
+
+const schema = {
+	'@context': 'https://schema.org',
+	'@type': 'Restaurant',
+	additionalType: 'https://schema.org/FoodEstablishment',
+	'@id': `${canonicalUrl.toString()}#localbusiness`,
+	name: business.name,
+	description,
+	image: [ogImageUrl],
+	url: `${siteUrlBase}/`,
+	telephone: business.phoneTel,
+	hasMenu: menuCaUrl,
+	address: {
+		'@type': 'PostalAddress',
+		streetAddress: business.address.street,
+		addressLocality: business.address.city,
+		addressRegion: business.address.region,
+		postalCode: business.address.postalCode,
+		addressCountry: business.address.country,
+	},
+	geo: {
+		'@type': 'GeoCoordinates',
+		latitude: business.geo.lat,
+		longitude: business.geo.lon,
+	},
+	openingHoursSpecification: openingHoursSpec,
+	priceRange: '€€',
+	paymentAccepted: 'Cash, Credit Card, Debit Card, Bizum',
+	currenciesAccepted: 'EUR',
+	sameAs,
+	aggregateRating: {
+		'@type': 'AggregateRating',
+		ratingValue: googleReviews.rating,
+		reviewCount: googleReviews.count,
+		bestRating: 5,
+		worstRating: 1,
+	},
+	servesCuisine: 'Regional',
+};
+---
+
+<script type="application/ld+json" set:html={JSON.stringify(schema)} />

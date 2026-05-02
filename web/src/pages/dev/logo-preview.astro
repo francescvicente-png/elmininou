@@ -1,0 +1,149 @@
+---
+/**
+ * /dev/logo-preview — visual review of the logo file across realistic
+ * contexts (background colour, size). Production build redirects this
+ * to /404.
+ */
+import '../../styles/global.css';
+import { Font } from 'astro:assets';
+import { business } from '../../data/business';
+
+const isProd = import.meta.env.PROD;
+---
+
+{
+	isProd ? (
+		<html lang="ca">
+			<head>
+				<meta charset="utf-8" />
+				<title>Not Found</title>
+				<meta http-equiv="refresh" content="0; url=/404" />
+				<meta name="robots" content="noindex" />
+			</head>
+			<body />
+		</html>
+	) : (
+		<html lang="ca">
+			<head>
+				<meta charset="utf-8" />
+				<meta name="viewport" content="width=device-width, initial-scale=1" />
+				<meta name="robots" content="noindex, nofollow" />
+				<title>{`Logo preview · ${business.name} (dev)`}</title>
+				<Font cssVariable="--font-playfair-display-sc" preload />
+				<Font cssVariable="--font-karla" preload />
+			</head>
+			<body class="min-h-screen bg-background text-foreground font-body p-8 md:p-12">
+				<header class="max-w-5xl mx-auto mb-12 space-y-3">
+					<p class="text-xs font-mono uppercase tracking-widest text-muted">Dev preview</p>
+					<h1 class="font-display text-4xl md:text-5xl tracking-tight">Logo · vista previa</h1>
+					<p class="text-base text-muted leading-relaxed max-w-2xl">
+						El logo se ha procesado con fondo transparente. Aparece en negro porque la silueta es negro puro;
+						el fondo blanco original ha desaparecido completamente. Así puede ponerse sobre cualquier fondo
+						del sitio sin recuadro alrededor.
+					</p>
+				</header>
+
+				<main class="max-w-5xl mx-auto space-y-16">
+
+					<section class="space-y-4">
+						<h2 class="font-display text-2xl tracking-tight">1 · Sobre el fondo crema del sitio · 320 px</h2>
+						<p class="text-sm text-muted">El render principal, como aparecería en una landing.</p>
+						<div class="bg-background border border-border rounded-xl p-12 flex items-center justify-center">
+							<img src="/logo.png" alt={business.name} width="320" height="320" />
+						</div>
+					</section>
+
+					<section class="space-y-4">
+						<h2 class="font-display text-2xl tracking-tight">2 · Sobre fondo blanco puro · 320 px</h2>
+						<p class="text-sm text-muted">Para ver que el "halo blanco" alrededor ha desaparecido.</p>
+						<div class="bg-white border border-border rounded-xl p-12 flex items-center justify-center">
+							<img src="/logo.png" alt={business.name} width="320" height="320" />
+						</div>
+					</section>
+
+					<section class="space-y-4">
+						<h2 class="font-display text-2xl tracking-tight">3 · Sobre fondo verde botella · 320 px</h2>
+						<p class="text-sm text-muted">
+							¡Cuidado! El logo procesado es <strong>negro puro</strong>. Sobre el verde oscuro casi no se ve
+							(contraste muy bajo). Si lo quieres en footer/secciones de marca, tendría que generar también
+							una versión <em>en blanco</em> del logo para usar ahí.
+						</p>
+						<div class="bg-primary border border-primary rounded-xl p-12 flex items-center justify-center">
+							<img src="/logo.png" alt={business.name} width="320" height="320" />
+						</div>
+					</section>
+
+					<section class="space-y-4">
+						<h2 class="font-display text-2xl tracking-tight">4 · Escala — 320 / 200 / 120 / 80 / 48 / 32 px</h2>
+						<p class="text-sm text-muted">A 32-48 px se vuelve ilegible. Para favicon mejor un símbolo más simple.</p>
+						<div class="bg-background border border-border rounded-xl p-8 flex items-end gap-8 flex-wrap">
+							<img src="/logo.png" alt="320" width="320" height="320" />
+							<img src="/logo.png" alt="200" width="200" height="200" />
+							<img src="/logo.png" alt="120" width="120" height="120" />
+							<img src="/logo.png" alt="80" width="80" height="80" />
+							<img src="/logo.png" alt="48" width="48" height="48" />
+							<img src="/logo.png" alt="32" width="32" height="32" />
+						</div>
+					</section>
+
+					<section class="space-y-4">
+						<h2 class="font-display text-2xl tracking-tight">5 · Simulación: header del sitio</h2>
+						<p class="text-sm text-muted">
+							Cómo quedaría sustituyendo el wordmark textual del header por el logo (altura 48 px).
+						</p>
+						<div class="bg-background border border-border rounded-xl">
+							<div class="flex items-center justify-between gap-4 px-6 py-4 border-b border-border">
+								<a href="#" class="flex items-center gap-3">
+									<img src="/logo.png" alt={business.name} width="48" height="48" class="h-12 w-12" />
+									<span class="font-display text-xl tracking-tight">{business.name}</span>
+								</a>
+								<nav class="flex items-center gap-6 text-sm">
+									<span class="text-foreground">Inici</span>
+									<span class="text-muted">Serveis</span>
+									<span class="text-muted">Galeria</span>
+									<span class="text-muted">Contacte</span>
+								</nav>
+							</div>
+						</div>
+						<p class="text-sm text-muted italic">
+							Variante: solo logo sin wordmark (evita duplicar el nombre de marca).
+						</p>
+						<div class="bg-background border border-border rounded-xl">
+							<div class="flex items-center justify-between gap-4 px-6 py-4 border-b border-border">
+								<a href="#">
+									<img src="/logo.png" alt={business.name} width="48" height="48" class="h-12 w-12" />
+								</a>
+								<nav class="flex items-center gap-6 text-sm">
+									<span class="text-foreground">Inici</span>
+									<span class="text-muted">Serveis</span>
+									<span class="text-muted">Galeria</span>
+									<span class="text-muted">Contacte</span>
+								</nav>
+							</div>
+						</div>
+					</section>
+
+					<section class="space-y-4">
+						<h2 class="font-display text-2xl tracking-tight">6 · Simulación: tarjeta hero / OG image</h2>
+						<p class="text-sm text-muted">
+							Cómo se vería en una imagen de redes sociales (cuando alguien comparte el sitio en WhatsApp, etc.).
+						</p>
+						<div class="bg-background border border-border rounded-xl p-8 flex items-center justify-center">
+							<div
+								class="w-full max-w-2xl aspect-[1200/630] bg-background border border-border flex flex-col items-center justify-center gap-4"
+							>
+								<img src="/logo.png" alt="" width="180" height="180" />
+								<p class="font-display text-2xl tracking-tight text-center">{business.name} · {business.address.city}</p>
+							</div>
+						</div>
+					</section>
+
+				</main>
+
+				<footer class="max-w-5xl mx-auto mt-16 pt-8 border-t border-border text-xs font-mono text-muted">
+					/dev/logo-preview · solo entorno de desarrollo
+				</footer>
+			</body>
+		</html>
+	)
+}
