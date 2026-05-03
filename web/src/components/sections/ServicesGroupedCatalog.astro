@@ -33,6 +33,15 @@ const {
 
 const t = useTranslations(lang);
 
+// Build a stable index map: illustrated services in DOM order → lightbox slot.
+const lightboxIndexMap = new Map<string, number>();
+let _lbIdx = 0;
+for (const group of groups) {
+	for (const s of group.items) {
+		if (s.illustration) lightboxIndexMap.set(s.id, _lbIdx++);
+	}
+}
+
 const categoryLabelKey: Record<ServiceCategoryKey, string> = {
 	starters: 'services.categoryStarters',
 	grills: 'services.categoryGrills',
@@ -96,6 +105,7 @@ const categoryLabelKey: Record<ServiceCategoryKey, string> = {
 								pendingConfirmation={s.pendingConfirmation ?? false}
 								size={s.featured ? 'lg' : 'md'}
 								headingLevel="h3"
+								lightboxIndex={lightboxIndexMap.get(s.id)}
 								class:list={[(s.featured ?? false) && 'lg:col-span-2']}
 							/>
 						))}

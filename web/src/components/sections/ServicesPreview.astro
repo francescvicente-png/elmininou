@@ -30,6 +30,7 @@ import {
 	getServiceName,
 	getServiceDescription,
 } from '../../data/services';
+import { MENU_DISH_ILLUSTRATIONS } from '../../data/menu-illustrations';
 import type { Lang } from '../../i18n/config';
 import { getRoutePair } from '../../i18n/routes';
 import { useTranslations } from '../../i18n/utils';
@@ -55,8 +56,10 @@ const mosaicOrder: ReadonlyArray<{
 ];
 const mosaic = mosaicOrder
 	.map((entry) => {
-		const service = services.find((s) => s.id === entry.id);
-		if (!service) return null;
+		const raw = services.find((s) => s.id === entry.id);
+		if (!raw) return null;
+		const generated = MENU_DISH_ILLUSTRATIONS[entry.id];
+		const service = generated ? { ...raw, illustration: generated } : raw;
 		return { service, size: entry.size };
 	})
 	.filter((m): m is NonNullable<typeof m> => m !== null);
@@ -67,7 +70,7 @@ const copy = {
 	ca: {
 		anchorId: 'carta-destacades',
 		eyebrow: 'Carta',
-		heading: 'Plats destacats',
+		heading: 'Selecció de la carta',
 		subtitle:
 			'Alguns exemples de la carta completa. Els preus i disponibilitat es confirmen al local; els allergens es detallen en text.',
 		viewAll: 'Veure carta completa',
@@ -75,7 +78,7 @@ const copy = {
 	es: {
 		anchorId: 'carta-destacadas',
 		eyebrow: 'Carta',
-		heading: 'Platos destacados',
+		heading: 'Selección de la carta',
 		subtitle:
 			'Algunos ejemplos de la carta completa. Precios y disponibilidad en el local; alérgenos en texto.',
 		viewAll: 'Ver carta completa',

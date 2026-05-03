@@ -65,14 +65,14 @@ const menuJumpHref = `#${menuAnchorId}`;
 				</li>
 			</ul>
 
-			<div class="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+			<div class="mt-8 flex flex-wrap gap-3">
 				<Button
 					as="a"
 					href={booking.href}
 					external={booking.external}
 					variant="primary"
 					size="lg"
-					class="w-full justify-center sm:w-auto shadow-md"
+					class="shadow-md"
 				>
 					{t('cta.callToBook')}
 				</Button>
@@ -82,7 +82,7 @@ const menuJumpHref = `#${menuAnchorId}`;
 					external={true}
 					variant="secondary"
 					size="lg"
-					class="w-full justify-center sm:w-auto border-primary/35 hover:border-primary/55"
+					class="border-primary/35 hover:border-primary/55"
 				>
 					{t('services.heroCtaWhatsApp')}
 					<Icon
@@ -93,7 +93,7 @@ const menuJumpHref = `#${menuAnchorId}`;
 					/>
 				</Button>
 				<a
-					class="inline-flex items-center justify-center gap-2 rounded-xl border border-transparent px-4 py-3 font-body text-sm font-semibold text-primary underline-offset-4 transition-colors hover:bg-primary/8 hover:underline sm:py-3"
+					class="inline-flex items-center gap-2 rounded-xl border border-transparent px-4 py-3 font-body text-sm font-semibold text-primary underline-offset-4 transition-colors hover:bg-primary/8 hover:underline"
 					href={menuJumpHref}
 				>
 					{t('services.menuHeroScrollCta')}
@@ -118,13 +118,6 @@ const menuJumpHref = `#${menuAnchorId}`;
 						sizes="(min-width: 1024px) 48vw, 100vw"
 					/>
 				</div>
-				<div class="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/45 to-transparent" aria-hidden="true">
-				</div>
-				<figcaption
-					class="pointer-events-none absolute bottom-3 left-4 right-4 font-body text-[0.65rem] font-medium uppercase tracking-[0.2em] text-white/88 drop-shadow-sm md:bottom-4 md:left-6"
-				>
-					{t('services.menuHeroAiCaption')}
-				</figcaption>
 			</div>
 		</figure>
 	</Container>

@@ -26,15 +26,13 @@ const copy = {
 		eyebrow: 'Restaurant · La Ametlla del Vallès',
 		heroTitle: 'Brases, menú del dia i tapes sense complicacions',
 		heroLead:
-			'Reserveu taula per telèfon o WhatsApp; consulteu al·lèrgens al servei (carta impresa fa fe).',
+			'Reserveu taula per telèfon o WhatsApp; consulteu al·lèrgens al servei.',
 		heroReserve: 'Reservar',
 		heroMenu: 'Veure carta',
-		heroHighlights: 'Plats destacats',
 		pillBrasa: 'Cuina oberta',
 		pillLocal: 'Ambient local',
 		blockTagline: 'Foc viu i producte treballat',
-		blockBody:
-			'Imatge d’ambient generada amb IA només com a reclam visual; quan tingueu fotos del pit o la sala, les hi encaixem sense tocar l’estructura.',
+		blockBody: 'Brases, combinats i tapes com cal. Cuina sense complicacions.',
 		infoHours: 'Horari',
 		infoPhone: 'Telèfon',
 		infoAddress: 'Adreça',
@@ -55,15 +53,13 @@ const copy = {
 		eyebrow: 'Restaurante · La Ametlla del Vallès',
 		heroTitle: 'Brasa, menú del día y tapas sin complicaciones',
 		heroLead:
-			'Reserva mesa por teléfono o WhatsApp; confirma alérgenos en sala (carta impresa manda).',
+			'Reserva mesa por teléfono o WhatsApp; confirma alérgenos en sala.',
 		heroReserve: 'Reservar',
 		heroMenu: 'Ver carta',
-		heroHighlights: 'Platos destacados',
 		pillBrasa: 'Cocina abierta',
 		pillLocal: 'Ambiente local',
 		blockTagline: 'Fuego vivo y producto trabajado',
-		blockBody:
-			'Imagen de ambiente generada con IA solo como reclamo visual; cuando tengáis fotos del grill o la sala, las encajamos sin cambiar la estructura.',
+		blockBody: 'Brasas, combinados y tapas como debe ser. Cocina sin complicaciones.',
 		infoHours: 'Horario',
 		infoPhone: 'Teléfono',
 		infoAddress: 'Dirección',
@@ -112,13 +108,6 @@ const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp
 						{c.heroReserve}
 					</Button>
 					<Button as="a" href={menuHref} variant="secondary" size="lg">{c.heroMenu}</Button>
-					<a
-						href="#pla-destacats"
-						class="inline-flex items-center gap-2 font-body text-sm font-semibold text-primary underline-offset-4 hover:underline"
-					>
-						{c.heroHighlights}
-						<Icon name="tabler:chevron-down" class="size-4" aria-hidden="true" />
-					</a>
 				</div>
 			</div>
 			<div class="relative order-1 lg:order-2">

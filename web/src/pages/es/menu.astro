@@ -8,7 +8,8 @@ import MenuPageHero from '../../components/menu/MenuPageHero.astro';
 import ServicesCategoryNav from '../../components/sections/ServicesCategoryNav.astro';
 import ServicesGroupedCatalog from '../../components/sections/ServicesGroupedCatalog.astro';
 import { Icon } from 'astro-icon/components';
-import { getServicesGrouped } from '../../data/services';
+import GalleryLightbox from '../../components/GalleryLightbox.astro';
+import { getServicesGrouped, getServiceName } from '../../data/services';
 import { MENU_PAGE_HERO_IMAGE } from '../../data/menu-illustrations';
 import { business } from '../../data/business';
 import { getBookingCta } from '../../data/site';
@@ -21,6 +22,16 @@ const grouped = getServicesGrouped();
 const firstIllustratedServiceId = grouped
 	.flatMap((g) => g.items)
 	.find((s) => s.illustration)?.id;
+
+const lightboxImages = grouped
+	.flatMap((g) => g.items)
+	.filter((s) => s.illustration != null)
+	.map((s) => ({
+		src: s.illustration!,
+		alt: getServiceName(s, lang),
+		photographer: '',
+		photoLicense: 'ai-demo' as const,
+	}));
 ---
 
 <BaseLayout
@@ -93,6 +104,8 @@ const firstIllustratedServiceId = grouped
 			</Container>
 		</section>
 	</FadeInOnScroll>
+
+	<GalleryLightbox lang={lang} images={lightboxImages} />
 
 	<FadeInOnScroll delay={100} instant>
 		<CtaBanner
