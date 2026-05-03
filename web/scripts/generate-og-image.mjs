@@ -2,17 +2,18 @@
  * Build-time generator for Open Graph / Twitter Card images (1200×630).
  *
  * Emits one JPEG per language so WhatsApp / Telegram previews match the page
- * locale (ca vs es). Uses a **typographic wordmark only** — no raster logo —
- * so a mis-labelled client JPG cannot ship the wrong trade name.
+ * locale (ca vs es). Composites the transparent brand PNG (from
+ * `copy-brand-logo.mjs`) over a scrim + typographic stack so shares show
+ * the restaurant mark as well as NAP/CTA.
  *
  * NAP and trade name must stay in sync with `src/data/business.ts`.
  *
  * Output:
- *   - `public/og/default-ca.jpg`
- *   - `public/og/default-es.jpg`
+ *   - `public/og/default-%lang%.jpg`
  *   - `public/og/default.jpg`  (alias of CA — defaultLang + legacy URLs)
  *
- * `prebuild` in package.json runs this script.
+ * `prebuild` runs `copy-brand-logo.mjs` before this script so
+ * `public/brand/el-mini-nou-logo.png` exists.
  */
 import sharp from 'sharp';
 import { mkdir, copyFile } from 'node:fs/promises';
@@ -46,9 +47,13 @@ const COPY = {
 
 const HERO_PATH = resolve(
 	ROOT,
-	'src/assets/images/demo/Modelo para web.png',
+	'src/assets/images/generated/home-hero-restaurant-brasa.jpg',
 );
+const BRAND_LOGO_PATH = resolve(ROOT, 'public/brand/el-mini-nou-logo.png');
 const OUT_DIR = resolve(ROOT, 'public/og');
+
+/** Logo height (px) composited on the OG canvas — stays inside WhatsApp left safe crop. */
+const OG_LOGO_HEIGHT = 132;
 
 /**
  * Escape text nodes for SVG/XML.
@@ -70,7 +75,7 @@ function buildOverlaySvg(lang) {
 	const address = escapeXml(c.address);
 	const cta = escapeXml(c.cta);
 
-	/* Left stack only — stays inside safe crop for WhatsApp (~600px wide previews). */
+	/* Left stack — raster logo sits above this block; copy stays inside WhatsApp safe crop. */
 	return `<svg width="1200" height="630" xmlns="http://www.w3.org/2000/svg">
 	<defs>
 		<linearGradient id="ogScrim" x1="0" y1="0" x2="1" y2="1">
@@ -80,29 +85,24 @@ function buildOverlaySvg(lang) {
 		</linearGradient>
 	</defs>
 	<rect width="1200" height="630" fill="url(#ogScrim)"/>
-	<text x="64" y="176"
-		font-family="Georgia, 'Times New Roman', serif"
-		font-size="48"
-		font-weight="700"
-		fill="#f4ead8">El mini nou</text>
-	<text x="64" y="258"
+	<text x="64" y="244"
 		font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 		font-size="26"
 		font-weight="600"
 		fill="#d4b896"
 		fill-opacity="0.98">${tag1}</text>
-	<text x="64" y="294"
+	<text x="64" y="282"
 		font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 		font-size="26"
 		font-weight="600"
 		fill="#d4b896"
 		fill-opacity="0.98">${tag2}</text>
-	<text x="64" y="354"
+	<text x="64" y="342"
 		font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 		font-size="21"
 		fill="#c9ae88"
 		fill-opacity="0.92">${address}</text>
-	<text x="64" y="390"
+	<text x="64" y="378"
 		font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif"
 		font-size="19"
 		fill="#b89a78"
@@ -115,9 +115,26 @@ if (!existsSync(HERO_PATH)) {
 	process.exit(1);
 }
 
+if (!existsSync(BRAND_LOGO_PATH)) {
+	console.error(
+		`[og-image] brand logo not found at ${BRAND_LOGO_PATH} — run copy-brand-logo.mjs first (prebuild order).`,
+	);
+	process.exit(1);
+}
+
+const ogLogoPng = await sharp(BRAND_LOGO_PATH)
+	.resize({ height: OG_LOGO_HEIGHT })
+	.ensureAlpha()
+	.png()
+	.toBuffer();
+
 await mkdir(OUT_DIR, { recursive: true });
 
 const langs = /** @type {const} */ (['ca', 'es']);
+
+/** Left padding aligns with SVG text block; `top` clears space above the first copy line. */
+const OG_LOGO_LEFT = 56;
+const OG_LOGO_TOP = 48;
 
 for (const lang of langs) {
 	const overlaySvg = buildOverlaySvg(lang);
@@ -126,7 +143,10 @@ for (const lang of langs) {
 	try {
 		await sharp(HERO_PATH)
 			.resize(1200, 630, { fit: 'cover', position: 'attention' })
-			.composite([{ input: Buffer.from(overlaySvg), top: 0, left: 0 }])
+			.composite([
+				{ input: Buffer.from(overlaySvg), top: 0, left: 0 },
+				{ input: ogLogoPng, top: OG_LOGO_TOP, left: OG_LOGO_LEFT },
+			])
 			.jpeg({ quality: 86, progressive: true, chromaSubsampling: '4:4:4' })
 			.toFile(outPath);
 		console.log(`[og-image] generated ${outPath} (${lang})`);

@@ -3,18 +3,19 @@ import type { Lang } from '../i18n/config';
 import { HOME_PAGE_CANVAS_COLOR } from '../config/home-page-canvas';
 import type { PhotoLicense } from '../types/photo-license';
 
-import heroModel from '../assets/images/demo/Modelo para web.png';
-import heroModel2 from '../assets/images/demo/Modelo para web 2.png';
-import postGalleryHeroAsset from '../assets/images/demo/modelo-para-web-hero-2.png';
-import ejemploPelo1 from '../assets/images/demo/ejemplo-pelo-1.jpg';
-import ejemploPelo2 from '../assets/images/demo/ejemplo-pelo-2.jpg';
-import ejemploPelo3 from '../assets/images/demo/ejemplo-pelo-3.jpg';
-import aiSalonInterior from '../assets/images/generated/home-preview-salon-interior.jpg';
-import aiSalonChair from '../assets/images/generated/home-preview-salon-chair.png';
-import aiSalonTools from '../assets/images/generated/home-preview-salon-tools.jpg';
+import homeHeroRestaurantBrasa from '../assets/images/generated/home-hero-restaurant-brasa.jpg';
+import homeHeroRestaurantDiningWide from '../assets/images/generated/home-hero-restaurant-dining-wide.jpg';
+import homeRestaurantHeroCard from '../assets/images/generated/home-restaurant-hero-card.jpg';
+import galleryDishTapasBoard from '../assets/images/generated/gallery-dish-tapas-board.jpg';
+import galleryDishBrasaMeat from '../assets/images/generated/gallery-dish-brasa-meat.jpg';
+import galleryDishBocadillo from '../assets/images/generated/gallery-dish-bocadillo.jpg';
+import galleryBarVertical from '../assets/images/generated/gallery-bar-vertical.jpg';
+import previewRestaurantInterior from '../assets/images/generated/home-preview-restaurant-interior.jpg';
+import previewDiningTable from '../assets/images/generated/home-preview-dining-table.jpg';
+import previewGrillDetail from '../assets/images/generated/home-preview-grill-detail.jpg';
 
 /**
- * Gallery + hero assets. Demonstration images (some AI illustration) for
+ * Gallery + hero assets. AI-generated illustrative scenes (Gemini) for
  * El mini nou; replace with venue photography when available.
  */
 export type GalleryCategoryId =
@@ -61,16 +62,16 @@ export interface HeroImage extends GalleryImage {
 
 export const heroImage: HeroImage = {
 	id: 'hero',
-	src: heroModel,
+	src: homeHeroRestaurantBrasa,
 	photographer: '',
 	unsplashUrl: '',
-	photoLicense: 'own',
+	photoLicense: 'ai-demo',
 	alt: {
-		ca: "Imatge editorial de mostra per al web d'El mini nou (no fotografia final del local)",
-		es: 'Imagen editorial de muestra para la web de El mini nou (no es la fotografía definitiva del local)',
+		ca: "Interior amb brasa i llum càlida — imatge il·lustrativa generada amb IA (Gemini), no és fotografia del local.",
+		es: 'Interior con brasa y luz cálida — imagen ilustrativa generada con IA (Gemini), no es fotografía del local.',
 	},
 	categories: ['cuts', 'care'],
-	objectPosition: '68% center',
+	objectPosition: '52% center',
 	pageCanvasColor: HOME_PAGE_CANVAS_COLOR,
 };
 
@@ -94,55 +95,55 @@ export interface GalleryBeforeAfterEntry {
 
 export const galleryBeforeAfterEntries: ReadonlyArray<GalleryBeforeAfterEntry> = [
 	{
-		id: 'session-portrait',
-		afterSrc: heroModel,
+		id: 'dining-ambience',
+		afterSrc: homeRestaurantHeroCard,
 		altAfter: {
-			ca: "Retrat editorial de la sessió fotogràfica per al web — resultat final",
-			es: 'Retrato editorial de la sesión fotográfica para la web — resultado final',
+			ca: 'Ambient de menjador amb reflexos de brasa — il·lustració IA',
+			es: 'Ambiente de comedor con reflejos de brasa — ilustración IA',
 		},
 		aspectRatio: '16/9',
 		title: {
-			ca: 'Retrat · sessió',
-			es: 'Retrato · sesión',
+			ca: 'Ambient · taula',
+			es: 'Ambiente · mesa',
 		},
 	},
 	{
-		id: 'color-sample-1',
-		afterSrc: ejemploPelo1,
+		id: 'tapas-board',
+		afterSrc: galleryDishTapasBoard,
 		altAfter: {
-			ca: 'Mostra de color i acabat en cabell — resultat',
-			es: 'Muestra de color y acabado en pelo — resultado',
+			ca: 'Taula de tapes sobre fusta — detall gastronòmic il·lustratiu (IA)',
+			es: 'Tabla de tapas sobre madera — detalle gastronómico ilustrativo (IA)',
 		},
 		aspectRatio: '4/3',
 		title: {
-			ca: 'Color i acabat · mostra 1',
-			es: 'Color y acabado · muestra 1',
+			ca: 'Tapes · composició',
+			es: 'Tapas · composición',
 		},
 	},
 	{
-		id: 'color-sample-2',
-		afterSrc: ejemploPelo2,
+		id: 'brasa-plate',
+		afterSrc: galleryDishBrasaMeat,
 		altAfter: {
-			ca: 'Detall de coloració i textura — resultat',
-			es: 'Detalle de coloración y textura — resultado',
+			ca: 'Plat de brasa amb carbó actiu — fum i llum lateral (IA)',
+			es: 'Plato de brasa con carbón activo — humo y luz lateral (IA)',
 		},
 		aspectRatio: '4/3',
 		title: {
-			ca: 'Detall · mostra 2',
-			es: 'Detalle · muestra 2',
+			ca: 'Brasa · detall',
+			es: 'Brasa · detalle',
 		},
 	},
 	{
-		id: 'styling-sample-3',
-		afterSrc: ejemploPelo3,
+		id: 'bocadillo',
+		afterSrc: galleryDishBocadillo,
 		altAfter: {
-			ca: "Resultat d'estilisme i cura del cabell — final",
-			es: 'Resultado de estilismo y cuidado del pelo — final',
+			ca: 'Entrepà artesà sobre taulell — exemple de carta il·lustratiu (IA)',
+			es: 'Bocadillo artesanal sobre barra — ejemplo de carta ilustrativo (IA)',
 		},
 		aspectRatio: '4/3',
 		title: {
-			ca: 'Estilisme · mostra 3',
-			es: 'Estilismo · muestra 3',
+			ca: 'Entrepà · encaix',
+			es: 'Bocadillo · encuadre',
 		},
 	},
 ];
@@ -151,158 +152,158 @@ export const postGalleryHeroImage: Pick<
 	HeroImage,
 	'src' | 'alt' | 'objectPosition' | 'photoLicense'
 > = {
-	src: postGalleryHeroAsset,
-	photoLicense: 'own',
+	src: homeHeroRestaurantDiningWide,
+	photoLicense: 'ai-demo',
 	alt: {
-		ca: 'Segona imatge de la sessió — pla amb més ambient i profunditat',
-		es: 'Segunda imagen de la sesión — plano con más ambiente y profundidad',
+		ca: 'Sala de restaurant amb barra il·luminada — pla general il·lustratiu (IA, Gemini)',
+		es: 'Sala de restaurante con barra iluminada — plano general ilustrativo (IA, Gemini)',
 	},
-	objectPosition: '52% center',
+	objectPosition: '48% center',
 };
 
 export const galleryImages: ReadonlyArray<GalleryImage> = [
 	{
-		id: 'ejemplo-pelo-1',
-		src: ejemploPelo1,
+		id: 'gallery-dish-tapas',
+		src: galleryDishTapasBoard,
 		photographer: '',
 		unsplashUrl: '',
-		photoLicense: 'own',
+		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Imatge demostrativa (mostra) — substituïr per plat real de la carta.',
-			es: 'Imagen demostrativa — sustituir por plato real de la carta.',
+			ca: "Selecció de tapes sobre fusta — imatge IA; no és el plat servit al local.",
+			es: 'Selección de tapas sobre madera — imagen IA; no es el plato servido en el local.',
 		},
 		categories: ['color', 'cuts'],
 	},
 	{
-		id: 'ejemplo-pelo-2',
-		src: ejemploPelo2,
+		id: 'gallery-dish-brasa',
+		src: galleryDishBrasaMeat,
 		photographer: '',
 		unsplashUrl: '',
-		photoLicense: 'own',
+		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Detall de coloració i textura',
-			es: 'Detalle de coloración y textura',
+			ca: 'Detall de brasa amb verdures rostides — imatge IA il·lustrativa.',
+			es: 'Detalle de brasa con verduras asadas — imagen IA ilustrativa.',
 		},
 		categories: ['color', 'care'],
 	},
 	{
-		id: 'ejemplo-pelo-3',
-		src: ejemploPelo3,
+		id: 'gallery-dish-bocadillo',
+		src: galleryDishBocadillo,
 		photographer: '',
 		unsplashUrl: '',
-		photoLicense: 'own',
+		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Imatge demostrativa editorial — reemplaçar per contingut real del local.',
-			es: 'Imagen demostrativa editorial — reemplazar por contenido real del local.',
+			ca: 'Entrepà i beguda en ambient de bar — demostració visual IA.',
+			es: 'Bocadillo y bebida en ambiente de bar — demostración visual IA.',
 		},
 		categories: ['cuts', 'color'],
 	},
 	{
-		id: 'preview-salon-interior',
-		src: aiSalonInterior,
+		id: 'preview-restaurant-interior',
+		src: previewRestaurantInterior,
 		photographer: '',
 		unsplashUrl: '',
 		photoLicense: 'ai-demo',
 		alt: {
-			ca: "Interior de restaurant il·lustratiu — generat amb IA (Gemini), no és encara el local d'El mini nou.",
-			es: "Interior de restaurante ilustrativo — imagen IA (Gemini), aún no es el local de El mini nou.",
+			ca: "Menjador il·lustratiu en estil mediterrani — IA (Gemini), no és El mini nou.",
+			es: 'Comedor ilustrativo de estilo mediterráneo — IA (Gemini), no es El mini nou.',
 		},
 		categories: ['space'],
 	},
 	{
-		id: 'preview-salon-station',
-		src: aiSalonChair,
+		id: 'preview-dining-table',
+		src: previewDiningTable,
 		photographer: '',
 		unsplashUrl: '',
 		photoLicense: 'ai-demo',
 		alt: {
-			ca: "Taula i servei en ambient de mostra — IA (Gemini), no és El mini nou.",
-			es: "Mesa y servicio en ambiente de muestra — IA (Gemini), no es El mini nou.",
+			ca: 'Mesa parada amb coberts i pa — ambient il·lustratiu IA.',
+			es: 'Mesa puesta con cubiertos y pan — ambiente ilustrativo IA.',
 		},
 		categories: ['space', 'care'],
 	},
 	{
-		id: 'preview-salon-color-tools',
-		src: aiSalonTools,
+		id: 'preview-grill-detail',
+		src: previewGrillDetail,
 		photographer: '',
 		unsplashUrl: '',
 		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Detall gastronòmic il·lustratiu sobre fusta — IA (Gemini), no és el local real.',
-			es: 'Detalle gastronómico ilustrativo sobre madera — IA (Gemini), no es el local real.',
+			ca: 'Graella amb brasa viva i fum suau — detall de cuina IA.',
+			es: 'Parrilla con brasa viva y humo suave — detalle de cocina IA.',
 		},
 		categories: ['tools', 'color'],
 	},
 	{
-		id: 'gallery-1',
-		src: heroModel,
+		id: 'gallery-hero-card',
+		src: homeRestaurantHeroCard,
 		photographer: '',
 		unsplashUrl: '',
-		photoLicense: 'own',
+		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Pla general del retrat; contrast suau sobre fons neutre',
-			es: 'Plano general del retrato; contraste suave sobre fondo neutro',
+			ca: 'Detall íntim de taula amb olis i reflexos de foc — IA.',
+			es: 'Detalle íntimo de mesa con aceites y reflejos de fuego — IA.',
 		},
 		categories: ['space', 'cuts'],
 	},
 	{
-		id: 'gallery-3',
-		src: heroModel2,
+		id: 'gallery-bar-vertical',
+		src: galleryBarVertical,
 		photographer: '',
 		unsplashUrl: '',
-		photoLicense: 'own',
+		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Pla mig — detall de clàssic blanc i negre editorial',
-			es: 'Plano medio — detalle en blanco y negro editorial',
+			ca: 'Fons de barra amb ampollers i llum àmbar — fotografia vertical IA.',
+			es: 'Fondo de barra con botelleros y luz ámbar — fotografía vertical IA.',
 		},
 		categories: ['care', 'color'],
 	},
 	{
-		id: 'gallery-4',
-		src: heroModel,
+		id: 'gallery-brasa-hero',
+		src: homeHeroRestaurantBrasa,
 		photographer: '',
 		unsplashUrl: '',
-		photoLicense: 'own',
+		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Èmfasi en la llum sobre el cabell i el contorn del rostre',
-			es: 'Énfasis en la luz sobre el pelo y el contorno del rostro',
+			ca: 'Vista amplia de cuina oberta amb brasa — mateixa sessió IA que el hero.',
+			es: 'Vista amplia de cocina abierta con brasa — misma sesión IA que el hero.',
 		},
 		categories: ['color', 'care'],
 	},
 	{
-		id: 'gallery-5',
-		src: heroModel2,
+		id: 'gallery-dining-wide',
+		src: homeHeroRestaurantDiningWide,
 		photographer: '',
 		unsplashUrl: '',
-		photoLicense: 'own',
+		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Composició vertical; espai negatiu per respirar el retrat',
-			es: 'Composición vertical; espacio negativo que respira en el retrato',
+			ca: 'Pla general del menjador — continuació del relat visual IA.',
+			es: 'Plano general del comedor — continuación del relato visual IA.',
 		},
-		categories: ['space', 'care'],
+		categories: ['space'],
 	},
 	{
-		id: 'gallery-6',
-		src: heroModel,
+		id: 'gallery-dish-tapas-alt',
+		src: galleryDishTapasBoard,
 		photographer: '',
 		unsplashUrl: '',
-		photoLicense: 'own',
+		photoLicense: 'ai-demo',
 		alt: {
-			ca: 'Detall de volum i textura en escala de grisos',
-			es: 'Detalle de volumen y textura en escala de grises',
+			ca: 'Encaix alternatiu: colors càlids de la mateixa sessió de tapes.',
+			es: 'Encuadre alternativo: colores cálidos de la misma sesión de tapas.',
+		},
+		categories: ['cuts', 'care'],
+	},
+	{
+		id: 'gallery-bar-vertical-alt',
+		src: galleryBarVertical,
+		photographer: '',
+		unsplashUrl: '',
+		photoLicense: 'ai-demo',
+		alt: {
+			ca: 'Vertical de barra: profunditat i glow sobre coure.',
+			es: 'Vertical de barra: profundidad y brillo sobre cobre.',
 		},
 		categories: ['tools', 'care'],
-	},
-	{
-		id: 'gallery-7',
-		src: heroModel2,
-		photographer: '',
-		unsplashUrl: '',
-		photoLicense: 'own',
-		alt: {
-			ca: 'Tancament de la seqüència — mateixa sessió, to editorial',
-			es: 'Cierre de la secuencia — misma sesión, tono editorial',
-		},
-		categories: ['space', 'color'],
 	},
 ];

@@ -7,6 +7,7 @@ import type { ImageMetadata } from 'astro';
 
 import menuHero from '../assets/images/menu-generated/menu-hero.jpg';
 import dishAmanidaElMini from '../assets/images/menu-generated/dish-amanida-el-mini.jpg';
+import dishAmanidaCodony from '../assets/images/menu-generated/dish-amanida-codony.jpg';
 import dishEntranya from '../assets/images/menu-generated/dish-entranya.jpg';
 import dishEspaguetis from '../assets/images/menu-generated/dish-espaguetis.jpg';
 import dishGrandSlam from '../assets/images/menu-generated/dish-grand-slam.jpg';
@@ -18,6 +19,7 @@ export const MENU_PAGE_HERO_IMAGE = menuHero;
 /** Featured catalog cards keyed by `Service.id`. */
 export const MENU_DISH_ILLUSTRATIONS: Partial<Record<string, ImageMetadata>> = {
 	'amanida-el-mini': dishAmanidaElMini,
+	'amanida-codony': dishAmanidaCodony,
 	entranya: dishEntranya,
 	espaguetis: dishEspaguetis,
 	'grand-slam': dishGrandSlam,

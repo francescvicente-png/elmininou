@@ -3,6 +3,7 @@
  * Replacement home: block-based marketing layout (skill recipe: hero-centric + conversion).
  * No fixed parallax portrait, no stacked editorial dividers from the old salon template.
  */
+import { Picture } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import type { Lang } from '../../i18n/config';
 import { business } from '../../data/business';
@@ -11,6 +12,7 @@ import { getRoutePair } from '../../i18n/routes';
 import { getBookingCta } from '../../data/site';
 import { useTranslations } from '../../i18n/utils';
 import Button from '../Button.astro';
+import homeRestaurantHeroCard from '../../assets/images/generated/home-restaurant-hero-card.jpg';
 
 interface Props {
 	lang: Lang;
@@ -32,7 +34,7 @@ const copy = {
 		pillLocal: 'Ambient local',
 		blockTagline: 'Foc viu i producte treballat',
 		blockBody:
-			'Imatge provisional d’ambient — substituïu-la per fotografia del vostre pit, taules o la cuina; aquest bloc només vol transmetre calidesa i foc mentre arriben les fotos finals.',
+			'Imatge d’ambient generada amb IA només com a reclam visual; quan tingueu fotos del pit o la sala, les hi encaixem sense tocar l’estructura.',
 		infoHours: 'Horari',
 		infoPhone: 'Telèfon',
 		infoAddress: 'Adreça',
@@ -46,6 +48,8 @@ const copy = {
 		reserveWhatsapp: 'WhatsApp',
 		locationTitle: 'On som',
 		locationCta: 'Obrir a Google Maps',
+		heroCardAlt:
+			'Ambient il·lustratiu de restaurant amb brasa i taula parada — imatge generada amb IA (Gemini), no és El mini nou.',
 	},
 	es: {
 		eyebrow: 'Restaurante · La Ametlla del Vallès',
@@ -59,7 +63,7 @@ const copy = {
 		pillLocal: 'Ambiente local',
 		blockTagline: 'Fuego vivo y producto trabajado',
 		blockBody:
-			'Imagen de ambiente provisional — sustitúyela por fotografías de vuestro grill, mesas o cocina; este bloque solo busca calidez mientras llegan las fotos finales.',
+			'Imagen de ambiente generada con IA solo como reclamo visual; cuando tengáis fotos del grill o la sala, las encajamos sin cambiar la estructura.',
 		infoHours: 'Horario',
 		infoPhone: 'Teléfono',
 		infoAddress: 'Dirección',
@@ -73,6 +77,8 @@ const copy = {
 		reserveWhatsapp: 'WhatsApp',
 		locationTitle: 'Dónde estamos',
 		locationCta: 'Abrir en Google Maps',
+		heroCardAlt:
+			'Ambiente ilustrativo de restaurante con brasa y mesa — imagen generada con IA (Gemini), no es El mini nou.',
 	},
 }[lang];
 
@@ -114,34 +120,38 @@ const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp
 						<Icon name="tabler:chevron-down" class="size-4" aria-hidden="true" />
 					</a>
 				</div>
-				<ul class="flex flex-wrap gap-2 pt-2">
-					<li
-						class="rounded-full bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)] px-4 py-1.5 font-body text-xs font-semibold uppercase tracking-wider text-primary"
-					>
-						{c.pillBrasa}
-					</li>
-					<li
-						class="rounded-full border border-border bg-card px-4 py-1.5 font-body text-xs font-semibold uppercase tracking-wider text-foreground"
-					>
-						{c.pillLocal}
-					</li>
-				</ul>
 			</div>
 			<div class="relative order-1 lg:order-2">
 				<div
-					class="relative isolate flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-3xl bg-linear-to-br from-primary via-primary to-accent px-8 py-10 text-primary-foreground shadow-lg ring-2 ring-black/12"
+					class="relative isolate flex aspect-[4/5] flex-col justify-end overflow-hidden rounded-3xl shadow-lg ring-2 ring-black/12"
 				>
-					<Icon
-						name="tabler:flame"
-						class="pointer-events-none absolute -right-4 -top-4 size-[11rem] opacity-[0.12]"
+					<Picture
+						src={homeRestaurantHeroCard}
+						alt={c.heroCardAlt}
+						class="absolute inset-0 -z-10 h-full w-full object-cover"
+						formats={['avif', 'webp']}
+						loading="eager"
+						decoding="async"
+						fetchpriority="high"
+						sizes="(min-width: 1024px) 42vw, 100vw"
+					/>
+					<div
+						class="pointer-events-none absolute inset-0 bg-linear-to-t from-black/82 via-black/38 to-black/12"
 						aria-hidden="true"
 					/>
-					<p class="font-body text-xs font-semibold uppercase tracking-[0.3em] text-primary-foreground/90">
-						{c.blockTagline}
-					</p>
-					<p class="font-display mt-3 text-balance text-2xl leading-snug md:text-3xl">
-						{c.blockBody}
-					</p>
+					<Icon
+						name="tabler:flame"
+						class="pointer-events-none absolute -right-4 -top-4 size-[11rem] text-white opacity-[0.14]"
+						aria-hidden="true"
+					/>
+					<div class="relative px-8 py-10 text-white">
+						<p class="font-body text-xs font-semibold uppercase tracking-[0.3em] text-white/90">
+							{c.blockTagline}
+						</p>
+						<p class="font-display mt-3 text-balance text-2xl leading-snug md:text-3xl">
+							{c.blockBody}
+						</p>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -271,17 +281,6 @@ const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp
 					{c.locationCta}
 					<Icon name="tabler:arrow-up-right" class="size-4" aria-hidden="true" />
 				</a>
-			</div>
-			<div
-				class="flex min-h-[220px] items-center justify-center rounded-3xl border-2 border-dashed border-border bg-[color-mix(in_oklch,var(--color-primary)_10%,transparent)] p-10 text-center"
-			>
-				<p class="max-w-sm text-sm leading-relaxed text-muted">
-					{
-						lang === 'ca'
-							? "Mapa incrustat opcional aquí — mantenim només l'enllaç a Google Maps per claredat i velocitat."
-							: 'Mapa incrustado opcional — por ahora sólo enlazamos Google Maps por claridad y rendimiento.'
-					}
-				</p>
 			</div>
 		</div>
 	</section>

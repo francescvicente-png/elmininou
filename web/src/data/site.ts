@@ -111,7 +111,7 @@ export interface SiteConfig {
 
 export const site: SiteConfig = {
 	canonicalUrl: 'https://elmininou.pages.dev',
-	ogImageCacheBust: '2',
+	ogImageCacheBust: '3',
 	businessType: 'restaurant',
 	features: {
 		services: true,
