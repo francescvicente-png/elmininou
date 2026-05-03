@@ -15,18 +15,15 @@ import { MENU_PAGE_HERO_IMAGE } from '../../data/menu-illustrations';
 
 interface Props {
 	lang: Lang;
-	menuAnchorId?: string;
 }
 
-const { lang, menuAnchorId = 'menu-dishes-start' } = Astro.props;
+const { lang } = Astro.props;
 const t = useTranslations(lang);
 const booking = getBookingCta();
 
 const cleanPhone = business.phoneTel.replace(/\D/g, '');
 const waMessage = t('services.heroWhatsAppMessage');
 const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
-
-const menuJumpHref = `#${menuAnchorId}`;
 ---
 
 <section class="menu-page-hero relative overflow-hidden border-b border-border" aria-labelledby="menu-page-hero-title">
@@ -92,13 +89,6 @@ const menuJumpHref = `#${menuAnchorId}`;
 						aria-hidden="true"
 					/>
 				</Button>
-				<a
-					class="inline-flex items-center gap-2 rounded-xl border border-transparent px-4 py-3 font-body text-sm font-semibold text-primary underline-offset-4 transition-colors hover:bg-primary/8 hover:underline"
-					href={menuJumpHref}
-				>
-					{t('services.menuHeroScrollCta')}
-					<Icon name="tabler:chevron-down" class="size-4" aria-hidden="true" />
-				</a>
 			</div>
 		</div>
 

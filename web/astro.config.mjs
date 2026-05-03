@@ -86,6 +86,12 @@ export default defineConfig({
           'carrot',
           'bread',
           'beer',
+          'tools-kitchen-2',
+          // Minigolf section
+          'flag',
+          'golf',
+          'arrow-right',
+          'clock',
         ],
       },
     }),
