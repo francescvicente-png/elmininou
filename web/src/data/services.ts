@@ -843,3 +843,81 @@ export function getServicesGrouped(): ReadonlyArray<ServiceGroup> {
 export function serviceCategoryAnchorId(category: ServiceCategoryKey): string {
 	return `menu-cat-${category}`;
 }
+
+/**
+ * Dietary / preparation tags for menu filtering and visual flags on cards.
+ *
+ * Kept as a separate map (not on the Service definition) so the source of truth
+ * for the dish list stays minimal and the tagging metadata can be reviewed and
+ * confirmed with the venue independently. Empty/missing entries simply mean
+ * "not yet tagged" — the UI must tolerate that gracefully.
+ */
+export type DishTag = 'brasa' | 'vegetarian' | 'gluten-free' | 'sharing' | 'spicy';
+
+export const DISH_TAGS: Partial<Record<string, ReadonlyArray<DishTag>>> = {
+	// Per començar
+	'amanida-el-mini': ['sharing'],
+	'amanida-codony': ['vegetarian'],
+	'amanida-mixta': ['vegetarian', 'gluten-free'],
+	'provolone-calent': ['vegetarian'],
+	tequenos: ['sharing', 'vegetarian'],
+	empanades: ['sharing'],
+	matrimoni: ['sharing'],
+	croquetes: ['sharing'],
+	escalivada: ['vegetarian', 'sharing', 'gluten-free'],
+	'patates-fregides': ['vegetarian', 'sharing'],
+	'patates-braves': ['vegetarian', 'sharing', 'spicy'],
+	'fingers-pollastre': ['sharing'],
+	'pa-torrat': ['vegetarian'],
+
+	// Brases
+	entranya: ['brasa', 'sharing', 'gluten-free'],
+	'pollastre-quarter': ['brasa', 'gluten-free'],
+	xai: ['brasa', 'sharing', 'gluten-free'],
+	'pop-pure': ['brasa', 'gluten-free'],
+	xurrasc: ['brasa', 'sharing', 'gluten-free'],
+	cansalada: ['brasa', 'gluten-free'],
+
+	// Pastes
+	espaguetis: ['sharing'],
+	canelons: ['sharing'],
+
+	// Combos
+	green: ['vegetarian'],
+
+	// Tapas (pretty much all sharing)
+	'tapas-olives': ['vegetarian', 'sharing', 'gluten-free'],
+	'tapas-escopinyes': ['sharing', 'gluten-free'],
+	'tapas-musclos': ['sharing'],
+	'tapas-braves': ['vegetarian', 'sharing', 'spicy'],
+	'tapas-potato-chip': ['vegetarian', 'sharing'],
+	'tapas-tequenos': ['vegetarian', 'sharing'],
+	'tapas-empanades': ['sharing'],
+	'tapas-croquetes-5': ['sharing'],
+	'tapas-fingers': ['sharing'],
+
+	// Drinks
+	'drink-freegluten': ['gluten-free'],
+};
+
+export function getDishTags(serviceId: string): ReadonlyArray<DishTag> {
+	return DISH_TAGS[serviceId] ?? [];
+}
+
+/**
+ * IDs of signature dishes shown in the magazine-style highlight section
+ * above the full catalog. Editorial ordering — keep tight (3 items) so the
+ * section stays a curated lead, not a second listing.
+ */
+export const SIGNATURE_DISH_IDS: ReadonlyArray<string> = [
+	'entranya',
+	'grand-slam',
+	'amanida-el-mini',
+];
+
+export function getSignatureDishes(): ReadonlyArray<Service> {
+	const lookup = new Map(services.map((s) => [s.id, s]));
+	return SIGNATURE_DISH_IDS.map((id) => lookup.get(id)).filter(
+		(s): s is Service => Boolean(s),
+	);
+}

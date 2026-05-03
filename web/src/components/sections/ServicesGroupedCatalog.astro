@@ -10,6 +10,7 @@ import { useTranslations } from '../../i18n/utils';
 import {
 	type ServiceCategoryKey,
 	type ServiceGroup,
+	getDishTags,
 	getServiceDescription,
 	getServiceName,
 	serviceCategoryAnchorId,
@@ -22,6 +23,16 @@ interface Props {
 	/** First illustrated card in DOM order gets LCP-friendly fetch priority. */
 	firstIllustratedServiceId: string | undefined;
 	class?: string;
+	/**
+	 * Lightbox index offset for this catalog instance. When the page renders
+	 * the catalog in two halves (e.g. with a story break between them), the
+	 * second half passes the count of illustrated items already rendered so
+	 * the lightbox keeps a single coherent index space.
+	 */
+	lightboxIndexBase?: number;
+	/** Whether to render the SR-only catalog heading (h2). When the page renders
+	 * multiple catalog batches it should appear only on the first one. */
+	includeSrHeading?: boolean;
 }
 
 const {
@@ -29,13 +40,15 @@ const {
 	groups,
 	firstIllustratedServiceId,
 	class: className,
+	lightboxIndexBase = 0,
+	includeSrHeading = true,
 } = Astro.props;
 
 const t = useTranslations(lang);
 
 // Build a stable index map: illustrated services in DOM order → lightbox slot.
 const lightboxIndexMap = new Map<string, number>();
-let _lbIdx = 0;
+let _lbIdx = lightboxIndexBase;
 for (const group of groups) {
 	for (const s of group.items) {
 		if (s.illustration) lightboxIndexMap.set(s.id, _lbIdx++);
@@ -55,9 +68,11 @@ const categoryLabelKey: Record<ServiceCategoryKey, string> = {
 ---
 
 <div class:list={['services-grouped-catalog', className]}>
-	<h2 id="services-catalog-start" class="sr-only">
-		{t('services.catalogSrHeading')}
-	</h2>
+	{includeSrHeading && (
+		<h2 id="services-catalog-start" class="sr-only">
+			{t('services.catalogSrHeading')}
+		</h2>
+	)}
 	{
 		groups.map((group) => {
 			const sectionId = serviceCategoryAnchorId(group.category);
@@ -67,6 +82,8 @@ const categoryLabelKey: Record<ServiceCategoryKey, string> = {
 					class="services-cat-section scroll-mt-28 md:scroll-mt-32"
 					id={sectionId}
 					aria-labelledby={headingId}
+					data-menu-section
+					data-category={group.category}
 				>
 					<header class="menu-catalog-section-heading mb-7 md:mb-9 md:border-l-[4px] md:border-primary md:pl-6">
 						<Heading as="h2" size="h3" class="menu-catalog-title !font-display tracking-tight" id={headingId}>
@@ -106,6 +123,8 @@ const categoryLabelKey: Record<ServiceCategoryKey, string> = {
 								size={s.featured ? 'lg' : 'md'}
 								headingLevel="h3"
 								lightboxIndex={lightboxIndexMap.get(s.id)}
+								serviceId={s.id}
+								tags={getDishTags(s.id)}
 								class:list={[(s.featured ?? false) && 'lg:col-span-2']}
 							/>
 						))}

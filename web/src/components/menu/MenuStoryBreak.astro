@@ -1,0 +1,83 @@
+---
+/**
+ * Editorial story break inserted between menu categories.
+ *
+ * Full-bleed image with a short pull-quote layered on top — gives the carta
+ * page rhythm and reinforces the brand voice without growing the catalog.
+ */
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+	image: string;
+	imageAlt: { ca: string; es: string };
+	eyebrow: { ca: string; es: string };
+	quote: { ca: string; es: string };
+	caption?: { ca: string; es: string };
+	/** Visual emphasis. `bold` = darker overlay & bigger type. */
+	intensity?: 'soft' | 'bold';
+}
+
+const { lang, image, imageAlt, eyebrow, quote, caption, intensity = 'bold' } = Astro.props;
+const isBold = intensity === 'bold';
+---
+
+<section
+	class="menu-story-break relative isolate overflow-hidden text-on-image"
+	aria-label={eyebrow[lang]}
+>
+	<div class="absolute inset-0 z-0 bg-foreground">
+		<img
+			src={image}
+			alt={imageAlt[lang]}
+			loading="lazy"
+			decoding="async"
+			data-placeholder="true"
+			class="size-full object-cover object-center motion-safe:animate-[mn-storybreak_28s_ease-in-out_infinite_alternate]"
+		/>
+		<div
+			class:list={[
+				'absolute inset-0',
+				isBold
+					? 'bg-gradient-to-r from-black/85 via-black/60 to-black/30'
+					: 'bg-gradient-to-r from-black/65 via-black/40 to-black/15',
+			]}
+			aria-hidden="true"
+		>
+		</div>
+	</div>
+
+	<div class="relative z-10 mx-auto max-w-5xl px-4 py-24 sm:px-6 md:py-32">
+		<p class="font-body text-xs font-semibold uppercase tracking-[0.32em] text-primary">
+			<span class="inline-block size-1.5 rounded-full bg-primary align-middle"></span>
+			<span class="ml-2 align-middle">{eyebrow[lang]}</span>
+		</p>
+		<blockquote class="font-display mt-6 max-w-3xl text-3xl font-medium leading-[1.12] tracking-tight md:text-5xl">
+			«{quote[lang]}»
+		</blockquote>
+		{
+			caption && (
+				<p class="mt-6 max-w-md font-body text-sm leading-relaxed text-on-image/75">
+					{caption[lang]}
+				</p>
+			)
+		}
+	</div>
+</section>
+
+<style>
+	@keyframes mn-storybreak {
+		0% {
+			transform: scale(1.02) translate3d(0, 0, 0);
+		}
+		100% {
+			transform: scale(1.08) translate3d(-1%, -0.5%, 0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.menu-story-break img {
+			animation: none !important;
+		}
+	}
+</style>
