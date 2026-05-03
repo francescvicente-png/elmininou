@@ -8,6 +8,7 @@ import { Icon } from 'astro-icon/components';
 import type { Lang } from '../../i18n/config';
 import { business } from '../../data/business';
 import { services } from '../../data/services';
+import { MENU_DISH_ILLUSTRATIONS } from '../../data/menu-illustrations';
 import { getRoutePair } from '../../i18n/routes';
 import { getBookingCta } from '../../data/site';
 import { useTranslations } from '../../i18n/utils';
@@ -79,7 +80,10 @@ const copy = {
 }[lang];
 
 const c = copy;
-const featured = services.filter((s) => s.featured);
+const featured = services.filter((s) => s.featured).map((s) => ({
+	...s,
+	illustration: MENU_DISH_ILLUSTRATIONS[s.id],
+}));
 const menuHref = getRoutePair('menu')[lang];
 const booking = getBookingCta();
 
@@ -189,30 +193,51 @@ const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp
 				{c.menuSectionTitle}
 			</h2>
 			<p class="mx-auto mt-4 max-w-2xl text-muted">{c.menuSectionLead}</p>
-			<ul class="mt-12 grid gap-5 text-left sm:grid-cols-2 xl:grid-cols-3">
+			<ul class="mt-12 grid gap-6 text-left sm:grid-cols-2 xl:grid-cols-3">
 				{
 					featured.map((item) => (
 						<li
-							class="group flex flex-col rounded-3xl border border-border bg-card p-6 shadow-sm transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-md"
+							class="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-md"
 						>
-							<div class="flex items-start justify-between gap-4">
-								<h3 class="font-display text-xl font-semibold text-foreground">
-									{item.name[lang]}
-								</h3>
-								{item.price != null ? (
-									<span class="shrink-0 font-body text-sm font-bold tabular-nums text-primary">
-										{euros.format(item.price)}
-									</span>
-								) : (
-									<span class="shrink-0 font-body text-sm font-semibold text-muted tabular-nums">
-										{lang === 'ca' ? 'A confirmar en sala' : 'Consultar en sala'}
-									</span>
+							{item.illustration ? (
+								<div class="relative aspect-[4/3] w-full overflow-hidden bg-[color-mix(in_oklch,var(--color-muted)_12%,var(--color-background))]">
+									<Picture
+										src={item.illustration}
+										alt={item.name[lang]}
+										formats={['avif', 'webp']}
+										class="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+										loading="lazy"
+										decoding="async"
+										sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 92vw"
+									/>
+									<div
+										class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent"
+										aria-hidden="true"
+									/>
+								</div>
+							) : null}
+							<div class="flex flex-1 flex-col p-6">
+								<div class="flex items-start justify-between gap-4">
+									<h3 class="font-display text-xl font-semibold text-foreground">
+										{item.name[lang]}
+									</h3>
+									{item.price != null ? (
+										<span class="shrink-0 font-body text-sm font-bold tabular-nums text-primary">
+											{euros.format(item.price)}
+										</span>
+									) : (
+										<span class="shrink-0 font-body text-sm font-semibold text-muted tabular-nums">
+											{lang === 'ca' ? 'A confirmar en sala' : 'Consultar en sala'}
+										</span>
+									)}
+								</div>
+								<p class="mt-3 flex-1 font-body text-sm leading-relaxed text-muted">
+									{item.description[lang]}
+								</p>
+								{!item.illustration && (
+									<Icon name={`tabler:${item.icon}`} class="mt-6 size-6 text-primary opacity-85" aria-hidden="true" />
 								)}
 							</div>
-							<p class="mt-3 flex-1 font-body text-sm leading-relaxed text-muted">
-								{item.description[lang]}
-							</p>
-							<Icon name={`tabler:${item.icon}`} class="mt-6 size-6 text-primary opacity-85" aria-hidden="true" />
 						</li>
 					))
 				}
