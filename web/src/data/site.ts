@@ -130,8 +130,7 @@ export const site: SiteConfig = {
 		url: '',
 	},
 	analytics: {
-		// Afegiu un ID de Microsoft Clarity quan vulgueu analítiques; buit desactiva l'script.
-		clarityProjectId: '',
+		clarityProjectId: 'wldb054hxc',
 	},
 };
 
