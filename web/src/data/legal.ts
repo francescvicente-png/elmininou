@@ -16,7 +16,7 @@ export const serviceProvider = {
 	/** Postal address for LSSI identification (distinct from the salon premises). */
 	addressLine: 'Carrer Nou, 82, 08492 Sant Martí de Centelles (Barcelona)',
 	/** Email address supplied by the service provider in chat (confirm active inbox). */
-	email: 'francecsvicente@gmail.com',
+	email: 'francescvicente@gmail.com',
 } as const;
 
 export const legalEntity = {

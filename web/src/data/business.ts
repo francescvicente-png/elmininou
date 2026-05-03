@@ -73,9 +73,8 @@ export const business: Business = {
 		country: 'ES',
 	},
 	geo: {
-		// Proximitat Carrer Jeroni de Moragas 13 — substituïr coordenades exactes de Google Maps (handoff §3.2).
-		lat: 41.6712,
-		lon: 2.2958,
+		lat: 41.67069170689928,
+		lon: 2.254346301702218,
 	},
 	phone: '604 92 79 03',
 	phoneTel: '+34604927903',
@@ -103,7 +102,7 @@ export const googleReviews: BusinessReviewsSnapshot = {
 	rating: 5,
 	count: 11,
 	url: business.googleMapsUrl,
-	lastUpdated: '2026-05-02',
+	lastUpdated: '2026-05-03',
 };
 
 export function getInstagramDisplayHandle(): string {
