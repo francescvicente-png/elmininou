@@ -7,6 +7,7 @@ import DrawnBorder from './decorative/DrawnBorder.astro';
 import Heading from './Heading.astro';
 import Badge from './Badge.astro';
 import { getLangFromUrl, useTranslations } from '../i18n/utils';
+import type { DishTag } from '../data/services';
 
 type HeadingLevel = 'h2' | 'h3' | 'h4';
 
@@ -25,6 +26,10 @@ interface Props {
 	imageFetchPriority?: 'high' | 'low' | 'auto';
 	featured?: boolean;
 	class?: string;
+	/** Optional service id — emitted as `data-dish-card` so the menu filter can target it. */
+	serviceId?: string;
+	/** Optional dietary / preparation tags for the menu filter and visual flags. */
+	tags?: ReadonlyArray<DishTag>;
 	/**
 	 * Visual size. Drives padding, heading scale and description size
 	 * so the same card composes at different scales in the magazine
@@ -64,10 +69,41 @@ const {
 	headingLevel = 'h3',
 	pendingConfirmation = false,
 	lightboxIndex,
+	serviceId,
+	tags = [],
 } = Astro.props;
 
 const lang = getLangFromUrl(Astro.url);
 const t = useTranslations(lang);
+
+// Tags shown as visual flags on the figure. Only the most distinctive are
+// surfaced visually — others remain filterable but stay off the card to avoid
+// pill-soup. Order = visual stacking order (left to right).
+const VISUAL_TAGS: ReadonlyArray<DishTag> = ['brasa', 'vegetarian', 'spicy'];
+const visibleTagFlags = VISUAL_TAGS.filter((t) => tags.includes(t));
+
+const TAG_ICON: Record<DishTag, string> = {
+	brasa: 'flame',
+	vegetarian: 'leaf',
+	'gluten-free': 'circle-check',
+	sharing: 'users',
+	spicy: 'flame',
+};
+const TAG_LABEL_CA: Record<DishTag, string> = {
+	brasa: 'Brasa',
+	vegetarian: 'Vegetarià',
+	'gluten-free': 'Sense gluten',
+	sharing: 'Per compartir',
+	spicy: 'Picant',
+};
+const TAG_LABEL_ES: Record<DishTag, string> = {
+	brasa: 'Brasa',
+	vegetarian: 'Vegetariano',
+	'gluten-free': 'Sin gluten',
+	sharing: 'Para compartir',
+	spicy: 'Picante',
+};
+const tagLabel = (tag: DishTag) => (lang === 'es' ? TAG_LABEL_ES[tag] : TAG_LABEL_CA[tag]);
 
 const sizeClasses: Record<NonNullable<Props['size']>, {
 	wrapper: string;
@@ -126,6 +162,8 @@ const pictureSizes =
 			: 'border-border bg-card',
 		className,
 	]}
+	data-dish-card={serviceId ? '' : undefined}
+	data-dish-tags={tags.length ? tags.join(',') : undefined}
 >
 	<DrawnBorder />
 	{
@@ -176,6 +214,25 @@ const pictureSizes =
 				<div class="service-card-figure-scrim pointer-events-none absolute inset-0" aria-hidden="true" />
 			</div>
 		) : null
+	}
+	{
+		visibleTagFlags.length > 0 && illustration && (
+			<ul class="pointer-events-none absolute left-3 top-3 z-10 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1.5">
+				{visibleTagFlags.map((tag) => (
+					<li class="inline-flex items-center gap-1 rounded-full bg-card/95 px-2 py-1 text-[0.6rem] font-semibold uppercase tracking-[0.16em] text-foreground shadow-sm backdrop-blur">
+						<Icon
+							name={`tabler:${TAG_ICON[tag]}`}
+							class:list={[
+								'size-3 shrink-0',
+								tag === 'spicy' ? 'text-accent' : 'text-primary',
+							]}
+							aria-hidden="true"
+						/>
+						<span>{tagLabel(tag)}</span>
+					</li>
+				))}
+			</ul>
+		)
 	}
 	<div
 		class:list={[

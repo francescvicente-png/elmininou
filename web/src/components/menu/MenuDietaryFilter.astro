@@ -1,0 +1,201 @@
+---
+/**
+ * Toggle chips that filter the menu catalog by tags (brasa, vegetarian, etc.).
+ *
+ * Filtering is intersectional — when several chips are active, only dishes
+ * that match all of them stay visible. Targets `[data-dish-card]` elements
+ * (set by ServiceCard) and reads their `data-dish-tags` (comma-separated).
+ *
+ * The chips are progressive enhancement: without JS they're inert and the
+ * full catalog stays visible.
+ */
+import { Icon } from 'astro-icon/components';
+import type { Lang } from '../../i18n/config';
+
+interface Props {
+	lang: Lang;
+	/** Wrapper class — passed through to the `<section>` element. */
+	class?: string;
+}
+
+const { lang, class: className } = Astro.props;
+
+const copy = {
+	ca: {
+		eyebrow: 'Filtres',
+		title: 'Què et ve de gust avui?',
+		lead: 'Activa els filtres que vulguis. Es pot combinar (brasa + per compartir, per exemple).',
+		clear: 'Netejar filtres',
+		emptyTitle: 'Cap plat amb aquesta combinació',
+		emptyBody:
+			'Encara estem etiquetant tota la carta — pregunta\'ns sense compromís quan vinguis. Mentrestant, prova una altra combinació.',
+	},
+	es: {
+		eyebrow: 'Filtros',
+		title: '¿Qué te apetece hoy?',
+		lead: 'Activa los filtros que quieras. Se pueden combinar (brasa + para compartir, por ejemplo).',
+		clear: 'Limpiar filtros',
+		emptyTitle: 'Ningún plato con esta combinación',
+		emptyBody:
+			'Aún estamos etiquetando toda la carta — pregúntanos sin compromiso cuando vengas. Mientras, prueba otra combinación.',
+	},
+}[lang];
+
+const filters: ReadonlyArray<{
+	tag: string;
+	icon: string;
+	label: { ca: string; es: string };
+}> = [
+	{ tag: 'brasa', icon: 'flame', label: { ca: 'Brasa', es: 'Brasa' } },
+	{ tag: 'vegetarian', icon: 'leaf', label: { ca: 'Vegetarià', es: 'Vegetariano' } },
+	{
+		tag: 'gluten-free',
+		icon: 'circle-check',
+		label: { ca: 'Sense gluten', es: 'Sin gluten' },
+	},
+	{ tag: 'sharing', icon: 'users', label: { ca: 'Per compartir', es: 'Para compartir' } },
+	{ tag: 'spicy', icon: 'flame', label: { ca: 'Picant', es: 'Picante' } },
+];
+---
+
+<section class:list={['menu-dietary-filter', className]} aria-label={copy.eyebrow}>
+	<div class="mx-auto max-w-6xl px-4 sm:px-6">
+		<div class="flex flex-col gap-5 md:flex-row md:items-end md:justify-between md:gap-8">
+			<div class="max-w-xl">
+				<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
+					{copy.eyebrow}
+				</p>
+				<h2 class="font-display mt-3 text-2xl font-semibold leading-tight tracking-tight text-foreground md:text-3xl">
+					{copy.title}
+				</h2>
+				<p class="mt-2 text-sm leading-relaxed text-muted">{copy.lead}</p>
+			</div>
+			<button
+				type="button"
+				class="hidden self-start rounded-full border border-border bg-card px-4 py-2 font-body text-xs font-semibold uppercase tracking-[0.18em] text-muted transition-colors hover:border-primary/50 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+				data-menu-filter-clear
+			>
+				{copy.clear}
+			</button>
+		</div>
+
+		<ul class="mt-6 flex flex-wrap gap-2 md:gap-2.5" role="group" aria-label={copy.title}>
+			{
+				filters.map((f) => (
+					<li>
+						<button
+							type="button"
+							data-menu-filter
+							data-filter-tag={f.tag}
+							aria-pressed="false"
+							class="menu-filter-chip inline-flex items-center gap-1.5 rounded-full border border-border bg-card px-3.5 py-2 font-body text-xs font-semibold uppercase tracking-[0.14em] text-foreground transition-all duration-200 hover:-translate-y-px hover:border-primary/45 hover:bg-[color-mix(in_oklch,var(--color-primary)_8%,var(--color-card))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+						>
+							<Icon
+								name={`tabler:${f.icon}`}
+								class="size-3.5 text-primary"
+								aria-hidden="true"
+							/>
+							<span>{f.label[lang]}</span>
+						</button>
+					</li>
+				))
+			}
+		</ul>
+
+		<div
+			class="mt-10 hidden rounded-2xl border border-dashed border-border bg-card px-6 py-10 text-center"
+			role="status"
+			data-menu-empty
+		>
+			<p class="font-display text-xl font-semibold text-foreground md:text-2xl">
+				{copy.emptyTitle}
+			</p>
+			<p class="mx-auto mt-3 max-w-md text-sm leading-relaxed text-muted">
+				{copy.emptyBody}
+			</p>
+		</div>
+	</div>
+</section>
+
+<script>
+	const chips = document.querySelectorAll<HTMLButtonElement>('[data-menu-filter]');
+	const clearBtn = document.querySelector<HTMLButtonElement>('[data-menu-filter-clear]');
+	const emptyState = document.querySelector<HTMLElement>('[data-menu-empty]');
+	const cards = document.querySelectorAll<HTMLElement>('[data-dish-card]');
+	const sections = document.querySelectorAll<HTMLElement>('[data-menu-section]');
+
+	if (chips.length && cards.length) {
+		const activeTags = new Set<string>();
+
+		const apply = () => {
+			let visibleCount = 0;
+			cards.forEach((card) => {
+				const raw = card.getAttribute('data-dish-tags') ?? '';
+				const tags = new Set(raw.split(',').filter(Boolean));
+				const matches =
+					activeTags.size === 0 ||
+					Array.from(activeTags).every((t) => tags.has(t));
+				card.toggleAttribute('hidden', !matches);
+				if (matches) visibleCount++;
+			});
+
+			// Hide category sections that ended up with zero visible cards.
+			sections.forEach((section) => {
+				const sectionCards = section.querySelectorAll<HTMLElement>('[data-dish-card]');
+				const anyVisible = Array.from(sectionCards).some((c) => !c.hasAttribute('hidden'));
+				section.toggleAttribute('hidden', activeTags.size > 0 && !anyVisible);
+			});
+
+			emptyState?.classList.toggle('hidden', visibleCount > 0 || activeTags.size === 0);
+			clearBtn?.classList.toggle('hidden', activeTags.size === 0);
+		};
+
+		chips.forEach((chip) => {
+			chip.addEventListener('click', () => {
+				const tag = chip.getAttribute('data-filter-tag');
+				if (!tag) return;
+				const isActive = chip.getAttribute('aria-pressed') === 'true';
+				if (isActive) {
+					activeTags.delete(tag);
+					chip.setAttribute('aria-pressed', 'false');
+				} else {
+					activeTags.add(tag);
+					chip.setAttribute('aria-pressed', 'true');
+				}
+				apply();
+			});
+		});
+
+		clearBtn?.addEventListener('click', () => {
+			activeTags.clear();
+			chips.forEach((c) => c.setAttribute('aria-pressed', 'false'));
+			apply();
+		});
+	}
+</script>
+
+<style>
+	.menu-filter-chip[aria-pressed='true'] {
+		background-color: var(--color-primary);
+		color: var(--color-primary-foreground);
+		border-color: var(--color-primary);
+		box-shadow: 0 6px 16px -8px color-mix(in oklch, var(--color-primary) 60%, transparent);
+	}
+
+	.menu-filter-chip[aria-pressed='true'] :global(svg) {
+		color: var(--color-primary-foreground);
+	}
+
+	.menu-filter-chip:active {
+		transform: translateY(0);
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.menu-filter-chip,
+		.menu-filter-chip:hover,
+		.menu-filter-chip:active {
+			transform: none;
+			transition: none;
+		}
+	}
+</style>

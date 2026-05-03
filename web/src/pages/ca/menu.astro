@@ -2,9 +2,11 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Container from '../../components/Container.astro';
 import Text from '../../components/Text.astro';
-import CtaBanner from '../../components/CtaBanner.astro';
 import FadeInOnScroll from '../../components/animations/FadeInOnScroll.astro';
 import MenuPageHero from '../../components/menu/MenuPageHero.astro';
+import MenuSignatureDishes from '../../components/menu/MenuSignatureDishes.astro';
+import MenuDietaryFilter from '../../components/menu/MenuDietaryFilter.astro';
+import MenuStoryBreak from '../../components/menu/MenuStoryBreak.astro';
 import ServicesCategoryNav from '../../components/sections/ServicesCategoryNav.astro';
 import ServicesGroupedCatalog from '../../components/sections/ServicesGroupedCatalog.astro';
 import { Icon } from 'astro-icon/components';
@@ -28,6 +30,25 @@ const grouped = getServicesGrouped();
 const firstIllustratedServiceId = grouped
 	.flatMap((g) => g.items)
 	.find((s) => s.illustration)?.id;
+
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent("Hola, voldria reservar taula a El mini nou. Gràcies.")}`;
+
+// Three catalog batches with two editorial story-breaks between them.
+// batch1 = entrants + brases  →  break 1 (la brasa)
+// batch2 = pastes + combinats →  break 2 (el pa amb tomàquet)
+// batch3 = entrepans + tapeta + begudes
+const grillsIdx = grouped.findIndex((g) => g.category === 'grills');
+const combosIdx = grouped.findIndex((g) => g.category === 'combos');
+const batch1 = grillsIdx >= 0 ? grouped.slice(0, grillsIdx + 1) : grouped;
+const batch2 =
+	grillsIdx >= 0 && combosIdx > grillsIdx
+		? grouped.slice(grillsIdx + 1, combosIdx + 1)
+		: [];
+const batch3 = combosIdx >= 0 ? grouped.slice(combosIdx + 1) : [];
+// Lightbox index bases — keep a single coherent index space across all three batches.
+const batch1Count = batch1.flatMap((g) => g.items).filter((s) => s.illustration).length;
+const batch2Count = batch2.flatMap((g) => g.items).filter((s) => s.illustration).length;
 
 const categoryLabelKey: Record<ServiceCategoryKey, UIKey> = {
 	starters: 'services.categoryStarters',
@@ -61,6 +82,71 @@ const lightboxImages = grouped
 			priceLocale: 'ca-ES',
 		},
 	}));
+
+const stats = [
+	{
+		icon: 'bowl',
+		value: '8',
+		label: 'categories',
+		sublabel: 'per arribar a tot',
+	},
+	{
+		icon: 'meat',
+		value: '+50',
+		label: 'plats',
+		sublabel: "d'entrants a postres",
+	},
+	{
+		icon: 'receipt-euro',
+		value: '1,70 €',
+		label: 'preu mínim',
+		sublabel: 'el pa torrat clàssic',
+	},
+	{
+		icon: 'flame',
+		value: 'Brasa',
+		label: 'de carbó',
+		sublabel: 'el cor de la cuina',
+	},
+];
+
+const brasaBreakProps = {
+	image: '/menu/story-fire.webp',
+	imageAlt: {
+		ca: 'Llenya cremant en una llar de pedra a una masia catalana, llum daurada íntima.',
+		es: 'Leña ardiendo en un hogar de piedra en una masía catalana, luz dorada íntima.',
+	},
+	eyebrow: { ca: 'La brasa', es: 'La brasa' },
+	quote: {
+		ca: 'El foc no afegeix sabor: el revela.',
+		es: 'El fuego no añade sabor: lo revela.',
+	},
+	caption: {
+		ca: 'Carbó vegetal, temps just i una mica de sal. Així surten les brases que veureu sortir de la cuina.',
+		es: 'Carbón vegetal, tiempo justo y un poco de sal. Así salen las brasas que veréis salir de la cocina.',
+	},
+};
+
+// Second pause — bridges the combos with everything that lives on a slice
+// of pa de coca (entrepans + tapeta). Softer overlay so the warm tones come
+// through; the editorial rhythm stays "fire → bread → bar".
+const breadBreakProps = {
+	image: '/menu/story-pa-tomaquet.webp',
+	imageAlt: {
+		ca: 'Pa amb tomàquet rústic torrat amb tomàquet madur, oli i sal sobre una taula de fusta vella, llum natural daurada.',
+		es: 'Pan con tomate rústico tostado con tomate maduro, aceite y sal sobre una tabla de madera vieja, luz natural dorada.',
+	},
+	eyebrow: { ca: 'El pa', es: 'El pan' },
+	quote: {
+		ca: 'Pa, tomàquet, sal i oli. La resta és accessori.',
+		es: 'Pan, tomate, sal y aceite. Lo demás es accesorio.',
+	},
+	caption: {
+		ca: 'Cada entrepà i cada tapa comencen aquí: pa de coca, tomàquet madur i una mica de paciència.',
+		es: 'Cada bocadillo y cada tapa empiezan aquí: pan de coca, tomate maduro y un poco de paciencia.',
+	},
+	intensity: 'soft' as const,
+};
 ---
 
 <BaseLayout
@@ -81,6 +167,30 @@ const lightboxImages = grouped
 >
 	<MenuPageHero lang={lang} />
 
+	<!-- ================== STAT BAND ================== -->
+	<section class="border-b border-border bg-card" aria-label="Xifres clau de la carta">
+		<div class="mx-auto grid max-w-6xl grid-cols-2 gap-px overflow-hidden bg-border md:grid-cols-4">
+			{
+				stats.map((s) => (
+					<div class="flex flex-col items-start gap-3 bg-card px-6 py-8 md:px-8 md:py-10">
+						<Icon name={`tabler:${s.icon}`} class="size-5 text-primary" aria-hidden="true" />
+						<p class="font-display text-4xl font-semibold leading-none tracking-tight text-foreground md:text-5xl">
+							{s.value}
+						</p>
+						<p class="text-sm font-semibold uppercase tracking-[0.16em] text-foreground">
+							{s.label}
+						</p>
+						<p class="text-xs leading-relaxed text-muted">{s.sublabel}</p>
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<!-- ================== SIGNATURE DISHES ================== -->
+	<MenuSignatureDishes lang={lang} />
+
+	<!-- ================== STICKY CATEGORY NAV ================== -->
 	<FadeInOnScroll delay={80} instant>
 		<section
 			id="menu-dishes-start"
@@ -92,28 +202,74 @@ const lightboxImages = grouped
 		</section>
 	</FadeInOnScroll>
 
+	<!-- ================== DIETARY FILTERS ================== -->
+	<FadeInOnScroll delay={80} instant>
+		<div class="bg-background pt-12 md:pt-16">
+			<MenuDietaryFilter lang={lang} />
+		</div>
+	</FadeInOnScroll>
+
+	<!-- ================== CATALOG BATCH 1 — entrants + brases ================== -->
 	<FadeInOnScroll delay={100} instant>
-		<Container as="section" class="pb-16 pt-8 md:pb-24 md:pt-10" aria-labelledby="menu-catalog-visual">
+		<Container as="section" class="pb-12 pt-10 md:pb-16 md:pt-12" aria-labelledby="menu-catalog-visual">
 			<p id="menu-catalog-visual" class="sr-only">
 				{t('services.dividerSub')}
 			</p>
 			<ServicesGroupedCatalog
 				lang={lang}
-				groups={grouped}
+				groups={batch1}
 				firstIllustratedServiceId={firstIllustratedServiceId}
+				lightboxIndexBase={0}
+				includeSrHeading={true}
 			/>
 		</Container>
 	</FadeInOnScroll>
 
+	<!-- ================== STORY BREAK 1 — la brasa ================== -->
+	{batch2.length > 0 && <MenuStoryBreak lang={lang} {...brasaBreakProps} />}
+
+	<!-- ================== CATALOG BATCH 2 — pastes + combinats ================== -->
+	{
+		batch2.length > 0 && (
+			<FadeInOnScroll delay={100} instant>
+				<Container as="section" class="pb-12 pt-12 md:pb-16 md:pt-16">
+					<ServicesGroupedCatalog
+						lang={lang}
+						groups={batch2}
+						firstIllustratedServiceId={firstIllustratedServiceId}
+						lightboxIndexBase={batch1Count}
+						includeSrHeading={false}
+					/>
+				</Container>
+			</FadeInOnScroll>
+		)
+	}
+
+	<!-- ================== STORY BREAK 2 — el pa ================== -->
+	{batch3.length > 0 && <MenuStoryBreak lang={lang} {...breadBreakProps} />}
+
+	<!-- ================== CATALOG BATCH 3 — entrepans + tapeta + begudes ================== -->
+	{
+		batch3.length > 0 && (
+			<FadeInOnScroll delay={100} instant>
+				<Container as="section" class="pb-16 pt-12 md:pb-24 md:pt-16">
+					<ServicesGroupedCatalog
+						lang={lang}
+						groups={batch3}
+						firstIllustratedServiceId={firstIllustratedServiceId}
+						lightboxIndexBase={batch1Count + batch2Count}
+						includeSrHeading={false}
+					/>
+				</Container>
+			</FadeInOnScroll>
+		)
+	}
+
+	<!-- ================== ALLERGEN POLICY ================== -->
 	<FadeInOnScroll delay={100} instant>
-		<section
-			class="bg-card py-16 md:py-20"
-			aria-labelledby="menu-allergens-policy"
-		>
+		<section class="bg-card py-16 md:py-20" aria-labelledby="menu-allergens-policy">
 			<Container>
-				<div
-					class="mx-auto max-w-3xl rounded-xl border border-border bg-background/60 p-6 md:flex md:gap-8 md:p-10"
-				>
+				<div class="mx-auto max-w-3xl rounded-xl border border-border bg-background/60 p-6 md:flex md:gap-8 md:p-10">
 					<Icon
 						name="tabler:circle-check"
 						class="h-10 w-10 shrink-0 text-primary hidden md:block"
@@ -140,13 +296,50 @@ const lightboxImages = grouped
 
 	<GalleryLightbox lang={lang} images={lightboxImages} />
 
-	<FadeInOnScroll delay={100} instant>
-		<CtaBanner
-			title={t('cta.bannerTitle')}
-			ctaLabel={t('cta.callToBook')}
-			ctaHref={booking.href}
-			ctaExternal={booking.external}
-			variant="primary"
-		/>
-	</FadeInOnScroll>
+	<!-- ================== CTA FINAL CINEMATOGRÀFIC ================== -->
+	<section class="relative isolate overflow-hidden text-on-image" aria-labelledby="menu-cta-heading">
+		<div class="absolute inset-0 z-0 bg-foreground">
+			<img
+				src="/minigolf/meal-table.webp"
+				alt=""
+				role="presentation"
+				data-placeholder="true"
+				loading="lazy"
+				decoding="async"
+				class="size-full object-cover object-center"
+			/>
+			<div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/60 to-black/35" aria-hidden="true"></div>
+		</div>
+
+		<div class="relative z-10 mx-auto max-w-4xl px-4 py-24 sm:px-6 md:py-32">
+			<p class="text-xs font-semibold uppercase tracking-[0.32em] text-primary">Reserva taula</p>
+			<h2
+				id="menu-cta-heading"
+				class="font-display mt-4 max-w-3xl text-3xl font-semibold leading-[1.05] tracking-tight md:text-6xl"
+			>
+				La carta es llegeix.<br />La taula s'ocupa.
+			</h2>
+			<p class="mt-6 max-w-xl text-lg leading-relaxed text-on-image/85 md:text-xl">
+				Truca o escriu per WhatsApp. Dinem fins tard, sopem amb temps i, si voleu, allargueu la sobretaula amb una partida de minigolf.
+			</p>
+			<div class="mt-10 flex flex-wrap gap-3">
+				<a
+					href={booking.href}
+					class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 font-body text-lg font-semibold text-primary-foreground shadow-lg transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+				>
+					<Icon name="tabler:phone" class="size-5 shrink-0" aria-hidden="true" />
+					{business.phoneTel}
+				</a>
+				<a
+					href={waUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="inline-flex items-center justify-center gap-2 rounded-full border border-on-image/40 bg-card/10 px-8 py-3.5 font-body text-lg font-semibold text-on-image backdrop-blur transition-colors hover:bg-card/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-on-image focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+				>
+					<Icon name="tabler:brand-whatsapp" class="size-5 shrink-0" aria-hidden="true" />
+					WhatsApp
+				</a>
+			</div>
+		</div>
+	</section>
 </BaseLayout>

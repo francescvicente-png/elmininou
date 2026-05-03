@@ -1,17 +1,17 @@
 ---
 /**
- * Full-bleed editorial hero for /menu — typographic block + hero food photography
- * (AI illustrative) and dual CTAs. Tuned to Playfair + Karla restaurant shell.
+ * Cinematic full-bleed hero for the carta page.
+ *
+ * Replaces the old text-left + image-right split with a single dramatic
+ * brasa image and overlaid editorial typography. Tuned to read against the
+ * gastro-charcoal palette and the warm primary tone of the shell.
  */
-import { Picture } from 'astro:assets';
-import Container from '../Container.astro';
 import Button from '../Button.astro';
 import { Icon } from 'astro-icon/components';
 import type { Lang } from '../../i18n/config';
 import { useTranslations } from '../../i18n/utils';
 import { business } from '../../data/business';
 import { getBookingCta } from '../../data/site';
-import { MENU_PAGE_HERO_IMAGE } from '../../data/menu-illustrations';
 
 interface Props {
 	lang: Lang;
@@ -24,134 +24,149 @@ const booking = getBookingCta();
 const cleanPhone = business.phoneTel.replace(/\D/g, '');
 const waMessage = t('services.heroWhatsAppMessage');
 const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(waMessage)}`;
+
+const copy = {
+	ca: {
+		eyebrow: 'Carta · L\'Ametlla del Vallès',
+		title: 'De la brasa,',
+		titleSecond: 'a la taula.',
+		lead:
+			'Cuina informal de bar amb caràcter: brases, combinats, tapes per allargar la sobretaula i entrepans de tota la vida. Preus orientatius — al·lèrgens sempre detallats al servei.',
+		jump: 'Veure la carta',
+	},
+	es: {
+		eyebrow: 'Carta · La Ametlla del Vallès',
+		title: 'De la brasa,',
+		titleSecond: 'a la mesa.',
+		lead:
+			'Cocina de bar con carácter: brasas, combinados, tapas para alargar la sobremesa y bocadillos de siempre. Precios orientativos — alérgenos siempre detallados en sala.',
+		jump: 'Ver la carta',
+	},
+}[lang];
 ---
 
-<section class="menu-page-hero relative overflow-hidden border-b border-border" aria-labelledby="menu-page-hero-title">
-	<div class="pointer-events-none absolute inset-0 opacity-90" aria-hidden="true">
+<section
+	class="menu-page-hero relative isolate overflow-hidden text-on-image"
+	aria-labelledby="menu-page-hero-title"
+>
+	<div class="absolute inset-0 z-0 bg-foreground">
+		<img
+			src="/menu/hero-brasa.webp"
+			alt=""
+			role="presentation"
+			data-placeholder="true"
+			loading="eager"
+			decoding="async"
+			fetchpriority="high"
+			class="size-full object-cover object-center motion-safe:animate-[mn-menu-hero_28s_ease-in-out_infinite_alternate]"
+		/>
 		<div
-			class="menu-page-hero-noise absolute inset-0"
+			class="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/85"
+			aria-hidden="true"
 		>
 		</div>
 		<div
-			class="absolute left-1/2 top-[18%] h-[min(420px,55vw)] w-[min(520px,85vw)] -translate-x-1/2 rounded-full blur-3xl lg:left-[8%] lg:translate-x-0"
-			style="background: radial-gradient(circle at 42% 42%, oklch(72% 0.18 54 / 0.14), transparent 62%);"
+			class="absolute inset-0 bg-[radial-gradient(ellipse_at_25%_15%,color-mix(in_oklch,var(--color-primary)_24%,transparent),transparent_55%)]"
+			aria-hidden="true"
 		>
 		</div>
 	</div>
 
-	<Container class="relative grid gap-10 py-12 md:gap-12 md:py-16 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-center lg:gap-14 lg:py-20">
-		<div class="max-w-xl lg:max-w-none">
-			<p class="menu-page-hero-eyebrow">{t('services.heroEyebrow')}</p>
-			<h1 id="menu-page-hero-title" class="menu-page-hero-title">
-				{t('services.heroTitle')}
-			</h1>
-			<p class="menu-page-hero-lead">{t('services.heroLead')}</p>
+	<div
+		class="relative z-10 mx-auto flex min-h-[clamp(580px,82svh,860px)] max-w-6xl flex-col justify-end px-4 pb-16 pt-32 sm:px-6 md:pb-24 md:pt-40"
+	>
+		<p
+			class="font-body text-xs font-semibold uppercase tracking-[0.32em] text-on-image/85"
+		>
+			<span class="inline-block size-1.5 rounded-full bg-primary align-middle"></span>
+			<span class="ml-2 align-middle">{copy.eyebrow}</span>
+		</p>
+		<h1
+			id="menu-page-hero-title"
+			class="font-display mt-5 max-w-4xl text-[clamp(2.75rem,7.4vw,6rem)] font-semibold leading-[0.96] tracking-tight"
+		>
+			{copy.title}<br /><span class="text-primary">{copy.titleSecond}</span>
+		</h1>
+		<p class="mt-7 max-w-2xl text-lg leading-relaxed text-on-image/90 md:text-xl">
+			{copy.lead}
+		</p>
 
-			<ul class="mt-6 flex flex-wrap gap-x-6 gap-y-2 font-body text-xs font-medium uppercase tracking-[0.14em] text-muted">
-				<li class="inline-flex items-center gap-2">
-					<Icon name="tabler:flame" class="size-4 text-primary shrink-0" aria-hidden="true" />
-					{t('services.menuHeroChipBrasa')}
-				</li>
-				<li class="inline-flex items-center gap-2">
-					<Icon name="tabler:leaf" class="size-4 text-primary shrink-0" aria-hidden="true" />
-					{t('services.menuHeroChipFresh')}
-				</li>
-				<li class="inline-flex items-center gap-2">
-					<Icon name="tabler:info-circle" class="size-4 text-primary shrink-0" aria-hidden="true" />
-					{t('services.menuHeroChipAllergens')}
-				</li>
-			</ul>
+		<ul
+			class="mt-8 flex flex-wrap gap-x-5 gap-y-2 font-body text-xs font-semibold uppercase tracking-[0.18em] text-on-image/85"
+			aria-hidden="false"
+		>
+			<li class="inline-flex items-center gap-2">
+				<Icon name="tabler:flame" class="size-4 text-primary shrink-0" aria-hidden="true" />
+				{t('services.menuHeroChipBrasa')}
+			</li>
+			<li class="inline-flex items-center gap-2">
+				<Icon name="tabler:leaf" class="size-4 text-primary shrink-0" aria-hidden="true" />
+				{t('services.menuHeroChipFresh')}
+			</li>
+			<li class="inline-flex items-center gap-2">
+				<Icon
+					name="tabler:info-circle"
+					class="size-4 text-primary shrink-0"
+					aria-hidden="true"
+				/>
+				{t('services.menuHeroChipAllergens')}
+			</li>
+		</ul>
 
-			<div class="mt-8 flex flex-wrap gap-3">
-				<Button
-					as="a"
-					href={booking.href}
-					external={booking.external}
-					variant="primary"
-					size="lg"
-					class="shadow-md"
-				>
-					{t('cta.callToBook')}
-				</Button>
-				<Button
-					as="a"
-					href={waUrl}
-					external={true}
-					variant="secondary"
-					size="lg"
-					class="border-primary/35 hover:border-primary/55"
-				>
-					{t('services.heroCtaWhatsApp')}
-					<Icon
-						slot="icon-trailing"
-						name="tabler:brand-whatsapp"
-						class="size-4 shrink-0"
-						aria-hidden="true"
-					/>
-				</Button>
-			</div>
-		</div>
-
-		<figure class="menu-page-hero-visual group relative mx-auto w-full max-w-2xl lg:mx-0 lg:max-w-none">
-			<div
-				class="relative overflow-hidden rounded-[1.35rem] shadow-[0_24px_56px_-28px_oklch(22%_0.08_42/0.55)] ring-1 ring-black/10"
+		<div class="mt-10 flex flex-wrap gap-3">
+			<Button
+				as="a"
+				href={booking.href}
+				external={booking.external}
+				variant="primary"
+				size="lg"
+				class="shadow-md"
 			>
-				<div class="aspect-[21/9] min-h-[168px] md:aspect-[16/9] lg:aspect-auto lg:max-h-[min(52vh,420px)] lg:min-h-[280px]">
-					<Picture
-						src={MENU_PAGE_HERO_IMAGE}
-						alt={t('services.menuHeroImageAlt')}
-						formats={['avif', 'webp']}
-						class="absolute inset-0 size-full object-cover transition-transform duration-[480ms] motion-safe:group-hover:scale-[1.02]"
-						loading="eager"
-						decoding="async"
-						fetchpriority="high"
-						sizes="(min-width: 1024px) 48vw, 100vw"
-					/>
-				</div>
-			</div>
-		</figure>
-	</Container>
+				<Icon
+					slot="icon-leading"
+					name="tabler:phone"
+					class="size-5 shrink-0"
+					aria-hidden="true"
+				/>
+				{t('cta.callToBook')}
+			</Button>
+			<a
+				href={waUrl}
+				target="_blank"
+				rel="noopener noreferrer"
+				class="inline-flex items-center justify-center gap-2 rounded-full border border-on-image/30 bg-card/10 px-6 py-3 font-body text-base font-semibold text-on-image backdrop-blur-md transition-colors hover:bg-card/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-on-image focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+			>
+				{t('services.heroCtaWhatsApp')}
+				<Icon
+					name="tabler:brand-whatsapp"
+					class="size-4 shrink-0"
+					aria-hidden="true"
+				/>
+			</a>
+			<a
+				href="#menu-dishes-start"
+				class="inline-flex items-center justify-center gap-2 rounded-full border border-on-image/20 bg-transparent px-5 py-3 font-body text-sm font-semibold uppercase tracking-[0.18em] text-on-image/80 transition-colors hover:bg-card/10 hover:text-on-image focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-on-image focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+			>
+				{copy.jump}
+				<Icon name="tabler:chevron-down" class="size-4 shrink-0" aria-hidden="true" />
+			</a>
+		</div>
+	</div>
 </section>
 
 <style>
-	.menu-page-hero-noise {
-		opacity: 0.04;
-		background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-	}
-
-	.menu-page-hero-eyebrow {
-		font-family: var(--font-body), system-ui, sans-serif;
-		font-size: 0.7rem;
-		text-transform: uppercase;
-		letter-spacing: 0.32em;
-		color: var(--color-muted);
-		margin: 0 0 0.85rem;
-	}
-
-	.menu-page-hero-title {
-		font-family: var(--font-display), Georgia, serif;
-		font-size: clamp(2.5rem, 4.5vw + 0.5rem, 4.85rem);
-		line-height: 1.03;
-		letter-spacing: -0.02em;
-		color: var(--color-foreground);
-		margin: 0;
-		text-wrap: balance;
-		max-width: 12ch;
-	}
-
-	.menu-page-hero-lead {
-		font-family: var(--font-body), system-ui, sans-serif;
-		font-size: clamp(1.05rem, 0.42vw + 0.94rem, 1.38rem);
-		line-height: 1.62;
-		color: var(--color-muted);
-		margin: 1.05rem 0 0;
-		max-width: 44rem;
-		text-wrap: pretty;
+	@keyframes mn-menu-hero {
+		0% {
+			transform: scale(1.04) translate3d(0, 0, 0);
+		}
+		100% {
+			transform: scale(1.12) translate3d(-1.5%, -0.8%, 0);
+		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
-		.menu-page-hero-visual :global(picture img) {
-			transition: none;
+		.menu-page-hero img {
+			animation: none !important;
 		}
 	}
 </style>
