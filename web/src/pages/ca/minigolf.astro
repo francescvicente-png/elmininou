@@ -3,8 +3,9 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import Container from '../../components/Container.astro';
 import Button from '../../components/Button.astro';
 import FaqList from '../../components/FaqList.astro';
+import MinigolfHoles from '../../components/sections/MinigolfHoles.astro';
 import { Icon } from 'astro-icon/components';
-import { minigolfHighlights, minigolfPricing } from '../../data/minigolf';
+import { minigolfHighlights, minigolfPricing, minigolfStats } from '../../data/minigolf';
 import { minigolfFaqs } from '../../data/faq';
 import { business } from '../../data/business';
 import { getRoutePair } from '../../i18n/routes';
@@ -15,6 +16,12 @@ const telHref = `tel:${business.phoneTel}`;
 const cleanPhone = business.phoneTel.replace(/\D/g, '');
 const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent("Hola, voldria preguntar pel minigolf d'El mini nou. Gràcies.")}`;
 const menuHref = getRoutePair('menu')[lang];
+
+const stepImages = [
+	{ src: '/minigolf/meal-table.webp', alt: "Taula del restaurant amb plats de brasa i pa amb tomàquet a llum daurada." },
+	{ src: '/minigolf/course-overview.webp', alt: 'Vista general del camp de minigolf integrat al jardí del restaurant.' },
+	{ src: '/minigolf/hole-1.webp', alt: 'Detall d\'un forat amb molí de fusta i pilota blanca.' },
+];
 
 const schemaService = JSON.stringify({
 	'@context': 'https://schema.org',
@@ -62,74 +69,151 @@ const schemaService = JSON.stringify({
 >
 	<script slot="head" type="application/ld+json" set:html={schemaService} />
 
-	<!-- Hero -->
-	<section class="border-b border-border bg-card px-4 pb-16 pt-12 sm:px-6 md:pb-20 md:pt-16">
-		<div class="mx-auto max-w-3xl text-center">
-			<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
-				Minigolf · {business.address.city}
+	<!-- ================== HERO INMERSIU ================== -->
+	<section
+		class="relative isolate overflow-hidden text-on-image"
+		aria-labelledby="minigolf-hero-heading"
+	>
+		<div class="absolute inset-0 z-0 bg-foreground">
+			<img
+				src="/minigolf/hero.webp"
+				alt=""
+				role="presentation"
+				data-placeholder="true"
+				class="size-full object-cover object-center motion-safe:animate-[mn-kenburns_24s_ease-in-out_infinite_alternate]"
+				loading="eager"
+				decoding="async"
+				fetchpriority="high"
+			/>
+			<div
+				class="absolute inset-0 bg-gradient-to-b from-black/45 via-black/30 to-black/85"
+				aria-hidden="true"
+			></div>
+			<div
+				class="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_20%,color-mix(in_oklch,var(--color-primary)_22%,transparent),transparent_55%)]"
+				aria-hidden="true"
+			></div>
+		</div>
+
+		<div class="relative z-10 mx-auto flex min-h-[clamp(560px,80svh,820px)] max-w-6xl flex-col justify-end px-4 pb-16 pt-32 sm:px-6 md:pb-24 md:pt-40">
+			<p class="font-body text-xs font-semibold uppercase tracking-[0.32em] text-on-image/85">
+				<span class="inline-block size-1.5 rounded-full bg-primary align-middle"></span>
+				<span class="ml-2 align-middle">Minigolf · {business.address.city}</span>
 			</p>
 			<h1
-				class="font-display mt-4 text-4xl font-semibold leading-[1.06] tracking-tight text-foreground md:text-5xl"
+				id="minigolf-hero-heading"
+				class="font-display mt-5 max-w-4xl text-[clamp(2.75rem,7vw,5.75rem)] font-semibold leading-[0.98] tracking-tight"
 			>
-				Camp de minigolf de 18 forats
+				18 forats al cor<br />del Vallès.
 			</h1>
-			<p class="mx-auto mt-5 max-w-xl text-xl leading-relaxed text-muted">
-				Inclòs si dines aquí. 5 € si només jugues.
+			<p class="mt-6 max-w-xl text-xl leading-relaxed text-on-image/90 md:text-2xl">
+				Una partida després del dinar. Gratis si mengeu aquí. <span class="text-on-image">5 € si només jugueu.</span>
 			</p>
-			<div class="mt-8 flex flex-wrap justify-center gap-3">
+			<div class="mt-10 flex flex-wrap gap-3">
 				<Button as="a" href={telHref} variant="primary" size="lg">
 					<Icon slot="icon-leading" name="tabler:phone" class="size-5" aria-hidden="true" />
 					Reserva taula i juga
 				</Button>
-				<Button as="a" href={menuHref} variant="secondary" size="lg">
-					Veure la carta
-				</Button>
+				<a
+					href="#com-funciona"
+					class="inline-flex items-center justify-center gap-2 rounded-full border border-on-image/30 bg-card/10 px-6 py-3 font-body text-base font-semibold text-on-image backdrop-blur-md transition-colors hover:bg-card/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-on-image focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
+				>
+					Com funciona
+					<Icon name="tabler:chevron-down" class="size-4" aria-hidden="true" />
+				</a>
+			</div>
+
+			<div class="absolute bottom-6 right-4 hidden items-center gap-3 text-xs font-semibold uppercase tracking-[0.22em] text-on-image/75 md:flex" aria-hidden="true">
+				<span class="h-px w-10 bg-on-image/40"></span>
+				Desplaça avall
 			</div>
 		</div>
 	</section>
 
-	<!-- Com funciona -->
-	<section class="px-4 py-16 sm:px-6 md:py-24">
-		<Container class="max-w-4xl">
-			<div class="text-center">
+	<!-- ================== STAT BAND ================== -->
+	<section class="border-b border-border bg-card" aria-label="Xifres clau">
+		<div class="mx-auto grid max-w-6xl grid-cols-2 gap-px overflow-hidden bg-border md:grid-cols-4">
+			{
+				minigolfStats.map((s) => (
+					<div class="flex flex-col items-start gap-3 bg-card px-6 py-8 md:px-8 md:py-10">
+						<Icon name={`tabler:${s.icon}`} class="size-5 text-primary" aria-hidden="true" />
+						<p class="font-display text-4xl font-semibold leading-none tracking-tight text-foreground md:text-5xl">
+							{s.value}
+						</p>
+						<p class="text-sm font-semibold uppercase tracking-[0.16em] text-foreground">
+							{s.label[lang]}
+						</p>
+						{s.sublabel && (
+							<p class="text-xs leading-relaxed text-muted">{s.sublabel[lang]}</p>
+						)}
+					</div>
+				))
+			}
+		</div>
+	</section>
+
+	<!-- ================== COM FUNCIONA — TIMELINE ================== -->
+	<section id="com-funciona" class="scroll-mt-24 px-4 py-20 sm:px-6 md:py-28">
+		<Container class="max-w-6xl">
+			<div class="max-w-2xl">
 				<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">Com funciona</p>
-				<h2 class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-					3 passos senzills
+				<h2 class="font-display mt-3 text-3xl font-semibold leading-[1.08] tracking-tight text-foreground md:text-5xl">
+					Tres passos.<br />Una tarda llarga.
 				</h2>
+				<p class="mt-5 text-lg leading-relaxed text-muted">
+					No cal app, no cal targeta, no cal saber jugar. Truques, dines, jugues. En aquest ordre.
+				</p>
 			</div>
-			<ol class="mt-12 grid gap-6 sm:grid-cols-3">
+
+			<ol class="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
+				<div class="absolute left-0 right-0 top-[88px] hidden h-px bg-gradient-to-r from-transparent via-border to-transparent md:block" aria-hidden="true"></div>
 				{
 					[
 						{
 							step: 1,
-							icon: 'calendar',
 							title: 'Reserva taula',
-							body: 'Truca o escriu per WhatsApp per confirmar taula. Dieu-nos quants sou.',
+							body: 'Truca o escriu per WhatsApp. Dieu-nos quants sou i a quina hora veniu. Cap formulari.',
+							icon: 'phone',
+							image: stepImages[0],
 						},
 						{
 							step: 2,
+							title: 'Dineu o sopeu',
+							body: 'A la brasa, combinats, tapes, entrepans. Sense pressa, com a casa.',
 							icon: 'tools-kitchen-2',
-							title: 'Dina o sopa',
-							body: 'Gaudiu de la carta: brases, combinats, tapes i entrepans.',
+							image: stepImages[1],
 						},
 						{
 							step: 3,
+							title: 'Jugueu al camp',
+							body: 'Demaneu els pals i les pilotes a la barra. El camp és vostre, sense afegit.',
 							icon: 'flag',
-							title: 'Juga gratis al minigolf',
-							body: "Demaneu el material al servei i endavant. El camp és vostre sense cost addicional.",
+							image: stepImages[2],
 						},
 					].map((s) => (
-						<li class="flex flex-col items-center rounded-2xl border border-border bg-card px-6 py-8 text-center shadow-sm">
-							<span class="inline-flex size-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
-								{s.step}
-							</span>
-							<Icon
-								name={`tabler:${s.icon}`}
-								class="mt-5 size-8 text-primary"
-								aria-hidden="true"
-							/>
-							<h3 class="font-display mt-4 text-xl font-semibold text-foreground">{s.title}</h3>
-							<p class="mt-3 text-sm leading-relaxed text-muted">{s.body}</p>
+						<li class="relative flex flex-col">
+							<div class="relative z-10 mb-6 inline-flex size-[88px] items-center justify-center rounded-full border border-border bg-card shadow-sm">
+								<span class="font-display text-4xl font-semibold tracking-tight text-foreground">
+									{s.step}
+								</span>
+								<span class="absolute -bottom-1 -right-1 inline-flex size-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-sm">
+									<Icon name={`tabler:${s.icon}`} class="size-4" aria-hidden="true" />
+								</span>
+							</div>
+							<div class="aspect-[4/3] overflow-hidden rounded-2xl border border-border bg-card">
+								<img
+									src={s.image.src}
+									alt={s.image.alt}
+									loading="lazy"
+									decoding="async"
+									data-placeholder="true"
+									class="size-full object-cover transition-transform duration-700 hover:scale-[1.04]"
+								/>
+							</div>
+							<h3 class="font-display mt-6 text-2xl font-semibold tracking-tight text-foreground">
+								{s.title}
+							</h3>
+							<p class="mt-3 text-base leading-relaxed text-muted">{s.body}</p>
 						</li>
 					))
 				}
@@ -137,144 +221,233 @@ const schemaService = JSON.stringify({
 		</Container>
 	</section>
 
-	<!-- El camp -->
-	<section class="border-y border-border bg-card px-4 py-16 sm:px-6 md:py-20">
-		<Container class="max-w-4xl">
-			<div class="grid gap-10 lg:grid-cols-2 lg:items-center">
-				<div>
+	<!-- ================== EL CAMP — MAGAZINE ================== -->
+	<section class="border-y border-border bg-card px-4 py-20 sm:px-6 md:py-28">
+		<Container class="max-w-6xl">
+			<div class="grid gap-12 lg:grid-cols-12 lg:items-center lg:gap-16">
+				<div class="relative lg:col-span-7">
+					<div class="aspect-[4/3] overflow-hidden rounded-3xl shadow-xl ring-1 ring-border">
+						<img
+							src="/minigolf/course-overview.webp"
+							alt="Vista oblicua del camp de minigolf integrat al jardí del restaurant a llum daurada."
+							loading="lazy"
+							decoding="async"
+							data-placeholder="true"
+							class="size-full object-cover"
+						/>
+					</div>
+					<div class="absolute -bottom-6 -left-2 hidden max-w-[240px] rounded-2xl bg-foreground/95 px-5 py-4 text-on-image shadow-lg backdrop-blur md:block">
+						<p class="text-xs font-semibold uppercase tracking-[0.22em] text-primary">El camp</p>
+						<p class="mt-1 font-display text-lg leading-tight">A peu de restaurant, sense moure’s del lloc.</p>
+					</div>
+				</div>
+
+				<div class="lg:col-span-5">
 					<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">El camp</p>
-					<h2 class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-						18 forats per a tothom
+					<h2 class="font-display mt-3 text-3xl font-semibold leading-[1.08] tracking-tight text-foreground md:text-5xl">
+						18 forats per allargar la sobretaula.
 					</h2>
-					<p class="mt-5 leading-relaxed text-muted">
-						El camp de minigolf d'El mini nou té 18 forats dissenyats amb un nivell de dificultat pensat per a tots els públics: des de nens petits fins a jugadors amb experiència. No cal saber jugar per gaudir-ne.
+					<p class="mt-5 text-lg leading-relaxed text-muted">
+						El recorregut està pensat perquè qualsevol persona, des dels nens fins als avis, hi pugui jugar amb sentit i somriure. Un parell de forats fan riure, un altre parell fan suar, i la resta són excuses per fer fotos.
 					</p>
-					<p class="mt-4 leading-relaxed text-muted">
-						L'ambient és familiar i distès. Ideal per allargar el dinar o el sopar amb una activitat a l'aire lliure sense complicacions.
-					</p>
-					<ul class="mt-6 space-y-3">
+					<figure class="my-8 border-l-4 border-primary pl-5">
+						<blockquote class="font-display text-xl leading-snug text-foreground md:text-2xl">
+							«Una partida és l’excusa perfecta per allargar el cafè. Aquí, el postres és arribar al forat 18.»
+						</blockquote>
+					</figure>
+					<ul class="space-y-4">
 						{
 							minigolfHighlights.map((h) => (
-								<li class="flex items-start gap-3">
-									<Icon
-										name={`tabler:${h.icon}`}
-										class="mt-0.5 size-5 shrink-0 text-primary"
-										aria-hidden="true"
-									/>
-									<span class="text-sm leading-relaxed text-foreground">
-										<strong>{h.title.ca}</strong> — {h.description.ca}
+								<li class="flex items-start gap-4">
+									<span class="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-full bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)]">
+										<Icon
+											name={`tabler:${h.icon}`}
+											class="size-4 text-primary"
+											aria-hidden="true"
+										/>
 									</span>
+									<div>
+										<p class="font-display text-base font-semibold text-foreground">{h.title.ca}</p>
+										<p class="mt-1 text-sm leading-relaxed text-muted">{h.description.ca}</p>
+									</div>
 								</li>
 							))
 						}
 					</ul>
 				</div>
-				<div class="flex flex-col gap-4">
-					<div class="rounded-2xl bg-[color-mix(in_oklch,var(--color-primary)_8%,var(--color-background))] px-8 py-10 text-center">
-						<Icon name="tabler:flag" class="mx-auto size-12 text-primary" aria-hidden="true" />
-						<p class="font-display mt-4 text-5xl font-bold text-foreground">18</p>
-						<p class="mt-1 text-sm font-semibold uppercase tracking-wider text-muted">forats</p>
-					</div>
-					<div class="rounded-2xl border border-border bg-background px-6 py-6 text-center text-sm leading-relaxed text-muted">
-						<Icon name="tabler:clock" class="mx-auto mb-3 size-6 text-muted" aria-hidden="true" />
-						Durada aproximada d'una partida: <strong class="text-foreground">45–60 min</strong>
-					</div>
-				</div>
 			</div>
 		</Container>
 	</section>
 
-	<!-- Preus -->
-	<section class="px-4 py-16 sm:px-6 md:py-20">
-		<Container class="max-w-3xl">
+	<!-- ================== FORATS DESTACATS ================== -->
+	<MinigolfHoles lang={lang} />
+
+	<!-- ================== PREUS PREMIUM ================== -->
+	<section class="border-t border-border bg-card px-4 py-20 sm:px-6 md:py-28">
+		<Container class="max-w-5xl">
 			<div class="text-center">
 				<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">Tarifes</p>
-				<h2 class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-					Accés al camp
+				<h2 class="font-display mt-3 text-3xl font-semibold leading-[1.08] tracking-tight text-foreground md:text-5xl">
+					Dues maneres de jugar.
 				</h2>
+				<p class="mx-auto mt-5 max-w-xl text-lg leading-relaxed text-muted">
+					O dines i jugues de regal, o entres directament al camp per cinc euros. No hi ha lletra petita.
+				</p>
 			</div>
-			<div class="mt-10 grid gap-4 sm:grid-cols-2">
+
+			<div class="mt-14 grid gap-6 md:grid-cols-2 md:gap-8">
 				{
-					minigolfPricing.map((p) => (
-						<div
-							class:list={[
-								'flex flex-col items-center rounded-2xl px-8 py-10 text-center shadow-sm',
-								p.context === 'with-meal'
-									? 'bg-primary text-primary-foreground shadow-md'
-									: 'border border-border bg-card text-foreground',
-							]}
-						>
-							<Icon
-								name={p.context === 'with-meal' ? 'tabler:gift' : 'tabler:golf'}
-								class:list={['size-10', p.context === 'with-meal' ? 'opacity-90' : 'text-muted']}
-								aria-hidden="true"
-							/>
-							<p
+					minigolfPricing.map((p) => {
+						const isMeal = p.context === 'with-meal';
+						return (
+							<div
 								class:list={[
-									'font-display mt-5 text-4xl font-bold',
-									p.context === 'with-meal' ? '' : 'text-foreground',
+									'relative flex flex-col overflow-hidden rounded-3xl px-8 py-12 text-center shadow-sm transition-shadow duration-300 hover:shadow-2xl md:px-10 md:py-14',
+									isMeal
+										? 'bg-foreground text-on-image ring-1 ring-foreground'
+										: 'border border-border bg-background text-foreground',
 								]}
 							>
-								{p.context === 'with-meal' ? 'GRATIS' : `${p.price} €`}
-							</p>
-							<p class:list={['mt-1 text-sm font-medium', p.context === 'with-meal' ? 'opacity-90' : 'text-muted']}>
-								{p.unit.ca}
-							</p>
-							<p
-								class:list={[
-									'mt-4 text-base font-semibold',
-									p.context === 'with-meal' ? 'opacity-95' : 'text-foreground',
-								]}
-							>
-								{p.label.ca}
-							</p>
-							{p.note && (
-								<p class:list={['mt-2 text-xs', p.context === 'with-meal' ? 'opacity-75' : 'text-muted']}>
-									{p.note.ca}
+								{isMeal && (
+									<>
+										<div
+											class="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary to-transparent"
+											aria-hidden="true"
+										></div>
+										<div
+											class="pointer-events-none absolute -inset-x-10 -top-24 h-48 bg-[radial-gradient(ellipse,color-mix(in_oklch,var(--color-primary)_55%,transparent),transparent_70%)] opacity-60"
+											aria-hidden="true"
+										></div>
+										<span class="relative inline-flex self-center rounded-full bg-primary px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.2em] text-primary-foreground shadow">
+											El nostre regal
+										</span>
+									</>
+								)}
+								{!isMeal && (
+									<span class="self-center text-xs font-semibold uppercase tracking-[0.22em] text-muted">
+										Sense reserva al restaurant
+									</span>
+								)}
+								<Icon
+									name={isMeal ? 'tabler:gift' : 'tabler:golf'}
+									class:list={['relative mx-auto mt-6 size-9', isMeal ? 'text-primary' : 'text-muted']}
+									aria-hidden="true"
+								/>
+								<p
+									class:list={[
+										'font-display relative mt-4 text-6xl font-semibold leading-none tracking-tight md:text-7xl',
+										isMeal ? '' : 'text-foreground',
+									]}
+								>
+									{isMeal ? 'Gratis' : `${p.price} €`}
 								</p>
-							)}
-						</div>
-					))
+								<p
+									class:list={[
+										'relative mt-4 text-base font-medium',
+										isMeal ? 'text-on-image/85' : 'text-muted',
+									]}
+								>
+									{p.unit.ca}
+								</p>
+								<p
+									class:list={[
+										'relative mt-6 font-display text-xl font-semibold',
+										isMeal ? 'text-on-image' : 'text-foreground',
+									]}
+								>
+									{p.label.ca}
+								</p>
+								{p.note && (
+									<p
+										class:list={[
+											'relative mt-2 text-sm',
+											isMeal ? 'text-on-image/70' : 'text-muted',
+										]}
+									>
+										{p.note.ca}
+									</p>
+								)}
+							</div>
+						);
+					})
 				}
+			</div>
+			<p class="mt-6 text-center text-sm text-muted">
+				Pal i pilota inclosos sempre. <a href={menuHref} class="font-semibold text-primary underline-offset-4 hover:underline">Veure la carta del restaurant →</a>
+			</p>
+		</Container>
+	</section>
+
+	<!-- ================== CITA / RESSENYA ================== -->
+	<section class="bg-background px-4 py-20 sm:px-6 md:py-24" aria-label="Què en diuen els clients">
+		<Container class="max-w-4xl">
+			<div class="flex flex-col items-center text-center">
+				<div class="flex items-center gap-1 text-rating" aria-label="5 sobre 5 estrelles">
+					{
+						Array.from({ length: 5 }).map(() => (
+							<Icon name="tabler:star-filled" class="size-5" aria-hidden="true" />
+						))
+					}
+				</div>
+				<blockquote class="font-display mt-6 text-2xl font-medium leading-[1.3] tracking-tight text-foreground md:text-4xl">
+					«Les nenes no es volien anar. Vam acabar fent dues partides. <span class="text-primary">Repetirem.</span>»
+				</blockquote>
+				<p class="mt-6 text-sm font-semibold uppercase tracking-[0.22em] text-muted">
+					Ressenya · Google · 5 ★
+				</p>
 			</div>
 		</Container>
 	</section>
 
-	<!-- FAQ minigolf -->
-	<section class="border-t border-border bg-card px-4 py-16 sm:px-6 md:py-20">
+	<!-- ================== FAQ ================== -->
+	<section class="border-t border-border bg-card px-4 py-20 sm:px-6 md:py-28">
 		<Container class="max-w-3xl">
-			<div class="mb-10 text-center">
+			<div class="mb-12 text-center">
 				<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">Preguntes</p>
-				<h2 class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-					Dubtes freqüents sobre el minigolf
+				<h2 class="font-display mt-3 text-3xl font-semibold leading-[1.08] tracking-tight text-foreground md:text-5xl">
+					Dubtes habituals
 				</h2>
 			</div>
 			<FaqList lang={lang} items={minigolfFaqs} headingLevel="h3" />
 		</Container>
 	</section>
 
-	<!-- CTA final -->
-	<section class="bg-primary px-4 py-16 text-primary-foreground sm:px-6 md:py-20">
-		<div class="mx-auto max-w-3xl text-center">
-			<h2 class="font-display text-3xl font-semibold tracking-tight md:text-4xl">
-				Reserveu taula i veniu a jugar
+	<!-- ================== CTA FINAL CINEMATOGRÀFIC ================== -->
+	<section class="relative isolate overflow-hidden text-on-image">
+		<div class="absolute inset-0 z-0 bg-foreground">
+			<img
+				src="/minigolf/meal-table.webp"
+				alt=""
+				role="presentation"
+				data-placeholder="true"
+				class="size-full object-cover object-center"
+				loading="lazy"
+				decoding="async"
+			/>
+			<div class="absolute inset-0 bg-gradient-to-r from-black/85 via-black/65 to-black/40" aria-hidden="true"></div>
+		</div>
+
+		<div class="relative z-10 mx-auto max-w-4xl px-4 py-24 sm:px-6 md:py-32">
+			<p class="text-xs font-semibold uppercase tracking-[0.32em] text-primary">Reserva taula</p>
+			<h2 class="font-display mt-4 max-w-2xl text-3xl font-semibold leading-[1.05] tracking-tight md:text-6xl">
+				Veniu, dineu, jugueu.<br />En aquest ordre.
 			</h2>
-			<p class="mx-auto mt-4 max-w-xl text-lg leading-relaxed opacity-90">
-				Truqueu o escriviu per WhatsApp. Dieu-nos quants sou i a quina hora, i ho arranquem.
+			<p class="mt-6 max-w-xl text-lg leading-relaxed text-on-image/85 md:text-xl">
+				Truqueu o escriviu per WhatsApp. Dieu-nos quants sou i a quina hora. Ho preparem.
 			</p>
-			<div class="mt-8 flex flex-wrap justify-center gap-3">
+			<div class="mt-10 flex flex-wrap gap-3">
 				<a
 					href={telHref}
-					class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-foreground px-8 py-3.5 font-body text-lg font-semibold text-primary shadow-sm transition-colors hover:bg-[color-mix(in_oklch,var(--color-primary-foreground)_92%,black)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+					class="inline-flex items-center justify-center gap-2 rounded-full bg-primary px-8 py-3.5 font-body text-lg font-semibold text-primary-foreground shadow-lg transition-colors hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
 				>
 					<Icon name="tabler:phone" class="size-5 shrink-0" aria-hidden="true" />
-					Truqueu-nos
+					{business.phoneTel}
 				</a>
 				<a
 					href={waUrl}
 					target="_blank"
 					rel="noopener noreferrer"
-					class="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-foreground px-8 py-3.5 font-body text-lg font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_oklch,var(--color-primary-foreground)_14%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+					class="inline-flex items-center justify-center gap-2 rounded-full border border-on-image/40 bg-card/10 px-8 py-3.5 font-body text-lg font-semibold text-on-image backdrop-blur transition-colors hover:bg-card/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-on-image focus-visible:ring-offset-2 focus-visible:ring-offset-foreground"
 				>
 					<Icon name="tabler:brand-whatsapp" class="size-5 shrink-0" aria-hidden="true" />
 					WhatsApp
@@ -283,3 +456,20 @@ const schemaService = JSON.stringify({
 		</div>
 	</section>
 </BaseLayout>
+
+<style>
+	@keyframes mn-kenburns {
+		0% {
+			transform: scale(1.05) translate3d(0, 0, 0);
+		}
+		100% {
+			transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		[class*='animate-[mn-kenburns'] {
+			animation: none !important;
+		}
+	}
+</style>

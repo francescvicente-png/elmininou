@@ -1,0 +1,138 @@
+---
+/**
+ * MinigolfHoles — featured holes gallery for the dedicated minigolf page.
+ *
+ * Renders a 3-column grid of marquee holes with image, number badge,
+ * difficulty rating and a short tagline. Used only on /ca/minigolf/ and
+ * /es/minigolf/. Images are AI-generated placeholders.
+ */
+import { Icon } from 'astro-icon/components';
+import type { Lang } from '../../i18n/config';
+import { minigolfHoles } from '../../data/minigolf';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const copy = {
+	ca: {
+		eyebrow: 'Forats destacats',
+		title: 'Tres reptes que recorden',
+		lead: 'Cada forat té el seu caràcter. Aquests són tres dels que més fan riure (i renegar) als jugadors.',
+		stripIntro: '15 forats més et esperen al camp',
+		hole: 'Forat',
+		difficultyLabel: 'Dificultat',
+		difficultyLevels: ['', 'Fàcil', 'Mitjana', 'Avançada'] as const,
+	},
+	es: {
+		eyebrow: 'Hoyos destacados',
+		title: 'Tres retos que se recuerdan',
+		lead: 'Cada hoyo tiene su carácter. Estos son tres de los que más hacen reír (y renegar) a los jugadores.',
+		stripIntro: '15 hoyos más te esperan en el campo',
+		hole: 'Hoyo',
+		difficultyLabel: 'Dificultad',
+		difficultyLevels: ['', 'Fácil', 'Media', 'Avanzada'] as const,
+	},
+}[lang];
+---
+
+<section class="border-t border-border bg-background px-4 py-20 sm:px-6 md:py-28">
+	<div class="mx-auto max-w-6xl">
+		<div class="max-w-2xl">
+			<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
+				{copy.eyebrow}
+			</p>
+			<h2
+				class="font-display mt-3 text-3xl font-semibold leading-[1.08] tracking-tight text-foreground md:text-5xl"
+			>
+				{copy.title}
+			</h2>
+			<p class="mt-5 max-w-xl text-lg leading-relaxed text-muted">
+				{copy.lead}
+			</p>
+		</div>
+
+		<ul class="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
+			{
+				minigolfHoles.map((hole, i) => (
+					<li
+						class="group relative flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-all duration-500 hover:-translate-y-1 hover:shadow-xl"
+						style={`view-transition-name: minigolf-hole-${hole.id};`}
+					>
+						<div class="relative aspect-square overflow-hidden">
+							<img
+								src={hole.image.src}
+								alt={hole.image.alt[lang]}
+								loading={i === 0 ? 'eager' : 'lazy'}
+								decoding="async"
+								data-placeholder="true"
+								class="absolute inset-0 size-full object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-[1.06]"
+							/>
+							<div class="absolute inset-0 bg-gradient-to-t from-black/55 via-black/0 to-black/0" />
+							<div class="absolute left-5 top-5 inline-flex items-center gap-2 rounded-full bg-card/90 px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-foreground backdrop-blur">
+								<span class="text-primary">●</span>
+								<span>
+									{copy.hole} {hole.number}
+								</span>
+							</div>
+							<div class="absolute bottom-5 left-5 right-5 flex items-end justify-between gap-3 text-on-image">
+								<h3 class="font-display text-2xl font-semibold leading-tight drop-shadow md:text-3xl">
+									{hole.name[lang]}
+								</h3>
+								<div
+									class="flex items-center gap-0.5 rounded-full bg-black/40 px-2.5 py-1 backdrop-blur"
+									aria-label={`${copy.difficultyLabel}: ${copy.difficultyLevels[hole.difficulty]}`}
+								>
+									{[1, 2, 3].map((n) => (
+										<Icon
+											name="tabler:star-filled"
+											class:list={[
+												'size-3.5 transition-colors',
+												n <= hole.difficulty ? 'text-primary' : 'text-on-image/40',
+											]}
+											aria-hidden="true"
+										/>
+									))}
+								</div>
+							</div>
+						</div>
+						<div class="flex flex-1 flex-col gap-3 px-6 py-6">
+							<p class="text-base leading-relaxed text-muted">
+								{hole.tagline[lang]}
+							</p>
+							<p class="text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+								{copy.difficultyLabel} · {copy.difficultyLevels[hole.difficulty]}
+							</p>
+						</div>
+					</li>
+				))
+			}
+		</ul>
+
+		<div
+			class="mt-12 flex items-center gap-4 rounded-2xl border border-dashed border-border bg-card px-6 py-5"
+			aria-hidden="true"
+		>
+			<div class="flex flex-1 items-center gap-1.5">
+				{
+					Array.from({ length: 18 }).map((_, idx) => {
+						const featured = minigolfHoles.some((h) => h.number === idx + 1);
+						return (
+							<span
+								class:list={[
+									'h-2 flex-1 rounded-full transition-colors',
+									featured ? 'bg-primary' : 'bg-border',
+								]}
+							/>
+						);
+					})
+				}
+			</div>
+			<p class="hidden text-xs font-semibold uppercase tracking-[0.18em] text-muted sm:block">
+				{copy.stripIntro}
+			</p>
+		</div>
+	</div>
+</section>
