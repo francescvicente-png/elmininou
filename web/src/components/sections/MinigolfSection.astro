@@ -1,0 +1,136 @@
+---
+/**
+ * MinigolfSection — home page block showcasing the 18-hole minigolf course.
+ *
+ * The minigolf is El mini nou's main commercial differentiator:
+ * free with a meal, €5/person walk-in.
+ * Placed between the reserve CTA banner and the location section.
+ */
+import { Icon } from 'astro-icon/components';
+import type { Lang } from '../../i18n/config';
+import { minigolfHighlights, minigolfPricing } from '../../data/minigolf';
+import { getRoutePair } from '../../i18n/routes';
+import { business } from '../../data/business';
+import Button from '../Button.astro';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+const copy = {
+	ca: {
+		eyebrow: 'Minigolf',
+		title: '18 forats al cor del Vallès',
+		lead: 'Acabeu el dinar amb una partida. El camp és gratuït per a tot el grup si mengeu al restaurant.',
+		pricingTitle: 'Accés al camp',
+		freeLabel: 'GRATIS',
+		freeContext: 'si dines aquí',
+		paidLabel: '5 € per persona',
+		paidContext: 'si només jugues',
+		paidNote: 'Pal i pilota inclosos',
+		ctaPrimary: 'Reserva taula i juga',
+		ctaSecondary: 'Veure el camp',
+	},
+	es: {
+		eyebrow: 'Minigolf',
+		title: '18 hoyos en el corazón del Vallès',
+		lead: 'Terminad la comida con una partida. El campo es gratuito para todo el grupo si coméis en el restaurante.',
+		pricingTitle: 'Acceso al campo',
+		freeLabel: 'GRATIS',
+		freeContext: 'si comes aquí',
+		paidLabel: '5 € por persona',
+		paidContext: 'si solo juegas',
+		paidNote: 'Palo y bola incluidos',
+		ctaPrimary: 'Reserva mesa y juega',
+		ctaSecondary: 'Ver el campo',
+	},
+}[lang];
+
+const minigolfHref = getRoutePair('minigolf')[lang];
+const telHref = `tel:${business.phoneTel}`;
+---
+
+<section
+	id="minigolf"
+	class="scroll-mt-28 border-t border-border bg-card px-4 py-16 sm:px-6 md:scroll-mt-32 md:py-24"
+	aria-labelledby="minigolf-heading"
+>
+	<div class="mx-auto max-w-6xl">
+		<div class="text-center">
+			<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
+				{copy.eyebrow}
+			</p>
+			<h2
+				id="minigolf-heading"
+				class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl"
+			>
+				{copy.title}
+			</h2>
+			<p class="mx-auto mt-4 max-w-2xl text-lg leading-relaxed text-muted">
+				{copy.lead}
+			</p>
+		</div>
+
+		<ul class="mt-12 grid gap-6 sm:grid-cols-3">
+			{
+				minigolfHighlights.map((h) => (
+					<li class="flex flex-col items-center rounded-2xl border border-border bg-background p-8 text-center shadow-sm">
+						<span class="inline-flex size-14 items-center justify-center rounded-full bg-[color-mix(in_oklch,var(--color-primary)_12%,transparent)]">
+							<Icon
+								name={`tabler:${h.icon}`}
+								class="size-7 text-primary"
+								aria-hidden="true"
+							/>
+						</span>
+						<h3 class="font-display mt-5 text-xl font-semibold text-foreground">
+							{h.title[lang]}
+						</h3>
+						<p class="mt-3 text-sm leading-relaxed text-muted">
+							{h.description[lang]}
+						</p>
+					</li>
+				))
+			}
+		</ul>
+
+		<div class="mt-12 grid gap-4 sm:grid-cols-2 sm:gap-6">
+			<div
+				class="flex flex-col items-center justify-center rounded-2xl bg-primary px-8 py-10 text-center text-primary-foreground shadow-md"
+			>
+				<Icon name="tabler:gift" class="size-10 opacity-90" aria-hidden="true" />
+				<p class="font-display mt-4 text-4xl font-bold tracking-tight">
+					{copy.freeLabel}
+				</p>
+				<p class="mt-2 text-lg font-medium opacity-90">{copy.freeContext}</p>
+			</div>
+
+			<div
+				class="flex flex-col items-center justify-center rounded-2xl border border-border bg-background px-8 py-10 text-center shadow-sm"
+			>
+				<Icon
+					name="tabler:golf"
+					class="size-10 text-muted"
+					aria-hidden="true"
+				/>
+				<p class="font-display mt-4 text-4xl font-bold tracking-tight text-foreground">
+					{copy.paidLabel}
+				</p>
+				<p class="mt-2 text-base text-muted">{copy.paidContext}</p>
+				<p class="mt-1 text-sm text-muted opacity-75">{copy.paidNote}</p>
+			</div>
+		</div>
+
+		<div class="mt-10 flex flex-wrap justify-center gap-3">
+			<Button as="a" href={telHref} variant="primary" size="lg">
+				<Icon slot="icon-leading" name="tabler:phone" class="size-5" aria-hidden="true" />
+				{copy.ctaPrimary}
+			</Button>
+			<Button as="a" href={minigolfHref} variant="secondary" size="lg">
+				{copy.ctaSecondary}
+				<Icon slot="icon-trailing" name="tabler:arrow-right" class="size-4" aria-hidden="true" />
+			</Button>
+		</div>
+	</div>
+</section>

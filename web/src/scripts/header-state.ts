@@ -43,6 +43,7 @@ const ROUTE_MAP: ReadonlyArray<RouteMapEntry> = [
 	{ ca: '/ca/avis-legal/', es: '/es/aviso-legal/' },
 	{ ca: '/ca/politica-privacitat/', es: '/es/politica-privacidad/' },
 	{ ca: '/ca/politica-cookies/', es: '/es/politica-cookies/' },
+	{ ca: '/ca/minigolf/', es: '/es/minigolf/' },
 ];
 
 function normalise(pathname: string): string {

@@ -1,0 +1,285 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Container from '../../components/Container.astro';
+import Button from '../../components/Button.astro';
+import FaqList from '../../components/FaqList.astro';
+import { Icon } from 'astro-icon/components';
+import { minigolfHighlights, minigolfPricing } from '../../data/minigolf';
+import { minigolfFaqs } from '../../data/faq';
+import { business } from '../../data/business';
+import { getRoutePair } from '../../i18n/routes';
+import { site } from '../../data/site';
+
+const lang = 'ca' as const;
+const telHref = `tel:${business.phoneTel}`;
+const cleanPhone = business.phoneTel.replace(/\D/g, '');
+const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent("Hola, voldria preguntar pel minigolf d'El mini nou. Gràcies.")}`;
+const menuHref = getRoutePair('menu')[lang];
+
+const schemaService = JSON.stringify({
+	'@context': 'https://schema.org',
+	'@type': 'Service',
+	name: 'Camp de minigolf de 18 forats',
+	description:
+		"Camp de minigolf de 18 forats integrat al restaurant El mini nou. Accés gratuït si menges al restaurant; 5 € per persona si només jugues.",
+	provider: {
+		'@type': 'Restaurant',
+		'@id': `${site.canonicalUrl}/#localbusiness`,
+	},
+	offers: [
+		{
+			'@type': 'Offer',
+			price: '0',
+			priceCurrency: 'EUR',
+			description: "Gratuït per a tot el grup si menges al restaurant",
+		},
+		{
+			'@type': 'Offer',
+			price: '5',
+			priceCurrency: 'EUR',
+			description: '5 € per persona si només jugues. Pal i pilota inclosos.',
+		},
+	],
+	areaServed: { '@type': 'Place', name: "L'Ametlla del Vallès" },
+});
+---
+
+<BaseLayout
+	title={`Minigolf de 18 forats · ${business.name}`}
+	description={`Camp de minigolf de 18 forats a ${business.address.city}. Gratuït si dines al restaurant. Familiar, per a tots els nivells. Reserva taula i juga.`}
+	siblingPath="/es/minigolf/"
+	keywords={[
+		'minigolf ametlla del vallès',
+		'el mini nou minigolf',
+		'minigolf restaurant vallès',
+		'activitat familiar ametlla vallès',
+		'minigolf gratis restaurant',
+	]}
+	breadcrumbs={[
+		{ name: 'Inici', url: '/ca/' },
+		{ name: 'Minigolf', url: '/ca/minigolf/' },
+	]}
+>
+	<script slot="head" type="application/ld+json" set:html={schemaService} />
+
+	<!-- Hero -->
+	<section class="border-b border-border bg-card px-4 pb-16 pt-12 sm:px-6 md:pb-20 md:pt-16">
+		<div class="mx-auto max-w-3xl text-center">
+			<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">
+				Minigolf · {business.address.city}
+			</p>
+			<h1
+				class="font-display mt-4 text-4xl font-semibold leading-[1.06] tracking-tight text-foreground md:text-5xl"
+			>
+				Camp de minigolf de 18 forats
+			</h1>
+			<p class="mx-auto mt-5 max-w-xl text-xl leading-relaxed text-muted">
+				Inclòs si dines aquí. 5 € si només jugues.
+			</p>
+			<div class="mt-8 flex flex-wrap justify-center gap-3">
+				<Button as="a" href={telHref} variant="primary" size="lg">
+					<Icon slot="icon-leading" name="tabler:phone" class="size-5" aria-hidden="true" />
+					Reserva taula i juga
+				</Button>
+				<Button as="a" href={menuHref} variant="secondary" size="lg">
+					Veure la carta
+				</Button>
+			</div>
+		</div>
+	</section>
+
+	<!-- Com funciona -->
+	<section class="px-4 py-16 sm:px-6 md:py-24">
+		<Container class="max-w-4xl">
+			<div class="text-center">
+				<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">Com funciona</p>
+				<h2 class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+					3 passos senzills
+				</h2>
+			</div>
+			<ol class="mt-12 grid gap-6 sm:grid-cols-3">
+				{
+					[
+						{
+							step: 1,
+							icon: 'calendar',
+							title: 'Reserva taula',
+							body: 'Truca o escriu per WhatsApp per confirmar taula. Dieu-nos quants sou.',
+						},
+						{
+							step: 2,
+							icon: 'tools-kitchen-2',
+							title: 'Dina o sopa',
+							body: 'Gaudiu de la carta: brases, combinats, tapes i entrepans.',
+						},
+						{
+							step: 3,
+							icon: 'flag',
+							title: 'Juga gratis al minigolf',
+							body: "Demaneu el material al servei i endavant. El camp és vostre sense cost addicional.",
+						},
+					].map((s) => (
+						<li class="flex flex-col items-center rounded-2xl border border-border bg-card px-6 py-8 text-center shadow-sm">
+							<span class="inline-flex size-12 items-center justify-center rounded-full bg-primary text-lg font-bold text-primary-foreground">
+								{s.step}
+							</span>
+							<Icon
+								name={`tabler:${s.icon}`}
+								class="mt-5 size-8 text-primary"
+								aria-hidden="true"
+							/>
+							<h3 class="font-display mt-4 text-xl font-semibold text-foreground">{s.title}</h3>
+							<p class="mt-3 text-sm leading-relaxed text-muted">{s.body}</p>
+						</li>
+					))
+				}
+			</ol>
+		</Container>
+	</section>
+
+	<!-- El camp -->
+	<section class="border-y border-border bg-card px-4 py-16 sm:px-6 md:py-20">
+		<Container class="max-w-4xl">
+			<div class="grid gap-10 lg:grid-cols-2 lg:items-center">
+				<div>
+					<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">El camp</p>
+					<h2 class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+						18 forats per a tothom
+					</h2>
+					<p class="mt-5 leading-relaxed text-muted">
+						El camp de minigolf d'El mini nou té 18 forats dissenyats amb un nivell de dificultat pensat per a tots els públics: des de nens petits fins a jugadors amb experiència. No cal saber jugar per gaudir-ne.
+					</p>
+					<p class="mt-4 leading-relaxed text-muted">
+						L'ambient és familiar i distès. Ideal per allargar el dinar o el sopar amb una activitat a l'aire lliure sense complicacions.
+					</p>
+					<ul class="mt-6 space-y-3">
+						{
+							minigolfHighlights.map((h) => (
+								<li class="flex items-start gap-3">
+									<Icon
+										name={`tabler:${h.icon}`}
+										class="mt-0.5 size-5 shrink-0 text-primary"
+										aria-hidden="true"
+									/>
+									<span class="text-sm leading-relaxed text-foreground">
+										<strong>{h.title.ca}</strong> — {h.description.ca}
+									</span>
+								</li>
+							))
+						}
+					</ul>
+				</div>
+				<div class="flex flex-col gap-4">
+					<div class="rounded-2xl bg-[color-mix(in_oklch,var(--color-primary)_8%,var(--color-background))] px-8 py-10 text-center">
+						<Icon name="tabler:flag" class="mx-auto size-12 text-primary" aria-hidden="true" />
+						<p class="font-display mt-4 text-5xl font-bold text-foreground">18</p>
+						<p class="mt-1 text-sm font-semibold uppercase tracking-wider text-muted">forats</p>
+					</div>
+					<div class="rounded-2xl border border-border bg-background px-6 py-6 text-center text-sm leading-relaxed text-muted">
+						<Icon name="tabler:clock" class="mx-auto mb-3 size-6 text-muted" aria-hidden="true" />
+						Durada aproximada d'una partida: <strong class="text-foreground">45–60 min</strong>
+					</div>
+				</div>
+			</div>
+		</Container>
+	</section>
+
+	<!-- Preus -->
+	<section class="px-4 py-16 sm:px-6 md:py-20">
+		<Container class="max-w-3xl">
+			<div class="text-center">
+				<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">Tarifes</p>
+				<h2 class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+					Accés al camp
+				</h2>
+			</div>
+			<div class="mt-10 grid gap-4 sm:grid-cols-2">
+				{
+					minigolfPricing.map((p) => (
+						<div
+							class:list={[
+								'flex flex-col items-center rounded-2xl px-8 py-10 text-center shadow-sm',
+								p.context === 'with-meal'
+									? 'bg-primary text-primary-foreground shadow-md'
+									: 'border border-border bg-card text-foreground',
+							]}
+						>
+							<Icon
+								name={p.context === 'with-meal' ? 'tabler:gift' : 'tabler:golf'}
+								class:list={['size-10', p.context === 'with-meal' ? 'opacity-90' : 'text-muted']}
+								aria-hidden="true"
+							/>
+							<p
+								class:list={[
+									'font-display mt-5 text-4xl font-bold',
+									p.context === 'with-meal' ? '' : 'text-foreground',
+								]}
+							>
+								{p.context === 'with-meal' ? 'GRATIS' : `${p.price} €`}
+							</p>
+							<p class:list={['mt-1 text-sm font-medium', p.context === 'with-meal' ? 'opacity-90' : 'text-muted']}>
+								{p.unit.ca}
+							</p>
+							<p
+								class:list={[
+									'mt-4 text-base font-semibold',
+									p.context === 'with-meal' ? 'opacity-95' : 'text-foreground',
+								]}
+							>
+								{p.label.ca}
+							</p>
+							{p.note && (
+								<p class:list={['mt-2 text-xs', p.context === 'with-meal' ? 'opacity-75' : 'text-muted']}>
+									{p.note.ca}
+								</p>
+							)}
+						</div>
+					))
+				}
+			</div>
+		</Container>
+	</section>
+
+	<!-- FAQ minigolf -->
+	<section class="border-t border-border bg-card px-4 py-16 sm:px-6 md:py-20">
+		<Container class="max-w-3xl">
+			<div class="mb-10 text-center">
+				<p class="text-xs font-semibold uppercase tracking-[0.26em] text-primary">Preguntes</p>
+				<h2 class="font-display mt-3 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+					Dubtes freqüents sobre el minigolf
+				</h2>
+			</div>
+			<FaqList lang={lang} items={minigolfFaqs} headingLevel="h3" />
+		</Container>
+	</section>
+
+	<!-- CTA final -->
+	<section class="bg-primary px-4 py-16 text-primary-foreground sm:px-6 md:py-20">
+		<div class="mx-auto max-w-3xl text-center">
+			<h2 class="font-display text-3xl font-semibold tracking-tight md:text-4xl">
+				Reserveu taula i veniu a jugar
+			</h2>
+			<p class="mx-auto mt-4 max-w-xl text-lg leading-relaxed opacity-90">
+				Truqueu o escriviu per WhatsApp. Dieu-nos quants sou i a quina hora, i ho arranquem.
+			</p>
+			<div class="mt-8 flex flex-wrap justify-center gap-3">
+				<a
+					href={telHref}
+					class="inline-flex items-center justify-center gap-2 rounded-full bg-primary-foreground px-8 py-3.5 font-body text-lg font-semibold text-primary shadow-sm transition-colors hover:bg-[color-mix(in_oklch,var(--color-primary-foreground)_92%,black)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+				>
+					<Icon name="tabler:phone" class="size-5 shrink-0" aria-hidden="true" />
+					Truqueu-nos
+				</a>
+				<a
+					href={waUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="inline-flex items-center justify-center gap-2 rounded-full border-2 border-primary-foreground px-8 py-3.5 font-body text-lg font-semibold text-primary-foreground transition-colors hover:bg-[color-mix(in_oklch,var(--color-primary-foreground)_14%,transparent)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-foreground focus-visible:ring-offset-2 focus-visible:ring-offset-primary"
+				>
+					<Icon name="tabler:brand-whatsapp" class="size-5 shrink-0" aria-hidden="true" />
+					WhatsApp
+				</a>
+			</div>
+		</div>
+	</section>
+</BaseLayout>

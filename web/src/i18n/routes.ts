@@ -22,6 +22,7 @@ export const routeMap = {
 		ca: '/ca/politica-cookies/',
 		es: '/es/politica-cookies/',
 	},
+	minigolf: { ca: '/ca/minigolf/', es: '/es/minigolf/' },
 } as const;
 
 export type RouteKey = keyof typeof routeMap;

@@ -13,6 +13,8 @@ export interface FaqItemData {
 	answerCa: string;
 	answerEs: string;
 	pendingConfirmation?: boolean;
+	/** Differentiates general restaurant FAQs from section-specific ones. */
+	scope?: 'restaurant' | 'minigolf';
 }
 
 export const faqs: ReadonlyArray<FaqItemData> = [
@@ -107,6 +109,50 @@ export const faqs: ReadonlyArray<FaqItemData> = [
 		answerEs:
 			'Consúltalo al reservar o en sala: depende del plato y la carga de cocina ese día.',
 		pendingConfirmation: true,
+	},
+];
+
+/** Minigolf-specific FAQ items — used by /ca/minigolf/ and /es/minigolf/ pages. */
+export const minigolfFaqs: ReadonlyArray<FaqItemData> = [
+	{
+		id: 'minigolf-reserva-camp',
+		scope: 'minigolf',
+		questionCa: 'Cal reservar el camp?',
+		questionEs: '¿Hay que reservar el campo?',
+		answerCa:
+			"No cal, però recomanem trucar si veniu en grup gran per assegurar-vos que el camp estigui disponible.",
+		answerEs:
+			'No es necesario, pero recomendamos llamar si venís en grupo grande para aseguraros de que el campo esté disponible.',
+	},
+	{
+		id: 'minigolf-edat-minima',
+		scope: 'minigolf',
+		questionCa: 'Hi ha edat mínima per jugar?',
+		questionEs: '¿Hay edad mínima para jugar?',
+		answerCa:
+			"No, és apte per a tota la família. Tenim pals adaptats per a nens de totes les edats.",
+		answerEs:
+			'No, es apto para toda la familia. Tenemos palos adaptados para niños de todas las edades.',
+	},
+	{
+		id: 'minigolf-durada-partida',
+		scope: 'minigolf',
+		questionCa: 'Quant dura una partida?',
+		questionEs: '¿Cuánto dura una partida?',
+		answerCa:
+			"Aproximadament 45-60 minuts per als 18 forats, depenent del nombre de jugadors i del ritme del grup.",
+		answerEs:
+			'Aproximadamente 45-60 minutos para los 18 hoyos, dependiendo del número de jugadores y el ritmo del grupo.',
+	},
+	{
+		id: 'minigolf-pluja',
+		scope: 'minigolf',
+		questionCa: 'Què passa si plou?',
+		questionEs: '¿Qué pasa si llueve?',
+		answerCa:
+			"El camp es tanca temporalment si plou intensament. Truqueu abans de venir per confirmar-ne la disponibilitat.",
+		answerEs:
+			'El campo cierra temporalmente si llueve intensamente. Llamad antes de venir para confirmar la disponibilidad.',
 	},
 ];
 

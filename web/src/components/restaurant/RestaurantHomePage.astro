@@ -7,12 +7,19 @@ import { Picture } from 'astro:assets';
 import { Icon } from 'astro-icon/components';
 import type { Lang } from '../../i18n/config';
 import { business } from '../../data/business';
-import { services } from '../../data/services';
+import {
+	services,
+	getServiceDescription,
+	type ServiceCategoryKey,
+} from '../../data/services';
 import { MENU_DISH_ILLUSTRATIONS } from '../../data/menu-illustrations';
 import { getRoutePair } from '../../i18n/routes';
 import { getBookingCta } from '../../data/site';
 import { useTranslations } from '../../i18n/utils';
+import type { UIKey } from '../../i18n/ui';
 import Button from '../Button.astro';
+import GalleryLightbox from '../GalleryLightbox.astro';
+import MinigolfSection from '../sections/MinigolfSection.astro';
 import homeRestaurantHeroCard from '../../assets/images/generated/home-restaurant-hero-card.jpg';
 
 interface Props {
@@ -94,6 +101,47 @@ const euros = new Intl.NumberFormat(lang === 'ca' ? 'ca-ES' : 'es-ES', {
 
 const cleanPhone = business.phoneTel.replace(/\D/g, '');
 const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp.defaultMessage'))}`;
+
+// Lightbox for the home featured-dish grid: same dish-mode UX as on /menu/.
+const categoryLabelKey: Record<ServiceCategoryKey, UIKey> = {
+	starters: 'services.categoryStarters',
+	grills: 'services.categoryGrills',
+	pasta: 'services.categoryPasta',
+	combos: 'services.categoryCombos',
+	'sandwiches-hot': 'services.categorySandwichesHot',
+	'sandwiches-cold': 'services.categorySandwichesCold',
+	tapas: 'services.categoryTapas',
+	drinks: 'services.categoryDrinks',
+};
+const pendingBadgeLabel = t('services.pendingBadge');
+const pricePendingLabel = t('menu.pricePending');
+const priceLocale = lang === 'ca' ? 'ca-ES' : 'es-ES';
+
+const lightboxImages = featured
+	.filter((s) => s.illustration != null)
+	.map((s) => ({
+		src: s.illustration!,
+		alt: s.name[lang],
+		photographer: '',
+		photoLicense: 'ai-demo' as const,
+		dish: {
+			categoryLabel: t(categoryLabelKey[s.category]),
+			description: getServiceDescription(s, lang),
+			price: s.price,
+			pendingConfirmation: s.pendingConfirmation ?? false,
+			pendingBadgeLabel,
+			pricePendingLabel,
+			priceLocale,
+		},
+	}));
+
+const lightboxIndexById = new Map<string, number>();
+{
+	let i = 0;
+	for (const s of featured) {
+		if (s.illustration) lightboxIndexById.set(s.id, i++);
+	}
+}
 ---
 
 <div class="bg-background pb-16">
@@ -200,12 +248,18 @@ const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp
 							class="group flex flex-col overflow-hidden rounded-3xl border border-border bg-card shadow-sm transition-[box-shadow,transform] hover:-translate-y-0.5 hover:shadow-md"
 						>
 							{item.illustration ? (
-								<div class="relative aspect-[4/3] w-full overflow-hidden bg-[color-mix(in_oklch,var(--color-muted)_12%,var(--color-background))]">
+								<button
+									type="button"
+									class="group/trigger relative aspect-[4/3] w-full cursor-zoom-in overflow-hidden border-0 bg-[color-mix(in_oklch,var(--color-muted)_12%,var(--color-background))] p-0 text-left"
+									data-lightbox-trigger
+									data-lightbox-index={lightboxIndexById.get(item.id)}
+									aria-label={`${t('gallery.openImage')}: ${item.name[lang]}`}
+								>
 									<Picture
 										src={item.illustration}
 										alt={item.name[lang]}
 										formats={['avif', 'webp']}
-										class="absolute inset-0 size-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
+										class="pointer-events-none absolute inset-0 size-full object-cover transition-transform duration-500 group-hover/trigger:scale-[1.04]"
 										loading="lazy"
 										decoding="async"
 										sizes="(min-width: 1280px) 30vw, (min-width: 640px) 45vw, 92vw"
@@ -214,7 +268,13 @@ const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp
 										class="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 to-transparent"
 										aria-hidden="true"
 									/>
-								</div>
+									<span
+										class="pointer-events-none absolute right-3 top-3 inline-flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white opacity-0 backdrop-blur-sm transition-opacity duration-200 group-hover/trigger:opacity-100"
+										aria-hidden="true"
+									>
+										<Icon name="tabler:zoom-in" class="h-4 w-4" />
+									</span>
+								</button>
 							) : null}
 							<div class="flex flex-1 flex-col p-6">
 								<div class="flex items-start justify-between gap-4">
@@ -275,6 +335,8 @@ const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp
 		</div>
 	</section>
 
+	<MinigolfSection lang={lang} />
+
 	<section id="ubicacio" class="scroll-mt-28 px-4 py-16 sm:px-6 md:scroll-mt-32 md:py-20">
 		<div class="mx-auto grid max-w-6xl gap-10 lg:grid-cols-2 lg:items-start">
 			<div>
@@ -298,4 +360,6 @@ const waUrl = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(t('whatsapp
 			</div>
 		</div>
 	</section>
+
+	<GalleryLightbox lang={lang} images={lightboxImages} />
 </div>
