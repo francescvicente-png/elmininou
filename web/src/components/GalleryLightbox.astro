@@ -41,12 +41,31 @@ import { Icon } from 'astro-icon/components';
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/config';
 import type { PhotoLicense } from '../types/photo-license';
+import { splitDishDescription } from '../data/services';
+
+/**
+ * Optional rich payload for restaurant-menu dishes. When present the
+ * lightbox switches from gallery-mode (caption-only) to a magazine
+ * split layout (image + info panel with ingredients, allergens and
+ * price). Generic gallery callers omit this field and get the legacy
+ * caption-only behaviour.
+ */
+export interface DishLightboxData {
+	categoryLabel: string;
+	description: string;
+	price: number | null;
+	pendingConfirmation: boolean;
+	pendingBadgeLabel: string;
+	pricePendingLabel: string;
+	priceLocale: string;
+}
 
 export interface LightboxImage {
 	src: ImageMetadata;
 	alt: string;
 	photographer: string;
 	photoLicense?: PhotoLicense;
+	dish?: DishLightboxData;
 }
 
 interface Props {
@@ -58,6 +77,12 @@ const { lang, images } = Astro.props;
 const t = useTranslations(lang);
 const demoCaption = t('gallery.demoImageCaption');
 const aiDemoSuffix = t('gallery.aiDemoImageSuffix');
+const ingredientsLabel = t('lightbox.ingredientsLabel');
+const allergensLabel = t('lightbox.allergensLabel');
+const noKnownAllergens = t('lightbox.noKnownAllergens');
+const priceLabel = t('lightbox.priceFromLabel');
+const dishDisclaimer = t('lightbox.disclaimer');
+const illustrativeNote = t('lightbox.illustrativeNote');
 ---
 
 <dialog class="gallery-lightbox" data-gallery-lightbox aria-label={t('gallery.openImage')}>
@@ -96,6 +121,89 @@ const aiDemoSuffix = t('gallery.aiDemoImageSuffix');
 					license === 'unsplash-demo' ||
 					license === 'ai-demo' ||
 					(license === 'own' && img.photographer.trim().length > 0);
+
+				if (img.dish) {
+					const dish = img.dish;
+					const split = splitDishDescription(dish.description);
+					const formattedPrice =
+						dish.price === null
+							? null
+							: new Intl.NumberFormat(dish.priceLocale, {
+									style: 'currency',
+									currency: 'EUR',
+									maximumFractionDigits: dish.price % 1 === 0 ? 0 : 2,
+								}).format(dish.price);
+					return (
+						<figure
+							class="lightbox-slide lightbox-slide--dish"
+							data-lightbox-slide={idx}
+						>
+							<div class="lightbox-image-wrap">
+								<Picture
+									src={img.src}
+									alt={img.alt}
+									formats={['avif', 'webp']}
+									class="lightbox-img lightbox-img--dish"
+									loading="lazy"
+									decoding="async"
+									sizes="(min-width: 1024px) 55vw, 100vw"
+								/>
+							</div>
+							<aside class="lightbox-dish-panel" aria-label={img.alt}>
+								<div class="lightbox-dish-panel-inner">
+									<p class="dish-eyebrow">{dish.categoryLabel}</p>
+									<h2 class="dish-name">{img.alt}</h2>
+									<div class="dish-price-row">
+										<div class="dish-price-block">
+											<span class="dish-price-label">{priceLabel}</span>
+											<span class="dish-price-value">
+												{formattedPrice ?? dish.pricePendingLabel}
+											</span>
+										</div>
+										{dish.pendingConfirmation && (
+											<span class="dish-pending-badge">
+												<Icon
+													name="tabler:hourglass"
+													class="h-3.5 w-3.5"
+													aria-hidden="true"
+												/>
+												{dish.pendingBadgeLabel}
+											</span>
+										)}
+									</div>
+									<div class="dish-divider" aria-hidden="true" />
+									<section class="dish-section">
+										<h3 class="dish-section-label">{ingredientsLabel}</h3>
+										<p class="dish-section-body">{split.ingredients}</p>
+									</section>
+									<section class="dish-section dish-allergens" aria-label={allergensLabel}>
+										<div class="dish-allergens-header">
+											<Icon
+												name="tabler:alert-triangle"
+												class="dish-allergens-icon"
+												aria-hidden="true"
+											/>
+											<h3 class="dish-section-label dish-allergens-label">{allergensLabel}</h3>
+										</div>
+										<p class="dish-section-body">
+											{split.allergens ?? noKnownAllergens}
+										</p>
+									</section>
+									<p class="dish-disclaimer">
+										<Icon
+											name="tabler:info-circle"
+											class="h-3.5 w-3.5 shrink-0"
+											aria-hidden="true"
+										/>
+										<span>{dishDisclaimer}</span>
+									</p>
+									<p class="dish-illustrative">{illustrativeNote}</p>
+								</div>
+							</aside>
+						</figure>
+					);
+				}
+
 				return (
 					<figure class="lightbox-slide" data-lightbox-slide={idx}>
 						<Picture
@@ -331,4 +439,272 @@ const aiDemoSuffix = t('gallery.aiDemoImageSuffix');
 			scroll-behavior: auto;
 		}
 	}
+
+	/* ---------- Dish-mode slide (magazine split layout) ---------- */
+	.lightbox-slide--dish {
+		display: grid;
+		padding: 0;
+		grid-template-columns: 1fr;
+		grid-template-rows: auto 1fr;
+		gap: 0;
+		align-items: stretch;
+		justify-items: stretch;
+		background: oklch(10% 0.005 60);
+	}
+
+	.lightbox-slide--dish .lightbox-image-wrap {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		min-height: 0;
+		overflow: hidden;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		background:
+			radial-gradient(
+				ellipse at 50% 35%,
+				color-mix(in oklch, var(--color-primary) 14%, transparent) 0%,
+				transparent 65%
+			),
+			oklch(8% 0.008 50);
+	}
+
+	.lightbox-img--dish {
+		max-width: min(100%, 92vw);
+		width: auto;
+		height: auto;
+		max-height: min(56dvh, 56vh);
+		object-fit: contain;
+		display: block;
+		filter: drop-shadow(0 24px 48px oklch(0% 0 0 / 0.55));
+	}
+
+	.lightbox-dish-panel {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		min-height: 0;
+		overflow-y: auto;
+		background:
+			linear-gradient(
+				180deg,
+				oklch(13% 0.012 60) 0%,
+				oklch(10% 0.008 50) 100%
+			);
+		color: var(--color-on-image);
+		border-top: 1px solid color-mix(in oklch, var(--color-primary) 30%, transparent);
+		box-shadow: inset 0 1px 0 0 color-mix(in oklch, var(--color-on-image) 8%, transparent);
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.lightbox-dish-panel-inner {
+		padding: 1.5rem 1.5rem 4.5rem;
+		max-width: 36rem;
+		margin: 0 auto;
+		width: 100%;
+	}
+
+	.dish-eyebrow {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.26em;
+		color: var(--color-primary);
+		margin: 0 0 0.85rem;
+	}
+
+	.dish-name {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 600;
+		font-size: clamp(1.85rem, 4vw, 2.85rem);
+		line-height: 1.05;
+		letter-spacing: -0.015em;
+		color: var(--color-on-image);
+		margin: 0;
+		text-wrap: balance;
+	}
+
+	.dish-price-row {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem 1.25rem;
+		margin-top: 1.25rem;
+	}
+
+	.dish-price-block {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+	}
+
+	.dish-price-label {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.65rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: color-mix(in oklch, var(--color-on-image) 65%, transparent);
+	}
+
+	.dish-price-value {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 600;
+		font-size: 1.85rem;
+		line-height: 1;
+		font-variant-numeric: tabular-nums;
+		color: var(--color-on-image);
+	}
+
+	.dish-pending-badge {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.12em;
+		padding: 0.35rem 0.7rem;
+		border-radius: 9999px;
+		color: color-mix(in oklch, var(--color-primary) 78%, white);
+		background: color-mix(in oklch, var(--color-primary) 14%, transparent);
+		border: 1px solid color-mix(in oklch, var(--color-primary) 38%, transparent);
+	}
+
+	.dish-divider {
+		margin: 1.6rem 0 1.4rem;
+		height: 1px;
+		background: linear-gradient(
+			to right,
+			transparent 0%,
+			color-mix(in oklch, var(--color-primary) 34%, transparent) 14%,
+			color-mix(in oklch, var(--color-on-image) 14%, transparent) 50%,
+			color-mix(in oklch, var(--color-primary) 34%, transparent) 86%,
+			transparent 100%
+		);
+	}
+
+	.dish-section {
+		margin-top: 1.1rem;
+	}
+
+	.dish-section:first-of-type {
+		margin-top: 0;
+	}
+
+	.dish-section-label {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.68rem;
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.2em;
+		color: color-mix(in oklch, var(--color-on-image) 72%, transparent);
+		margin: 0 0 0.5rem;
+	}
+
+	.dish-section-body {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 1rem;
+		line-height: 1.62;
+		color: color-mix(in oklch, var(--color-on-image) 92%, transparent);
+		margin: 0;
+		text-wrap: pretty;
+		max-width: 60ch;
+	}
+
+	.dish-allergens {
+		margin-top: 1.4rem;
+		padding: 1.15rem 1.15rem 1.05rem;
+		border-radius: 0.85rem;
+		background: color-mix(in oklch, var(--color-primary) 11%, transparent);
+		border: 1px solid color-mix(in oklch, var(--color-primary) 28%, transparent);
+		box-shadow: inset 0 1px 0 0 color-mix(in oklch, var(--color-on-image) 5%, transparent);
+	}
+
+	.dish-allergens-header {
+		display: flex;
+		align-items: center;
+		gap: 0.55rem;
+		margin-bottom: 0.4rem;
+	}
+
+	.dish-allergens-icon {
+		width: 1.1rem;
+		height: 1.1rem;
+		color: color-mix(in oklch, var(--color-primary) 88%, white);
+		flex-shrink: 0;
+	}
+
+	.dish-allergens-label {
+		margin: 0;
+		color: color-mix(in oklch, var(--color-primary) 88%, white);
+	}
+
+	.dish-allergens .dish-section-body {
+		color: color-mix(in oklch, var(--color-on-image) 96%, transparent);
+		font-weight: 500;
+	}
+
+	.dish-disclaimer {
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		margin: 1.6rem 0 0;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.78rem;
+		line-height: 1.5;
+		color: color-mix(in oklch, var(--color-on-image) 70%, transparent);
+	}
+
+	.dish-disclaimer :global(svg) {
+		margin-top: 0.18rem;
+		color: color-mix(in oklch, var(--color-primary) 75%, transparent);
+	}
+
+	.dish-illustrative {
+		margin: 0.65rem 0 0;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		line-height: 1.5;
+		font-style: italic;
+		color: color-mix(in oklch, var(--color-on-image) 50%, transparent);
+	}
+
+	/* Desktop split layout: image left, info panel right. */
+	@media (min-width: 1024px) {
+		.lightbox-slide--dish {
+			grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+			grid-template-rows: 1fr;
+		}
+
+		.lightbox-img--dish {
+			max-height: min(86dvh, 86vh);
+		}
+
+		.lightbox-dish-panel {
+			border-top: none;
+			border-left: 1px solid
+				color-mix(in oklch, var(--color-primary) 30%, transparent);
+		}
+
+		.lightbox-dish-panel-inner {
+			padding: 4.5rem 3rem 4.5rem 2.75rem;
+		}
+
+		.dish-name {
+			font-size: clamp(2.2rem, 2.4vw + 1rem, 3.1rem);
+		}
+	}
+
+	/* The dish layout already has a built-in scroll panel; the legacy
+	   .lightbox-slide padding/centering would fight against it. */
+	.lightbox-slide--dish > * {
+		min-width: 0;
+	}
+
+	/* Hide global dot indicators when the image fills the dialog
+	   in dish-mode — the panel sits below them on mobile. */
 </style>

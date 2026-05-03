@@ -46,6 +46,8 @@ export default defineConfig({
           'calendar',
           'info-circle',
           'message-circle',
+          'alert-triangle',
+          'hourglass',
           // Content / domain
           'scissors',
           'sparkles',

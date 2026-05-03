@@ -9,11 +9,17 @@ import ServicesCategoryNav from '../../components/sections/ServicesCategoryNav.a
 import ServicesGroupedCatalog from '../../components/sections/ServicesGroupedCatalog.astro';
 import { Icon } from 'astro-icon/components';
 import GalleryLightbox from '../../components/GalleryLightbox.astro';
-import { getServicesGrouped, getServiceName } from '../../data/services';
+import {
+	getServicesGrouped,
+	getServiceName,
+	getServiceDescription,
+} from '../../data/services';
 import { MENU_PAGE_HERO_IMAGE } from '../../data/menu-illustrations';
 import { business } from '../../data/business';
 import { getBookingCta } from '../../data/site';
 import { useTranslations } from '../../i18n/utils';
+import type { UIKey } from '../../i18n/ui';
+import type { ServiceCategoryKey } from '../../data/services';
 
 const lang = 'ca' as const;
 const t = useTranslations(lang);
@@ -23,6 +29,20 @@ const firstIllustratedServiceId = grouped
 	.flatMap((g) => g.items)
 	.find((s) => s.illustration)?.id;
 
+const categoryLabelKey: Record<ServiceCategoryKey, UIKey> = {
+	starters: 'services.categoryStarters',
+	grills: 'services.categoryGrills',
+	pasta: 'services.categoryPasta',
+	combos: 'services.categoryCombos',
+	'sandwiches-hot': 'services.categorySandwichesHot',
+	'sandwiches-cold': 'services.categorySandwichesCold',
+	tapas: 'services.categoryTapas',
+	drinks: 'services.categoryDrinks',
+};
+
+const pendingBadgeLabel = t('services.pendingBadge');
+const pricePendingLabel = t('menu.pricePending');
+
 const lightboxImages = grouped
 	.flatMap((g) => g.items)
 	.filter((s) => s.illustration != null)
@@ -31,6 +51,15 @@ const lightboxImages = grouped
 		alt: getServiceName(s, lang),
 		photographer: '',
 		photoLicense: 'ai-demo' as const,
+		dish: {
+			categoryLabel: t(categoryLabelKey[s.category]),
+			description: getServiceDescription(s, lang),
+			price: s.price,
+			pendingConfirmation: s.pendingConfirmation ?? false,
+			pendingBadgeLabel,
+			pricePendingLabel,
+			priceLocale: 'ca-ES',
+		},
 	}));
 ---
 

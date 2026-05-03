@@ -778,6 +778,29 @@ export function getServiceDescription(service: Service, lang: Lang): string {
 	return service.description[lang];
 }
 
+/**
+ * Splits a dish description into ingredients + allergens parts.
+ * Source descriptions follow the convention "<ingredients>. Al·lèrgens (text): <allergens>"
+ * (CA) or "<ingredients>. Alérgenos (texto): <allergens>" (ES). Tolerates real-world
+ * source typos: "Al·lègens", "Alèrgens", "Alérgeno", optional parenthetical, optional
+ * trailing period.
+ */
+export interface SplitDescription {
+	ingredients: string;
+	allergens: string | null;
+}
+export function splitDishDescription(text: string): SplitDescription {
+	// Match: "Al·lèrgens", "Al·lègens", "Alèrgens", "Al·lergens", "Alérgenos",
+	// "Alérgeno", followed by optional "(text)"/"(texto)" and the colon.
+	const re =
+		/(?:Al[·.]?l?[èé]r?ge?n?s?|Al[èé]rgenos?)\s*(?:\([^)]*\))?\s*:\s*/i;
+	const match = re.exec(text);
+	if (!match) return { ingredients: text.trim(), allergens: null };
+	const before = text.slice(0, match.index).trim().replace(/[.,;]+$/, '').trim();
+	const after = text.slice(match.index + match[0].length).trim().replace(/\.$/, '').trim();
+	return { ingredients: before, allergens: after.length ? after : null };
+}
+
 export function getFeaturedServices(): ReadonlyArray<Service> {
 	return services.filter((s) => s.featured);
 }

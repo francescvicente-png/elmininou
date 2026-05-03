@@ -338,6 +338,13 @@ export const ui = {
 		'services.policyHeading': 'Reserves i suggerència de pla',
 		'services.bookingPolicyNote':
 			'Les brases van amb patates fregides (text de carta original). Els canvis de guarnició o la disponibilitat de plats els confirmeu trucant o per WhatsApp. Preu dels canelons subjecte a confirmació.',
+		'lightbox.ingredientsLabel': 'Ingredients',
+		'lightbox.allergensLabel': 'Al·lèrgens',
+		'lightbox.noKnownAllergens': 'Sense al·lèrgens declarats al text font.',
+		'lightbox.priceFromLabel': 'Preu',
+		'lightbox.disclaimer':
+			'Confirmeu sempre els al·lèrgens i la disponibilitat al servei. La carta impresa fa fe.',
+		'lightbox.illustrativeNote': 'Imatge orientativa generada amb IA — el muntatge real al plat pot variar.',
 	},
 	es: {
 		'nav.home': 'Inicio',
@@ -681,6 +688,13 @@ export const ui = {
 		'services.policyHeading': 'Reservas y consejos de plan',
 		'services.bookingPolicyNote':
 			'Las brasas van con patatas fritas según carta impresa. Confirmar cambios de guarnición y disponibilidad por teléfono o WhatsApp. Precio de canelones sujeto a confirmación.',
+		'lightbox.ingredientsLabel': 'Ingredientes',
+		'lightbox.allergensLabel': 'Alérgenos',
+		'lightbox.noKnownAllergens': 'Sin alérgenos declarados en el texto fuente.',
+		'lightbox.priceFromLabel': 'Precio',
+		'lightbox.disclaimer':
+			'Confirma siempre los alérgenos y la disponibilidad en sala. La carta impresa manda.',
+		'lightbox.illustrativeNote': 'Imagen orientativa generada con IA — el emplatado real puede variar.',
 	},
 } as const;
 
