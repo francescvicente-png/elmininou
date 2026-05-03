@@ -1,7 +1,8 @@
 ---
 import { useTranslations } from '../i18n/utils';
 import type { Lang } from '../i18n/config';
-import { business } from '../data/business';
+import { business, googleReviews } from '../data/business';
+import { googleReviewsPublicUrl } from '../data/reviews';
 import { getRoutePair } from '../i18n/routes';
 import { Icon } from 'astro-icon/components';
 import Heading from './Heading.astro';
@@ -13,6 +14,16 @@ interface Props {
 const { lang } = Astro.props;
 const t = useTranslations(lang);
 const currentYear = new Date().getFullYear();
+
+const locale = lang === 'ca' ? 'ca-ES' : 'es-ES';
+const ratingLabel = googleReviews.rating.toLocaleString(locale, {
+	minimumFractionDigits: 1,
+	maximumFractionDigits: 1,
+});
+const reviewsLinkLabel =
+	lang === 'ca'
+		? `Ressenyes a Google (${ratingLabel} ★)`
+		: `Reseñas en Google (${ratingLabel} ★)`;
 
 const menuHref = getRoutePair('menu')[lang];
 const galleryHref = getRoutePair('gallery')[lang];
@@ -167,6 +178,17 @@ const brandLogoSrc = '';
 						>
 							<Icon name="tabler:map-pin" class="h-4 w-4" aria-hidden="true" />
 							Google Maps
+						</a>
+					</li>
+					<li>
+						<a
+							href={googleReviewsPublicUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="inline-flex items-center gap-2 text-foreground hover:text-primary transition-colors"
+						>
+							<Icon name="tabler:star-filled" class="h-4 w-4" aria-hidden="true" />
+							{reviewsLinkLabel}
 						</a>
 					</li>
 				</ul>

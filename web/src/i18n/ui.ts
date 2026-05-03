@@ -266,12 +266,6 @@ export const ui = {
 		'bridal.galleryLightboxOpenLabel': 'Ampliar',
 		'bridal.galleryLightboxPrev': 'Imatge anterior',
 		'bridal.galleryLightboxNext': 'Imatge següent',
-		'bridal.testimonialEyebrow': 'Veu de clientela',
-		'bridal.testimonialQuote':
-			"Vam quedar més gent del que esperàvem — ens van reorganitzar taula i la brasa va sortir igual de puntual.",
-		'bridal.testimonialAuthor': 'Família habitual al municipi',
-		'bridal.testimonialContext':
-			'Tò exemple — reemplaçar per cites reals quan decidim destacar grup mitjà',
 		'bridal.faqEyebrow': 'Detalls',
 		'bridal.faqTitleNew': 'Preguntes que ens fan sovint',
 		'bridal.faqIntroNew':
@@ -617,12 +611,6 @@ export const ui = {
 		'bridal.galleryLightboxOpenLabel': 'Ampliar',
 		'bridal.galleryLightboxPrev': 'Imagen anterior',
 		'bridal.galleryLightboxNext': 'Imagen siguiente',
-		'bridal.testimonialEyebrow': 'Voz del comensal',
-		'bridal.testimonialQuote':
-			'Veníamos un grupo improvisado y reorganizaron mesas igual salió la brasa en hora.',
-		'bridal.testimonialAuthor': 'Texto ejemplo',
-		'bridal.testimonialContext':
-			'Texto modelo — cambiar cuando existan testimonios reales para grupos',
 		'bridal.faqEyebrow': 'Detalles',
 		'bridal.faqTitleNew': 'Preguntas que nos hacen a menudo',
 		'bridal.faqIntroNew':

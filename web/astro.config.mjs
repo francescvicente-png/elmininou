@@ -38,6 +38,7 @@ export default defineConfig({
           'arrows-maximize',
           'zoom-in',
           // Communication / contact
+          'brand-google',
           'brand-instagram',
           'brand-whatsapp',
           'mail',
