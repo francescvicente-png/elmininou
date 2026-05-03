@@ -18,6 +18,8 @@ Web pública del restaurant **El mini nou** de l'Ametlla del Vallès. Sirve como
 - **Pàgina de carta completa** amb tots els plats organitzats per seccions (entrants, brases, pastes, combinats, entrepans calents, entrepans freds, tapes, begudes).
 - **Foto editorial per cada plat** de la carta (54 imatges), generades com a referència visual.
 - **Visualització ampliada de cada plat** en obrir-ne la imatge: a part de la foto en gran, mostra el nom, el preu, els ingredients, els al·lèrgens destacats en un bloc d'avís i un recordatori de confirmar sempre al servei.
+- **Plats firma al començament de la carta**: tres clàssics destacats amb foto gran i preu visible per ajudar al client que entra per primer cop a decidir.
+- **Filtres dietètics ràpids** a la carta amb etiquetes a cada plat (brasa, vegetarià, sense gluten, per compartir, picant). Es poden combinar — per exemple "brasa + per compartir" — i el catàleg s'adapta al moment.
 - Galeria de fotos del local i de plats com a mostra ambient.
 - Botó flotant de WhatsApp i botó de "trucar per reservar" sempre visibles.
 - Pàgines de contacte, com arribar i preguntes freqüents.
@@ -71,7 +73,7 @@ Beneficis esperats (estimats, encara per validar):
 - Galeria de fotos reals del local i de plats reals (sessió fotogràfica).
 - Botó "compartir carta" per WhatsApp directe des de cada plat.
 - Versió "imprimible" de la carta en PDF per al servei en sala.
-- Avís especial per al·lèrgens crítics (gluten, fruita seca, lactosa) com a filtre o icona destacada.
+- Sistema d'icones més evident per al·lèrgens crítics (fruita seca, lactosa, ou) plat per plat — actualment hi ha el filtre "sense gluten", però es podria reforçar visualment per tot tipus d'al·lèrgens.
 
 ---
 
