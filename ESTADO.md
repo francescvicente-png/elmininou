@@ -2,7 +2,7 @@
 
 > **Última actualización:** 03/05/2026
 > **Estado general:** 🟡 En desarrollo
-> **Versión actual:** pre-producción (web en revisión antes de presentar al restaurant)
+> **Versión actual:** pre-producción (web en revisión antes de presentar al restaurant — incorporadas les ressenyes reals de Google)
 
 ---
 
@@ -21,6 +21,7 @@ Web pública del restaurant **El mini nou** de l'Ametlla del Vallès. Sirve como
 - Galeria de fotos del local i de plats com a mostra ambient.
 - Botó flotant de WhatsApp i botó de "trucar per reservar" sempre visibles.
 - Pàgines de contacte, com arribar i preguntes freqüents.
+- **Bloc de ressenyes reals de Google al home**: les 8 ressenyes amb text es mostren en una composició editorial tipus bento (cita destacada gran + tarjetes), amb mitjana 5,0 ★ i comptador de les 11 ressenyes verificades. Les 3 valoracions sense text es comptabilitzen però no es citen. Cada cita inclou nom de l'autor, data, distintiu de "Local Guide" quan correspon i marca de "Ressenya verificada a Google". Si la ressenya original és en castellà, la versió en català inclou un avís de traducció automàtica.
 - Pàgines legals (avís legal, política de privacitat, política de cookies).
 - Banner de cookies amb opció d'acceptar / rebutjar.
 - Versió completa en català i en castellà.
@@ -68,7 +69,6 @@ Beneficis esperats (estimats, encara per validar):
 
 - Pàgina pública de menú del dia que es pugui actualitzar setmanalment sense tocar codi.
 - Galeria de fotos reals del local i de plats reals (sessió fotogràfica).
-- Integració amb Google Reseñas per mostrar opinions de clients.
 - Botó "compartir carta" per WhatsApp directe des de cada plat.
 - Versió "imprimible" de la carta en PDF per al servei en sala.
 - Avís especial per al·lèrgens crítics (gluten, fruita seca, lactosa) com a filtre o icona destacada.

@@ -5,6 +5,7 @@ import {
 	googleReviews,
 	type DayKey,
 } from '../../data/business';
+import { reviews } from '../../data/reviews';
 import { site } from '../../data/site';
 
 interface Props {
@@ -60,6 +61,28 @@ const sameAs: string[] = [
 const description =
 	'Restaurant and bar in L’Ametlla del Vallès (Barcelona): grills, combined plates, sandwiches and tapas — check the online menu and confirm allergens on site.';
 
+// Schema.org Review entries — one per real Google review with text. The
+// star-only reviews (Oriol, Adrià, Guillem at the time of writing) are
+// counted in `aggregateRating.reviewCount` but skipped here because
+// Schema.org requires `reviewBody` content for individual Review nodes
+// to be eligible as rich-result data.
+const reviewSchema = reviews.map((r) => ({
+	'@type': 'Review',
+	author: {
+		'@type': 'Person',
+		name: r.authorName,
+	},
+	datePublished: r.datePublished,
+	reviewBody: r.textEs,
+	inLanguage: r.language === 'de' ? 'de' : r.language,
+	reviewRating: {
+		'@type': 'Rating',
+		ratingValue: r.rating,
+		bestRating: 5,
+		worstRating: 1,
+	},
+}));
+
 const schema = {
 	'@context': 'https://schema.org',
 	'@type': 'Restaurant',
@@ -96,6 +119,7 @@ const schema = {
 		bestRating: 5,
 		worstRating: 1,
 	},
+	review: reviewSchema,
 	servesCuisine: 'Regional',
 };
 ---

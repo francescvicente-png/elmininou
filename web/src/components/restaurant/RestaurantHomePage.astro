@@ -20,6 +20,7 @@ import type { UIKey } from '../../i18n/ui';
 import Button from '../Button.astro';
 import GalleryLightbox from '../GalleryLightbox.astro';
 import MinigolfSection from '../sections/MinigolfSection.astro';
+import ReviewsBentoSection from '../sections/ReviewsBentoSection.astro';
 import homeRestaurantHeroCard from '../../assets/images/generated/home-restaurant-hero-card.jpg';
 
 interface Props {
@@ -334,6 +335,8 @@ const lightboxIndexById = new Map<string, number>();
 			</div>
 		</div>
 	</section>
+
+	<ReviewsBentoSection lang={lang} />
 
 	<MinigolfSection lang={lang} />
 

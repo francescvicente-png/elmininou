@@ -1,0 +1,908 @@
+---
+/**
+ * ReviewsBentoSection
+ *
+ * Editorial bento of all real Google reviews currently published for
+ * El mini nou. Replaces the previous "post-gallery hero" + "reviews
+ * cream-band" duo with a single, asymmetric block that owns the
+ * social-proof beat between the orange CTA and the minigolf feature.
+ *
+ * Composition:
+ *   - Editorial header: kicker "GOOGLE" · h2 display · rating snapshot.
+ *   - Bento (lg = 12 cols, md = 6 cols, sm = 1 col):
+ *       · Featured pull-quote (Olga, CA original) — biggest tile.
+ *       · Two long cards (Pol, Tony) on the right column.
+ *       · Three medium cards (Jamil, Nuria, Santi).
+ *       · Two compact cards (Angels, Pepi).
+ *       · One "+N valoracions sense text" tile that aggregates the
+ *         star-only reviews (Oriol, Adrià, Guillem at the time of
+ *         writing) without inventing a quote.
+ *   - Footer link to the public Google listing.
+ *
+ * All copy is verbatim from `src/data/reviews.ts`. The "translated
+ * automatically" note is preserved per card — the visitor must always
+ * know when they're reading a translation, not the original words.
+ *
+ * Honesty contract:
+ *   - The aggregated tile uses
+ *     `googleReviews.count - reviews.length` so it stays correct when
+ *     a future review with text bumps the dataset. It never names the
+ *     authors who left only stars (no quote = no card).
+ *   - We never round 4.x ratings up to 5.0 — the snapshot in
+ *     `business.ts` is the ground truth.
+ */
+import { Icon } from 'astro-icon/components';
+import { useTranslations } from '../../i18n/utils';
+import type { Lang } from '../../i18n/config';
+import { reviews, googleReviewsPublicUrl } from '../../data/reviews';
+import { googleReviews } from '../../data/business';
+import FadeInOnScroll from '../animations/FadeInOnScroll.astro';
+
+interface Props {
+	lang: Lang;
+}
+
+const { lang } = Astro.props;
+const t = useTranslations(lang);
+
+const locale = lang === 'ca' ? 'ca-ES' : 'es-ES';
+const ratingLabel = googleReviews.rating.toLocaleString(locale, {
+	minimumFractionDigits: 1,
+	maximumFractionDigits: 1,
+});
+const lastUpdatedLabel = new Date(googleReviews.lastUpdated).toLocaleDateString(
+	locale,
+	{ day: 'numeric', month: 'long', year: 'numeric' },
+);
+
+const featured = reviews.find((r) => r.featured) ?? reviews[0];
+const supporting = reviews.filter((r) => r !== featured);
+
+// Star-only reviews (no quote) are derived, never invented.
+const starOnlyCount = Math.max(googleReviews.count - reviews.length, 0);
+
+const copy = {
+	ca: {
+		kicker: 'Google',
+		title: 'Opinions de clients',
+		subtitlePrefix: 'Mitjana de',
+		subtitleSeparator: '★ a Google amb',
+		subtitleSuffix: 'ressenyes verificades.',
+		updatedLabel: 'Actualitzat',
+		featuredLeadIn: 'Ressenya destacada',
+		extraTitle: '+ ' + starOnlyCount + ' valoracions',
+		extraSubtitle:
+			starOnlyCount === 1
+				? 'd\'una persona que va deixar 5 ★ sense escriure cap text.'
+				: 'de persones que van deixar 5 ★ sense escriure cap text.',
+		extraCta: 'Veure-les a Google',
+		footerCta: 'Llegir totes les ressenyes a Google',
+		bentoLabel: 'Ressenyes verificades de Google',
+	},
+	es: {
+		kicker: 'Google',
+		title: 'Opiniones de clientes',
+		subtitlePrefix: 'Media de',
+		subtitleSeparator: '★ en Google con',
+		subtitleSuffix: 'reseñas verificadas.',
+		updatedLabel: 'Actualizado',
+		featuredLeadIn: 'Reseña destacada',
+		extraTitle: '+ ' + starOnlyCount + ' valoraciones',
+		extraSubtitle:
+			starOnlyCount === 1
+				? 'de una persona que dejó 5 ★ sin escribir comentario.'
+				: 'de personas que dejaron 5 ★ sin escribir comentario.',
+		extraCta: 'Verlas en Google',
+		footerCta: 'Leer todas las reseñas en Google',
+		bentoLabel: 'Reseñas verificadas en Google',
+	},
+}[lang];
+
+// Bento area assignment is order-dependent: cards consume areas from the
+// `bentoAreas` array so the CSS only has to wire areas to grid spans.
+const bentoAreas = ['pol', 'tony', 'nuria', 'jamil', 'santi', 'angels', 'pepi'] as const;
+type BentoArea = typeof bentoAreas[number];
+
+interface BentoCard {
+	area: BentoArea;
+	review: typeof reviews[number];
+}
+
+const bentoCards: BentoCard[] = supporting
+	.slice(0, bentoAreas.length)
+	.map((review, i) => ({ area: bentoAreas[i], review }));
+
+const stars5 = [1, 2, 3, 4, 5];
+
+const translationNoteKeyFor = (lang_: 'ca' | 'es' | 'de') =>
+	lang_ === 'de'
+		? 'reviews.translatedFromDe'
+		: lang_ === 'es'
+			? 'reviews.translatedFromEs'
+			: 'reviews.translatedFromCa';
+
+const renderText = (r: typeof reviews[number]) =>
+	lang === 'ca' && r.textCa ? r.textCa : r.textEs;
+
+const renderedLanguage = (r: typeof reviews[number]): 'ca' | 'es' =>
+	lang === 'ca' && r.textCa ? 'ca' : 'es';
+
+const isTranslatedFor = (r: typeof reviews[number]) =>
+	r.language !== renderedLanguage(r);
+
+const dateFor = (r: typeof reviews[number]) =>
+	lang === 'ca' ? r.dateCa : r.dateEs;
+---
+
+<section
+	id="ressenyes"
+	class="reviews-bento scroll-mt-28 px-4 sm:px-6 md:scroll-mt-32"
+	aria-labelledby="reviews-bento-heading"
+>
+	<div class="reviews-bento-shell mx-auto max-w-6xl">
+		<FadeInOnScroll delay={80}>
+			<header class="reviews-bento-header">
+				<p class="reviews-bento-kicker">
+					<Icon name="tabler:brand-google" class="reviews-bento-kicker-icon" aria-hidden="true" />
+					<span>{copy.kicker}</span>
+				</p>
+				<h2 id="reviews-bento-heading" class="reviews-bento-title">
+					{copy.title}
+				</h2>
+				<div class="reviews-bento-rating">
+					<span
+						class="reviews-bento-stars"
+						role="img"
+						aria-label={t('reviews.starsAlt').replace('{rating}', ratingLabel)}
+					>
+						{stars5.map((s) => (
+							<Icon
+								name={s <= Math.floor(googleReviews.rating + 0.05) ? 'tabler:star-filled' : 'tabler:star'}
+								class="reviews-bento-star"
+								aria-hidden="true"
+							/>
+						))}
+					</span>
+					<p class="reviews-bento-rating-line">
+						<span class="reviews-bento-rating-number tabular-nums">{ratingLabel}</span>
+						<span aria-hidden="true">·</span>
+						<span class="reviews-bento-rating-count">
+							<span class="tabular-nums">{googleReviews.count}</span> {lang === 'ca' ? 'ressenyes' : 'reseñas'}
+						</span>
+					</p>
+					<p class="reviews-bento-updated">
+						{copy.updatedLabel}: {lastUpdatedLabel}
+					</p>
+				</div>
+			</header>
+		</FadeInOnScroll>
+
+		<FadeInOnScroll delay={140}>
+			<div class="reviews-bento-grid" role="list" aria-label={copy.bentoLabel}>
+				{/* Featured pull-quote — Olga */}
+				<article
+					class="reviews-bento-card reviews-bento-featured"
+					data-area="featured"
+					role="listitem"
+					lang={renderedLanguage(featured)}
+				>
+					<p class="reviews-bento-featured-eyebrow">
+						<Icon name="tabler:quote" class="reviews-bento-featured-eyebrow-icon" aria-hidden="true" />
+						<span>{copy.featuredLeadIn}</span>
+					</p>
+					<blockquote class="reviews-bento-featured-quote">
+						<span class="reviews-bento-featured-mark" aria-hidden="true">&#10078;</span>
+						<p class="reviews-bento-featured-text">{renderText(featured)}</p>
+					</blockquote>
+					<footer class="reviews-bento-featured-footer">
+						<div class="reviews-bento-featured-author">
+							<span class="reviews-bento-avatar reviews-bento-avatar-large" aria-hidden="true">
+								{featured.authorInitial}
+							</span>
+							<div class="reviews-bento-author-meta">
+								<p class="reviews-bento-author-name">{featured.authorName}</p>
+								<p class="reviews-bento-author-sub">
+									{featured.isLocalGuide && (
+										<>
+											<span class="reviews-bento-local-guide">
+												{t('reviews.localGuide')}
+											</span>
+											<span aria-hidden="true">·</span>
+										</>
+									)}
+									<span>{dateFor(featured)}</span>
+								</p>
+							</div>
+						</div>
+						<span
+							class="reviews-bento-card-stars"
+							role="img"
+							aria-label={t('reviews.starsAlt').replace('{rating}', String(featured.rating))}
+						>
+							{stars5.map((s) => (
+								<Icon
+									name={s <= featured.rating ? 'tabler:star-filled' : 'tabler:star'}
+									class="reviews-bento-card-star"
+									aria-hidden="true"
+								/>
+							))}
+						</span>
+					</footer>
+					<p class="reviews-bento-verified">
+						<Icon name="tabler:circle-check" class="reviews-bento-verified-icon" aria-hidden="true" />
+						<span>{t('reviews.verifiedBadge')}</span>
+					</p>
+					{isTranslatedFor(featured) && (
+						<p class="reviews-bento-translated">
+							{t(translationNoteKeyFor(featured.language))}
+						</p>
+					)}
+				</article>
+
+				{/* Standard cards (Pol, Tony, Nuria, Jamil, Santi, Angels, Pepi) */}
+				{bentoCards.map(({ area, review }) => (
+					<article
+						class="reviews-bento-card reviews-bento-quote-card"
+						data-area={area}
+						role="listitem"
+						lang={renderedLanguage(review)}
+					>
+						<header class="reviews-bento-card-header">
+							<div class="reviews-bento-card-author">
+								<span class="reviews-bento-avatar" aria-hidden="true">
+									{review.authorInitial}
+								</span>
+								<div class="reviews-bento-author-meta">
+									<p class="reviews-bento-author-name">{review.authorName}</p>
+									<p class="reviews-bento-author-sub">
+										{review.isLocalGuide && (
+											<>
+												<span class="reviews-bento-local-guide">
+													{t('reviews.localGuide')}
+												</span>
+												<span aria-hidden="true">·</span>
+											</>
+										)}
+										<span>{dateFor(review)}</span>
+									</p>
+								</div>
+							</div>
+							<span
+								class="reviews-bento-card-stars"
+								role="img"
+								aria-label={t('reviews.starsAlt').replace('{rating}', String(review.rating))}
+							>
+								{stars5.map((s) => (
+									<Icon
+										name={s <= review.rating ? 'tabler:star-filled' : 'tabler:star'}
+										class="reviews-bento-card-star"
+										aria-hidden="true"
+									/>
+								))}
+							</span>
+						</header>
+						<blockquote class="reviews-bento-card-quote">
+							<p>“{renderText(review)}”</p>
+						</blockquote>
+						<footer class="reviews-bento-card-footer">
+							<p class="reviews-bento-verified">
+								<Icon name="tabler:circle-check" class="reviews-bento-verified-icon" aria-hidden="true" />
+								<span>{t('reviews.verifiedBadge')}</span>
+							</p>
+							{isTranslatedFor(review) && (
+								<p class="reviews-bento-translated reviews-bento-translated-inline">
+									{t(translationNoteKeyFor(review.language))}
+								</p>
+							)}
+						</footer>
+					</article>
+				))}
+
+				{/* Star-only aggregator — only renders if there are real ratings without text */}
+				{starOnlyCount > 0 && (
+					<aside
+						class="reviews-bento-card reviews-bento-extra"
+						data-area="extra"
+						role="listitem"
+					>
+						<span
+							class="reviews-bento-card-stars reviews-bento-extra-stars"
+							role="img"
+							aria-label={t('reviews.starsAlt').replace('{rating}', '5')}
+						>
+							{stars5.map(() => (
+								<Icon name="tabler:star-filled" class="reviews-bento-card-star" aria-hidden="true" />
+							))}
+						</span>
+						<p class="reviews-bento-extra-title">{copy.extraTitle}</p>
+						<p class="reviews-bento-extra-sub">{copy.extraSubtitle}</p>
+						<a
+							href={googleReviewsPublicUrl}
+							target="_blank"
+							rel="noopener noreferrer"
+							class="reviews-bento-extra-link"
+						>
+							<span>{copy.extraCta}</span>
+							<Icon name="tabler:arrow-up-right" class="reviews-bento-extra-link-icon" aria-hidden="true" />
+						</a>
+					</aside>
+				)}
+			</div>
+		</FadeInOnScroll>
+
+		<FadeInOnScroll delay={200}>
+			<div class="reviews-bento-cta">
+				<a
+					href={googleReviewsPublicUrl}
+					target="_blank"
+					rel="noopener noreferrer"
+					class="reviews-bento-cta-link"
+				>
+					<Icon name="tabler:brand-google" class="reviews-bento-cta-icon" aria-hidden="true" />
+					<span>{copy.footerCta}</span>
+					<Icon name="tabler:arrow-up-right" class="reviews-bento-cta-arrow" aria-hidden="true" />
+				</a>
+			</div>
+		</FadeInOnScroll>
+	</div>
+</section>
+
+<style>
+	.reviews-bento {
+		padding-block: clamp(3.5rem, 8vw, 6rem);
+		background-color: var(--color-background);
+	}
+
+	.reviews-bento-shell {
+		display: flex;
+		flex-direction: column;
+		gap: clamp(2rem, 4vw, 3rem);
+	}
+
+	/* ───────────────────────── Header ───────────────────────── */
+
+	.reviews-bento-header {
+		display: grid;
+		gap: 1.5rem;
+		align-items: end;
+	}
+
+	@media (min-width: 768px) {
+		.reviews-bento-header {
+			grid-template-columns: 1fr auto;
+			gap: 2rem;
+		}
+	}
+
+	.reviews-bento-kicker {
+		grid-column: 1 / -1;
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-primary);
+		margin: 0;
+	}
+
+	.reviews-bento-kicker-icon {
+		width: 0.85rem;
+		height: 0.85rem;
+	}
+
+	.reviews-bento-title {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 600;
+		font-size: clamp(2.25rem, 4.5vw + 0.5rem, 4rem);
+		line-height: 1.05;
+		letter-spacing: -0.018em;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: balance;
+		max-width: 14ch;
+	}
+
+	.reviews-bento-rating {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		justify-self: start;
+	}
+
+	@media (min-width: 768px) {
+		.reviews-bento-rating {
+			justify-self: end;
+			text-align: right;
+			align-items: flex-end;
+		}
+	}
+
+	.reviews-bento-stars {
+		display: inline-flex;
+		gap: 2px;
+	}
+
+	.reviews-bento-star {
+		width: 1.25rem;
+		height: 1.25rem;
+		color: var(--color-rating, oklch(72% 0.18 80));
+	}
+
+	.reviews-bento-rating-line {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.5rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.95rem;
+		color: var(--color-foreground);
+		margin: 0;
+	}
+
+	.reviews-bento-rating-number {
+		font-family: var(--font-display), Georgia, serif;
+		font-size: 1.6rem;
+		font-weight: 600;
+		line-height: 1;
+	}
+
+	.reviews-bento-rating-count {
+		font-weight: 500;
+	}
+
+	.reviews-bento-updated {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.72rem;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	/* ───────────────────────── Bento grid ───────────────────────── */
+
+	.reviews-bento-grid {
+		display: grid;
+		grid-template-columns: 1fr;
+		grid-auto-rows: min-content;
+		gap: 1rem;
+	}
+
+	@media (min-width: 768px) {
+		.reviews-bento-grid {
+			grid-template-columns: repeat(6, 1fr);
+			gap: 1.25rem;
+			grid-template-areas:
+				'featured featured featured featured featured featured'
+				'pol pol pol tony tony tony'
+				'nuria nuria jamil jamil santi santi'
+				'angels angels pepi pepi extra extra';
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.reviews-bento-grid {
+			grid-template-columns: repeat(12, 1fr);
+			gap: 1.5rem;
+			grid-template-areas:
+				'featured featured featured featured featured featured featured pol pol pol pol pol'
+				'featured featured featured featured featured featured featured tony tony tony tony tony'
+				'nuria nuria nuria nuria jamil jamil jamil jamil santi santi santi santi'
+				'angels angels angels pepi pepi pepi extra extra extra extra extra extra';
+		}
+	}
+
+	[data-area='featured'] {
+		grid-area: featured;
+	}
+	[data-area='pol'] {
+		grid-area: pol;
+	}
+	[data-area='tony'] {
+		grid-area: tony;
+	}
+	[data-area='nuria'] {
+		grid-area: nuria;
+	}
+	[data-area='jamil'] {
+		grid-area: jamil;
+	}
+	[data-area='santi'] {
+		grid-area: santi;
+	}
+	[data-area='angels'] {
+		grid-area: angels;
+	}
+	[data-area='pepi'] {
+		grid-area: pepi;
+	}
+	[data-area='extra'] {
+		grid-area: extra;
+	}
+
+	/* ───────────────────────── Card base ───────────────────────── */
+
+	.reviews-bento-card {
+		position: relative;
+		display: flex;
+		flex-direction: column;
+		gap: 1rem;
+		padding: clamp(1.25rem, 2vw, 1.75rem);
+		background-color: var(--color-card, var(--color-background));
+		border: 1px solid var(--color-border);
+		border-radius: 1rem;
+		transition:
+			transform 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			border-color 400ms cubic-bezier(0.22, 1, 0.36, 1),
+			box-shadow 400ms cubic-bezier(0.22, 1, 0.36, 1);
+		will-change: transform;
+	}
+
+	.reviews-bento-card:hover {
+		transform: translateY(-3px);
+		border-color: color-mix(in oklch, var(--color-primary) 65%, var(--color-border));
+		box-shadow: 0 14px 36px -16px oklch(30% 0.08 50 / 0.25);
+	}
+
+	/* ───────────────────────── Featured ───────────────────────── */
+
+	.reviews-bento-featured {
+		gap: 1.25rem;
+		padding: clamp(1.5rem, 3vw, 2.5rem);
+		background:
+			linear-gradient(
+				160deg,
+				color-mix(in oklch, var(--color-primary) 10%, var(--color-card, var(--color-background))) 0%,
+				var(--color-card, var(--color-background)) 70%
+			);
+		overflow: hidden;
+	}
+
+	.reviews-bento-featured::before {
+		content: '';
+		position: absolute;
+		inset: 0;
+		pointer-events: none;
+		background: radial-gradient(
+			circle at 8% 6%,
+			color-mix(in oklch, var(--color-primary) 22%, transparent) 0%,
+			transparent 38%
+		);
+		opacity: 0.55;
+		mix-blend-mode: multiply;
+	}
+
+	.reviews-bento-featured > * {
+		position: relative;
+	}
+
+	.reviews-bento-featured-eyebrow {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.68rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.32em;
+		color: var(--color-primary);
+		margin: 0;
+	}
+
+	.reviews-bento-featured-eyebrow-icon {
+		width: 0.8rem;
+		height: 0.8rem;
+	}
+
+	.reviews-bento-featured-quote {
+		margin: 0;
+		padding: 0;
+		max-width: 28ch;
+	}
+
+	.reviews-bento-featured-mark {
+		display: block;
+		font-family: var(--font-display), Georgia, serif;
+		font-size: clamp(2.5rem, 5vw, 4rem);
+		line-height: 0.7;
+		color: var(--color-primary);
+		opacity: 0.55;
+		margin-bottom: 0.5rem;
+	}
+
+	.reviews-bento-featured-text {
+		font-family: var(--font-display), Georgia, serif;
+		font-style: italic;
+		font-size: clamp(1.4rem, 1.5vw + 1rem, 2.4rem);
+		line-height: 1.18;
+		letter-spacing: -0.012em;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: balance;
+	}
+
+	.reviews-bento-featured-footer {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		margin-top: auto;
+		padding-top: 1rem;
+		border-top: 1px solid color-mix(in oklch, var(--color-border) 70%, transparent);
+	}
+
+	.reviews-bento-featured-author {
+		display: flex;
+		align-items: center;
+		gap: 0.85rem;
+	}
+
+	/* ───────────────────────── Author block ───────────────────────── */
+
+	.reviews-bento-avatar {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		width: 2.25rem;
+		height: 2.25rem;
+		border-radius: 9999px;
+		background-color: color-mix(in oklch, var(--color-primary) 14%, transparent);
+		color: var(--color-primary);
+		font-family: var(--font-display), Georgia, serif;
+		font-size: 1rem;
+		font-weight: 600;
+		flex-shrink: 0;
+	}
+
+	.reviews-bento-avatar-large {
+		width: 2.6rem;
+		height: 2.6rem;
+		font-size: 1.15rem;
+	}
+
+	.reviews-bento-author-meta {
+		display: flex;
+		flex-direction: column;
+		gap: 0.15rem;
+		min-width: 0;
+	}
+
+	.reviews-bento-author-name {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-weight: 600;
+		font-size: 0.95rem;
+		color: var(--color-foreground);
+		line-height: 1.2;
+		margin: 0;
+		text-wrap: balance;
+	}
+
+	.reviews-bento-author-sub {
+		display: flex;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.78rem;
+		color: var(--color-muted);
+		margin: 0;
+		line-height: 1.3;
+	}
+
+	.reviews-bento-local-guide {
+		font-size: 0.68rem;
+		font-weight: 600;
+		text-transform: uppercase;
+		letter-spacing: 0.18em;
+		color: var(--color-primary);
+	}
+
+	/* ───────────────────────── Standard cards ───────────────────────── */
+
+	.reviews-bento-card-header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.reviews-bento-card-stars {
+		display: inline-flex;
+		gap: 1px;
+		flex-shrink: 0;
+	}
+
+	.reviews-bento-card-star {
+		width: 0.95rem;
+		height: 0.95rem;
+		color: var(--color-rating, oklch(72% 0.18 80));
+	}
+
+	.reviews-bento-card-quote {
+		margin: 0;
+		padding: 0;
+		flex: 1;
+	}
+
+	.reviews-bento-card-quote p {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.92rem;
+		line-height: 1.55;
+		color: var(--color-foreground);
+		margin: 0;
+		text-wrap: pretty;
+	}
+
+	.reviews-bento-card-footer {
+		display: flex;
+		flex-direction: column;
+		gap: 0.35rem;
+		padding-top: 0.5rem;
+		border-top: 1px solid color-mix(in oklch, var(--color-border) 65%, transparent);
+		margin-top: auto;
+	}
+
+	/* Compact cards (Angels, Pepi) tighten typography for short quotes. */
+	[data-area='angels'] .reviews-bento-card-quote p,
+	[data-area='pepi'] .reviews-bento-card-quote p {
+		font-size: 1.1rem;
+		font-style: italic;
+		font-family: var(--font-display), Georgia, serif;
+		line-height: 1.35;
+	}
+
+	/* Featured Pol-style card (long quote): allow taller card without overflow. */
+	[data-area='pol'] .reviews-bento-card-quote p {
+		font-size: 0.86rem;
+	}
+
+	/* ───────────────────────── Verified + translated ───────────────────────── */
+
+	.reviews-bento-verified {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		color: var(--color-muted);
+		margin: 0;
+	}
+
+	.reviews-bento-verified-icon {
+		width: 0.95rem;
+		height: 0.95rem;
+		color: var(--color-primary);
+		flex-shrink: 0;
+	}
+
+	.reviews-bento-translated {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.7rem;
+		font-style: italic;
+		color: var(--color-muted);
+		margin: 0;
+		line-height: 1.4;
+	}
+
+	.reviews-bento-translated-inline {
+		font-size: 0.68rem;
+	}
+
+	/* ───────────────────────── Extra tile ───────────────────────── */
+
+	.reviews-bento-extra {
+		justify-content: space-between;
+		background-color: color-mix(in oklch, var(--color-primary) 8%, var(--color-card, var(--color-background)));
+		border-color: color-mix(in oklch, var(--color-primary) 20%, var(--color-border));
+	}
+
+	.reviews-bento-extra-stars {
+		gap: 2px;
+	}
+
+	.reviews-bento-extra-stars .reviews-bento-card-star {
+		width: 1.1rem;
+		height: 1.1rem;
+	}
+
+	.reviews-bento-extra-title {
+		font-family: var(--font-display), Georgia, serif;
+		font-size: clamp(1.5rem, 1.5vw + 0.85rem, 2.1rem);
+		font-weight: 600;
+		line-height: 1.1;
+		color: var(--color-foreground);
+		margin: 0;
+		letter-spacing: -0.01em;
+	}
+
+	.reviews-bento-extra-sub {
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.85rem;
+		line-height: 1.5;
+		color: var(--color-muted);
+		margin: 0;
+		max-width: 32ch;
+	}
+
+	.reviews-bento-extra-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		align-self: flex-start;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.85rem;
+		font-weight: 600;
+		color: var(--color-primary);
+		text-decoration: none;
+		border-bottom: 1px solid color-mix(in oklch, var(--color-primary) 50%, transparent);
+		padding-block-end: 1px;
+		transition: color 200ms ease, border-color 200ms ease;
+	}
+
+	.reviews-bento-extra-link:hover,
+	.reviews-bento-extra-link:focus-visible {
+		color: var(--color-foreground);
+		border-color: var(--color-foreground);
+	}
+
+	.reviews-bento-extra-link-icon {
+		width: 0.95rem;
+		height: 0.95rem;
+	}
+
+	/* ───────────────────────── Footer CTA ───────────────────────── */
+
+	.reviews-bento-cta {
+		display: flex;
+		justify-content: center;
+		padding-top: 0.5rem;
+	}
+
+	.reviews-bento-cta-link {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		font-family: var(--font-body), system-ui, sans-serif;
+		font-size: 0.95rem;
+		font-weight: 600;
+		color: var(--color-primary);
+		padding: 0.7rem 1.3rem;
+		border: 1.5px solid color-mix(in oklch, var(--color-primary) 45%, transparent);
+		border-radius: 9999px;
+		text-decoration: none;
+		transition:
+			background-color 240ms ease,
+			border-color 240ms ease,
+			color 240ms ease,
+			transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
+		background-color: transparent;
+	}
+
+	.reviews-bento-cta-link:hover,
+	.reviews-bento-cta-link:focus-visible {
+		background-color: var(--color-primary);
+		border-color: var(--color-primary);
+		color: var(--color-primary-foreground, var(--color-background));
+		transform: translateY(-1px);
+	}
+
+	.reviews-bento-cta-icon,
+	.reviews-bento-cta-arrow {
+		width: 1.1rem;
+		height: 1.1rem;
+	}
+
+	/* ───────────────────────── Reduced motion ───────────────────────── */
+
+	@media (prefers-reduced-motion: reduce) {
+		.reviews-bento-card,
+		.reviews-bento-card:hover,
+		.reviews-bento-cta-link,
+		.reviews-bento-cta-link:hover {
+			transition: none;
+			transform: none;
+			box-shadow: none;
+		}
+	}
+</style>
