@@ -1,6 +1,8 @@
-# CLAUDE.md — El mini nou web
+# CLAUDE.md — El mini nou
 
-> Este archivo es el contrato de trabajo del proyecto. Cualquier agente (Cursor, Claude Code, etc.) que abra este repo debe leerlo entero antes de tocar código. Última actualización: 03/05/2026.
+> Este archivo es el contrato de trabajo del proyecto. Cualquier agente (Cursor, Claude Code, etc.) que abra este repo debe leerlo entero antes de tocar código.
+> **Ubicación:** raíz del repositorio. El código Astro vive en la subcarpeta `web/`.
+> Última actualización: 04/05/2026 (movido a raíz desde `web/CLAUDE.md`).
 
 ---
 
@@ -160,17 +162,26 @@ A 03/05/2026:
 
 ---
 
-## 7. Documentos relacionados (en disco local de Francesc)
+## 7. Documentos relacionados
+
+### 7.1 Dentro de este repo (consultarlos siempre antes de tocar nada)
+
+- **`CONTEXT_ELMININOU.md`** (raíz) — contexto técnico+producto exhaustivo: stack, páginas, datos, decisiones, deuda, pendientes. **Punto de entrada obligatorio para cualquier agente.**
+- **`ESTADO_ELMININOU.md`** (raíz) — escaparate del producto en lenguaje llano para no técnicos.
+- **`MENU_ELMININOU.md`** (raíz) — fuente canónica de la carta (transcripción del PDF). El código `web/src/data/services.ts` es una traducción de este archivo.
+- **`README.md`** (raíz) — índice corto del repo + cómo arrancar.
+- `docs/reference/` — capturas físicas (PDF/PNG) del menú original del local.
+
+### 7.2 En disco local de Francesc (NO en el repo)
 
 - `MAESTRO.md` — identidad y modelo de negocio de Francesc.
 - `PLAYBOOK_VENTA.md` — protocolo comercial.
-- `docs/HANDOFF_EL_MINI_NOU.md` — briefing original del cliente.
-- `docs/MENU_CA_SOURCE.md` — fuente de verdad de la carta.
-- `Auditoria_Completa_ElMiniNou.md` — auditoría técnica.
 - `BRIEFING_GESTOR_ALTA_AUTONOMO_WEBS.md` — gestión fiscal (externa al proyecto técnico).
 
-Estos documentos son fuentes de contexto humano. Si entran en conflicto con este `CLAUDE.md`, este `CLAUDE.md` prevalece **solo en decisiones técnicas del proyecto El mini nou**.
+> Los antiguos `docs/HANDOFF_EL_MINI_NOU.md`, `docs/MENU_CA_SOURCE.md`, `DOSSIER_ESTADO_ELMININOU.md` y `Auditoria_Completa_ElMiniNou.md` fueron **consolidados en `CONTEXT_ELMININOU.md` y `MENU_ELMININOU.md`** y eliminados del repo (commit `73c4bbc`). Buscar info en los nuevos super-archivos.
+
+Si entran en conflicto con este `CLAUDE.md`, este `CLAUDE.md` prevalece **solo en decisiones técnicas del proyecto El mini nou**.
 
 ---
 
-**FIN del CLAUDE.md. Versión 2.0 · 03/05/2026.**
+**FIN del CLAUDE.md. Versión 2.1 · 04/05/2026** (movido a raíz, referencias a docs actualizadas).

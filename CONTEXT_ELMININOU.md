@@ -2,7 +2,7 @@
 
 > **Documento único de contexto técnico y de producto del proyecto.**
 > Punto de entrada obligatorio para cualquier agente (Claude Code u otros) antes de tocar código.
-> Última consolidación: 04/05/2026.
+> Última consolidación: 04/05/2026 (sincronizada con `CLAUDE.md` v2.0 en raíz).
 > Sustituye y deja obsoletos a: `Auditoria_Completa_ElMiniNou.md`, `DOSSIER_ESTADO_ELMININOU.md`, `docs/HANDOFF_EL_MINI_NOU.md`.
 
 Para el estado del producto en lenguaje llano (jefes, cliente) → `ESTADO_ELMININOU.md`.
@@ -33,11 +33,13 @@ Para la fuente canónica de la carta → `MENU_ELMININOU.md`.
 ### 1.1 Producto
 
 - **Nombre comercial:** El mini nou
-- **Tipo:** restaurante — brasa informal, menú del día, tapes, entrepans, begudes
+- **Tipo:** bar-restaurante con **minigolf de 18 hoyos integrado** al local. Cocina informal: brasas, platos combinados, tapas, entrepans, hamburguesas.
+- **Diferenciador comercial principal:** el **minigolf**. Gratuito si se come en el restaurante; **5 €/persona si solo se juega**. Es el ángulo más fuerte de la web frente a otros restaurantes locales.
 - **Repositorio:** `francescvicente-png/elmininou` (este repo)
 - **Subcarpeta del código:** `web/` (Astro 6 estático)
 - **Hosting actual:** Cloudflare Pages → `https://elmininou.pages.dev`
 - **Estado:** pre-producción, en revisión interna antes de presentar al restaurante.
+- **Web actual del cliente:** NO TIENEN. El dominio `espaielmini.com` (del local anterior) está expirado y en venta.
 
 ### 1.2 NAP (Name, Address, Phone)
 
@@ -47,7 +49,7 @@ Para la fuente canónica de la carta → `MENU_ELMININOU.md`.
 | Teléfono | 604 92 79 03 → E.164 `+34604927903` |
 | Instagram | [@elmininou](https://www.instagram.com/elmininou/) |
 | Email RGPD | `francecsvicente@gmail.com` ⚠️ con typo aparente (probablemente `francescvicente`) |
-| Coordenadas geo | 41.6712, 2.2958 ⚠️ aproximadas |
+| Coordenadas geo | **41.67069170689928, 2.254346301702218** (verificadas en Google Maps por Francesc; reflejadas en `business.ts`) |
 | Google Place ID | ⚠️ vacío |
 | Nombre legal/fiscal | ⚠️ "Titular fiscal pendent" (placeholder) |
 | NIF titular | ⚠️ "TODO_NIF_TITULAR" (placeholder) |
@@ -81,6 +83,26 @@ Para la fuente canónica de la carta → `MENU_ELMININOU.md`.
 - **Dirección:** Carrer Nou, 82, 08492 Sant Martí de Centelles (Barcelona)
 - **Email:** `francecsvicente@gmail.com` (verificar typo)
 - **Titular fiscal del restaurante:** pendiente de obtener por escrito.
+
+### 1.6 Estado comercial y reglas de comunicación con el cliente
+
+- **Estado comercial:** **prospección fría**. El cliente todavía **no ha sido contactado**. Francesc visitó el local como cliente (con sus padres) y decidió hacer la web por iniciativa propia como prospección comercial.
+- **Sistema de reservas actual del restaurante:** solo teléfono y WhatsApp. **NO** usan Fresha, Treatwell ni similar.
+- **Rating Google:** 5,0 con 11 reseñas (todas con texto positivo, perfil joven).
+
+**⚠️ REGLA ABSOLUTA DE COMUNICACIÓN:** el local anterior en el mismo edificio se llamaba **"elMini VERMUTS & GRILL"** y cerró. El propietario actual de "El mini nou" es **distinto** y tomó el relevo. **NO mencionar nunca al cliente el local anterior** — el dueño actual no quiere que se le recuerde el antecedente. Esto aplica también a copy de la web, mensajes de presentación, etc.
+
+### 1.7 Modelo económico cerrado (referencia interna, no contractual)
+
+- **Web base:** 1.100 €.
+- **Sesión fotográfica:** 200 € (15-20 fotos: comida + interior + minigolf, 2-3 h en local).
+- **Total recomendado:** 1.300 €.
+- **Cobro:** 50 % al inicio, 50 % al lanzamiento.
+- **Plazo:** 10-14 días desde la sesión fotográfica.
+- **Mantenimiento:** 240 €/año en factura única anual. Incluye dominio, 3 actualizaciones de carta/año, 2 cambios pequeños/año, monitorización mensual, soporte WhatsApp prioridad 24-48 h.
+- **Cambios fuera del plan:** 30 € puntual, 45 €/h trabajo grande.
+- **Forma de pago:** a elección del cliente (efectivo, Bizum, transferencia).
+- **Factura:** pendiente de la decisión fiscal de Francesc (alta epígrafe 763 vía gestor).
 
 ---
 
@@ -149,6 +171,7 @@ Para la fuente canónica de la carta → `MENU_ELMININOU.md`.
 
 ```
 elmininou/
+├── CLAUDE.md              ← contrato de trabajo del proyecto (técnico, en raíz)
 ├── CONTEXT_ELMININOU.md   ← este archivo: contexto técnico+producto
 ├── ESTADO_ELMININOU.md    ← escaparate del producto en lenguaje llano
 ├── MENU_ELMININOU.md      ← fuente canónica de la carta
@@ -157,7 +180,6 @@ elmininou/
 │   └── reference/         ← capturas físicas del menú (PDF/PNG del restaurante)
 ├── skills-lock.json
 └── web/                   ← código Astro (subcarpeta de trabajo)
-    ├── CLAUDE.md          ← ⚠️ todavía escrito como Klip's (no actualizado)
     ├── astro.config.mjs
     ├── package.json
     ├── public/
@@ -219,6 +241,7 @@ elmininou/
 | `/` | — | Redirección por idioma (HTML estático + JS + meta-refresh fallback) |
 | `/ca/` | `/es/` | Portada / Home (`RestaurantHomePage.astro`) |
 | `/ca/menu/` | `/es/menu/` | Carta digital completa (50+ platos en 8 categorías) |
+| `/ca/minigolf/` | `/es/minigolf/` | **Página dedicada al minigolf de 18 hoyos** (mayor diferenciador comercial) |
 | `/ca/galeria/` | `/es/galeria/` | Galería 12 imágenes IA + lightbox View Transitions |
 | `/ca/contacte/` | `/es/contacto/` | Canales de contacto |
 | `/ca/com-arribar/` | `/es/como-llegar/` | Cómo llegar (mapa link + dirección) |
@@ -246,7 +269,7 @@ elmininou/
 - Anchor "↓ Plats destacats" con scroll suave Lenis.
 
 **Quick info bar (3 columnas)**
-- Horario con badge en tiempo real (ver §3.10).
+- Horario con badge en tiempo real (ver §3.11).
 - Teléfono clicable.
 - Dirección con link a Google Maps (URL construida con dirección codificada).
 
@@ -288,7 +311,17 @@ elmininou/
 - **Bloque política de alérgenos** destacado: la carta impresa es la referencia legal.
 - **CTA final** de reserva por teléfono.
 
-### 3.5 Funcionalidades — Galería (`/ca/galeria/`, `/es/galeria/`)
+### 3.5 Funcionalidades — Minigolf (`/ca/minigolf/`, `/es/minigolf/`)
+
+Página dedicada al **mayor diferenciador comercial** del local.
+
+- **Hero editorial** del minigolf.
+- **Componentes propios:** `MinigolfSection.astro` (también usado en home como teaser) y `MinigolfHoles.astro` (presentación de los 18 hoyos).
+- **Modelo de uso:** gratis si comes en el restaurante; **5 €/persona si solo juegas**. Esta regla queda explícita en la página.
+- **Schema.org:** la página emite `@type: Service` apuntando al `Restaurant` principal vía `@id`. No es un negocio aparte: es un servicio del restaurante.
+- **CTAs:** reservar mesa por teléfono / WhatsApp (no hay reserva de pista propia — viene incluida con la mesa).
+
+### 3.6 Funcionalidades — Galería (`/ca/galeria/`, `/es/galeria/`)
 
 - Hero con título editorial.
 - **Filtro por categorías**: Tot / El local / Cuina i barra / Plats / Brasa / Taules. Implementado con `data-category` + `IntersectionObserver`.
@@ -301,14 +334,14 @@ elmininou/
   - Progressive enhancement: si el browser no soporta View Transitions, abre sin morph.
 - Pull quote editorial + CTA contacto.
 
-### 3.6 Funcionalidades — FAQ (`/ca/faq/`, `/es/faq/`)
+### 3.7 Funcionalidades — FAQ (`/ca/faq/`, `/es/faq/`)
 
 - 10 preguntas/respuestas en acordeón. Bilingüe (`questionCa/Es`, `answerCa/Es`).
 - Temas: reserva de mesa, métodos de pago, aparcamiento, horario, alérgenos, idiomas, sin app de reservas externa, grupos grandes, cambios/cancelaciones, comida para llevar.
 - **5 de 10 preguntas con `pendingConfirmation: true`** — pendientes de validación con el restaurante (no muestran badge visible al usuario, pero sí flag interno).
 - Schema.org `FAQPage` JSON-LD para rich snippets en Google.
 
-### 3.7 Funcionalidades globales — Header
+### 3.8 Funcionalidades globales — Header
 
 - Logo clicable a inicio.
 - Switcher de idioma CA/ES con rutas emparejadas.
@@ -317,13 +350,13 @@ elmininou/
 - **Shyness**: se oculta al hacer scroll hacia abajo, reaparece al subir.
 - **Image trail**: al hover sobre el link "Galeria", miniaturas siguen al cursor (solo desktop; cancelado en `prefers-reduced-motion` y touch). Defensa anti-stale state con `elementFromPoint` en cada frame de RAF, para evitar que el trail se quede activo tras una View Transition.
 
-### 3.8 Funcionalidades globales — Footer
+### 3.9 Funcionalidades globales — Footer
 
 - Horario completo, teléfono clicable, dirección con Google Maps, Instagram.
 - Links a páginas legales.
 - Nota explícita: "imatges il·lustratives generades amb IA".
 
-### 3.9 WhatsApp flotante
+### 3.10 WhatsApp flotante
 
 - Botón fijo esquina inferior derecha, mensaje pre-rellenado en URL.
 - **Ocultado en páginas legales** vía lista hardcoded en `BaseLayout.astro` (`LEGAL_PATHS`):
@@ -339,7 +372,7 @@ const showWhatsApp = site.features.whatsappFloat && !LEGAL_PATHS.includes(Astro.
 
 Decisión de layout (no feature flag): en una página legal el CTA de venta es intrusivo y demuestra inconsistencia.
 
-### 3.10 Badge de apertura en tiempo real
+### 3.11 Badge de apertura en tiempo real
 
 - "Obert ara · tanca a les 23:00" / "Tancat ara · obrim a les..." / "Tancat avui · obrim dijous a les...".
 - Calculado en cliente con el reloj del visitante. Recalcula cada 60 s.
@@ -368,7 +401,7 @@ function computeStatus(now: Date, hours): Status {
 }
 ```
 
-### 3.11 Banner de cookies
+### 3.12 Banner de cookies
 
 - LSSI compliant. Bilingüe (detecta idioma de URL en SSR).
 - Estado persistido en `localStorage`.
@@ -376,7 +409,7 @@ function computeStatus(now: Date, hours): Status {
 - **`transition:persist`** en Astro: no parpadea entre navegaciones SPA.
 - **No tiene efecto funcional de gating todavía** porque no se carga ningún tracker que lo necesite (Clarity está vacío). Cuando se active, la infra ya está lista.
 
-### 3.12 Otros globales
+### 3.13 Otros globales
 
 - **Scroll suave Lenis**: solo desktop, bail-out en `prefers-reduced-motion`. Mobile usa scroll nativo.
 - **View Transitions SPA**: animación slide entre páginas con `ClientRouter`. Reset a top en cada nav (excepto si la URL tiene hash).
@@ -405,7 +438,7 @@ export const business: Business = {
     region: 'Barcelona',
     country: 'ES',
   },
-  geo: { lat: 41.6712, lon: 2.2958 },          // ⚠️ APROXIMADAS
+  geo: { lat: 41.67069170689928, lon: 2.254346301702218 }, // ✅ verificadas en Maps
   phone: '604 92 79 03',
   phoneTel: '+34604927903',
   freshaUrl: '',
@@ -647,6 +680,12 @@ export const homeSections = [
 - `src/components/restaurant/RestaurantFooter.astro`
 - `src/components/restaurant/RestaurantHomePage.astro` ← **portada monolítica**
 - `src/components/menu/MenuPageHero.astro`
+- `src/components/menu/MenuSignatureDishes.astro` — plats firma destacados al inicio de la carta.
+- `src/components/menu/MenuDietaryFilter.astro` — filtros dietéticos client-side combinables.
+- `src/components/menu/MenuStoryBreak.astro` — interludios editoriales entre secciones de carta.
+- `src/components/sections/MinigolfSection.astro` — bloque de minigolf (home + página dedicada).
+- `src/components/sections/MinigolfHoles.astro` — presentación de los 18 hoyos.
+- `src/components/sections/ReviewsBentoSection.astro` — bento editorial de reseñas reales de Google en home.
 
 ### 6.2 Compartidos (válidos para cualquier sector)
 
@@ -702,7 +741,7 @@ Header, Footer, Button, Card, Container, Heading, Text, Section, Marquee, Badge,
   telephone: '+34604927903',
   hasMenu: '/ca/menu/',                               // ✅
   address: { '@type': 'PostalAddress', streetAddress, addressLocality, addressRegion, postalCode, addressCountry },
-  geo: { '@type': 'GeoCoordinates', latitude: 41.6712, longitude: 2.2958 },  // ⚠️ aprox
+  geo: { '@type': 'GeoCoordinates', latitude: 41.67069170689928, longitude: 2.254346301702218 }, // ✅
   openingHoursSpecification: [...],                   // generado desde openingHours
   priceRange: '€€',                                   // (subjetivo)
   paymentAccepted: 'Cash, Credit Card, Debit Card, Bizum',
@@ -715,6 +754,9 @@ Header, Footer, Button, Card, Container, Heading, Text, Section, Marquee, Badge,
   servesCuisine: 'Regional',
 }
 ```
+
+**Schema adicional — página minigolf:**
+La página `/ca/minigolf/` y `/es/minigolf/` emite `@type: Service` apuntando al `Restaurant` principal vía `@id` (`#localbusiness`). El minigolf es un servicio del restaurante, no un negocio independiente.
 
 **Lo que falta o se puede mejorar:**
 
@@ -802,8 +844,10 @@ Header, Footer, Button, Card, Container, Heading, Text, Section, Marquee, Badge,
 - ✅ Schema.org `Restaurant` en lugar de `BeautySalon`/`HairSalon`.
 - ✅ OG image generator con texto "Brasa informal · Tapes · entrepans · menú del dia".
 - ✅ Copy de UI orientada a restauración en `i18n/ui.ts`.
-- ✅ Bloque editorial bento de reseñas reales de Google en home.
-- ✅ Filtros dietéticos en carta + plats firma + detalle ampliado de plato.
+- ✅ Bloque editorial bento de reseñas reales de Google en home (`ReviewsBentoSection`).
+- ✅ Filtros dietéticos en carta + plats firma + detalle ampliado de plato (`MenuDietaryFilter`, `MenuSignatureDishes`).
+- ✅ **Páginas dedicadas `/ca/minigolf/` y `/es/minigolf/`** + componentes `MinigolfSection` y `MinigolfHoles` — diferenciador comercial principal.
+- ✅ Schema.org `Service` para minigolf apuntando al `Restaurant` principal vía `@id`.
 
 ### 9.3 Compartidos (sirven a ambos sectores sin tocar)
 
@@ -817,16 +861,16 @@ Container, Heading, Text, Button, Card, Section, Hero, FaqList/FaqItem, GalleryG
 
 ```
 $ pnpm build
-[build] ✓ Completed in 2.00s
+[build] ✓ Completed in ~2 s
 [@astrojs/sitemap] sitemap-index.xml created at dist
-[build] 23 page(s) built in 2.11s
+[build] 25 page(s) built
 [build] Complete!
 ```
 
 | Métrica | Valor |
 |---|---|
 | Build pasa | ✅ |
-| Páginas generadas | 23 |
+| Páginas generadas | 25 (incluye las 2 de minigolf CA/ES) |
 | Archivos en `dist/` | 253 |
 | Tamaño `dist/` | 28 MB (95% imágenes) |
 | Bundle JS principal (`BaseLayout` script) | 42,7 KB minificado |
@@ -874,11 +918,10 @@ Estimaciones (sin datos reales del negocio):
 
 ### 11.1 Crítica para limpieza
 
-1. **`web/CLAUDE.md` está enteramente escrito como Klip's Estilistes**. Habla de "Beatriz Vega Segura", "Aiguafreda", "Coloració orgànica", "EquipSection", `/nuvies/`. **No menciona "El mini nou"**. Confunde a futuros agentes.
-2. **`package.json` con `"name": "klips-estilistes-web"`**. Trivial corregir a `"elmininou-web"`.
-3. **`home-sections.ts` está obsoleto**: la portada actual no lo consulta. Decidir entre borrarlo o rehacer `RestaurantHomePage.astro` para que respete el orquestador.
-4. **`web/screenshots/` con material de Klip's** (13 desktop + 13 mobile incluyendo `packs.png`, `productes.png`, `treballa-amb-nosaltres.png`). No usar como referencia visual.
-5. **`web/VESSEL_CONTEXT_AZZAKRITI.md`** y **`public/brand/klips-logo.jpg`**: residuos del proyecto anterior.
+1. **`package.json` con `"name": "klips-estilistes-web"`**. Trivial corregir a `"elmininou-web"`.
+2. **`home-sections.ts` está obsoleto**: la portada actual no lo consulta. Decidir entre borrarlo o rehacer `RestaurantHomePage.astro` para que respete el orquestador.
+3. **`web/screenshots/` con material de Klip's** (13 desktop + 13 mobile incluyendo `packs.png`, `productes.png`, `treballa-amb-nosaltres.png`). No usar como referencia visual.
+4. **`web/VESSEL_CONTEXT_AZZAKRITI.md`** y **`public/brand/klips-logo.jpg`**: residuos del proyecto anterior.
 
 ### 11.2 Datos heredados sin uso (ocupan disco y deps TS)
 
@@ -916,9 +959,8 @@ A modo de referencia para futuros agentes:
    - `serviceProvider.email: 'francecsvicente@gmail.com'` → typo aparente (`francecs` → `francesc`).
    - Sin estos datos las páginas legales no son LSSI/RGPD-ready.
 2. **Cero fotografía real**: TODAS las imágenes son IA (Gemini), etiquetadas honestamente en `alt`. Para presentación al cliente con orgullo se necesita sesión fotográfica del local, platos y equipo.
-3. **Reseñas vacías en datos**: aunque la home tiene un bento editorial con las 8 reseñas reales con texto, conviene formalizar en `reviews.ts` con permiso explícito.
-4. **Coordenadas geo aproximadas** (`41.6712, 2.2958`) — pendiente exactas vía clic-derecho en Google Maps.
-5. **Google Place ID vacío** — no se puede vincular oficialmente con la ficha de Google.
+3. **Reseñas vacías en datos**: aunque la home tiene un bento editorial con las 8 reseñas reales con texto, conviene formalizar en `reviews.ts` con permiso explícito del cliente.
+4. **Google Place ID vacío** — no se puede vincular oficialmente con la ficha de Google.
 
 ### 12.2 IMPORTANTE no bloqueante
 
@@ -930,14 +972,14 @@ A modo de referencia para futuros agentes:
 
 ### 12.3 Decisiones de producto pendientes
 
-11. **¿Sesión fotográfica planificada?**
-12. **¿Reservas online (Fresha/CoverManager/Booksy)?** Hoy solo tel:+WhatsApp. La infra está preparada.
-13. **¿Sección de equipo (cocina/sala)?** `EquipSection` disponible, requiere fotos+bios.
-14. **¿Actividad complementaria (minigolf, terraza, eventos)?** El handoff mencionaba "contexto golf/minigolf" pero no hay sección implementada. **Pendiente confirmar.**
-15. **¿Menú del día con precio fijo?** La carta tiene precios por plato; si hay menú diario (12,50 € · primer + segon + postres + cafè), conviene destacarlo.
-16. **¿Hay reseñas reales que el cliente quiera publicar verbatim con autorización formal?**
-17. **Métodos de pago**: FAQ y Schema dicen "Efectivo, tarjeta, Bizum". Confirmar.
-18. **Horario actual** + temporada baja/alta.
+10. **¿Sesión fotográfica planificada?** Cubrirá comida + interior + minigolf (2-3 h en local, 15-20 fotos).
+11. **¿Reservas online (Fresha/CoverManager/Booksy)?** Hoy solo tel: + WhatsApp. La infra está preparada para activarlo si el cliente lo decide.
+12. **¿Sección de equipo (cocina/sala)?** `EquipSection` disponible pero desactivada — requiere fotos+bios.
+13. **¿Menú del día con precio fijo?** La carta tiene precios por plato; si hay menú diario (12,50 € · primer + segon + postres + cafè), conviene destacarlo.
+14. **¿Hay reseñas reales que el cliente quiera publicar verbatim con autorización formal por escrito?**
+15. **Métodos de pago**: FAQ y Schema dicen "Efectivo, tarjeta, Bizum". Confirmar.
+16. **Horario actual** + temporada baja/alta.
+17. **Tarifa minigolf**: confirmar que sigue siendo gratis con comida y 5 €/persona solo juego.
 
 ### 12.4 Riesgos abiertos
 

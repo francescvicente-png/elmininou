@@ -6,6 +6,7 @@ Repositori dedicat al restaurant **El mini nou** (L'Ametlla del Vallès).
 
 | Fitxer | Per a qui | Què conté |
 |---|---|---|
+| [`CLAUDE.md`](./CLAUDE.md) | Agents (Claude Code i altres) | Contracte de treball del projecte: identitat del client, decisions tècniques tancades, regles de comunicació amb el client, model econòmic. **Llegir abans de tocar codi.** |
 | [`CONTEXT_ELMININOU.md`](./CONTEXT_ELMININOU.md) | Agents (Claude Code i altres) | Context tècnic + de producte complet: stack, pàgines, dades, decisions, deute, pendents. **Punt d'entrada obligatori abans de tocar codi.** |
 | [`ESTADO_ELMININOU.md`](./ESTADO_ELMININOU.md) | Caps, client, lectors no tècnics | Aparador del producte en llenguatge planer (què funciona, què està en curs, problemes coneguts). |
 | [`MENU_ELMININOU.md`](./MENU_ELMININOU.md) | Qui editi la carta | Font canònica de la carta del restaurant (preus, al·lèrgens, citacions golf). |

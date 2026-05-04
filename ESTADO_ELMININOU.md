@@ -1,14 +1,14 @@
 # Estado del proyecto — El mini nou
 
-> **Última actualización:** 03/05/2026
+> **Última actualización:** 04/05/2026
 > **Estado general:** 🟡 En desarrollo
-> **Versión actual:** pre-producción (web en revisión antes de presentar al restaurant — incorporadas les ressenyes reals de Google)
+> **Versión actual:** pre-producción (web en revisión abans de presentar al restaurant — incorporades les ressenyes reals de Google i la pàgina de minigolf)
 
 ---
 
 ## ¿Qué es?
 
-Web pública del restaurant **El mini nou** de l'Ametlla del Vallès. Sirve como aparador del local en internet: presenta la carta amb fotos, mostra els horaris i la ubicació, i permet als clients trucar o escriure per WhatsApp per reservar taula. Funciona en català i castellà.
+Web pública del restaurant **El mini nou** de l'Ametlla del Vallès. Sirve como aparador del local en internet: presenta la carta amb fotos, **dóna visibilitat al minigolf de 18 forats integrat al local** (gratuït si menges, 5 €/persona si només jugues), mostra els horaris i la ubicació, i permet als clients trucar o escriure per WhatsApp per reservar taula. Funciona en català i castellà.
 
 ---
 
@@ -24,6 +24,7 @@ Web pública del restaurant **El mini nou** de l'Ametlla del Vallès. Sirve como
 - Botó flotant de WhatsApp i botó de "trucar per reservar" sempre visibles.
 - Pàgines de contacte, com arribar i preguntes freqüents.
 - **Bloc de ressenyes reals de Google al home**: les 8 ressenyes amb text es mostren en una composició editorial tipus bento (cita destacada gran + tarjetes), amb mitjana 5,0 ★ i comptador de les 11 ressenyes verificades. Les 3 valoracions sense text es comptabilitzen però no es citen. Cada cita inclou nom de l'autor, data, distintiu de "Local Guide" quan correspon i marca de "Ressenya verificada a Google". Si la ressenya original és en castellà, la versió en català inclou un avís de traducció automàtica.
+- **Pàgina dedicada al minigolf de 18 forats** integrat al local — el principal diferenciador comercial. Explica els 18 forats, deixa clar que **és gratuït si menges al restaurant i costa 5 €/persona si només jugues**, i porta a reservar taula. També apareix un bloc de minigolf al home perquè qui hi entri ho vegi de seguida.
 - Pàgines legals (avís legal, política de privacitat, política de cookies).
 - Banner de cookies amb opció d'acceptar / rebutjar.
 - Versió completa en català i en castellà.
@@ -79,7 +80,7 @@ Beneficis esperats (estimats, encara per validar):
 
 ## Próximos pasos
 
-1. Quedar amb el restaurant per validar carta, preus i dades de contacte definitives.
+1. Quedar amb el restaurant per validar carta, preus, tarifes del minigolf i dades de contacte definitives.
 2. Decidir si fem sessió fotogràfica al local o si mantenim les fotos IA durant un temps.
 3. Comprar i connectar un domini propi.
 
@@ -87,4 +88,4 @@ Beneficis esperats (estimats, encara per validar):
 
 ## Notas para el lector
 
-Aquest document s'actualitza quan hi ha avenços rellevants per al producte. No conté detalls tècnics ni història del codi. Per a informació tècnica, consulta el repositori i el `CLAUDE.md` del projecte.
+Aquest document s'actualitza quan hi ha avenços rellevants per al producte. No conté detalls tècnics ni història del codi. Per a informació tècnica, consulta el `CONTEXT_ELMININOU.md` i el `CLAUDE.md` (a la rel del repositori).
