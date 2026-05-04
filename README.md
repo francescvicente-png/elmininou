@@ -1,15 +1,16 @@
 # El mini nou — projecte web
 
-Repositori dedicat al restaurant **El mini nou** (L’Ametlla del Vallès).
+Repositori dedicat al restaurant **El mini nou** (L'Ametlla del Vallès).
 
-## Contingut
+## Documents de context
 
-| Fitxer / carpeta | Descripció |
-|------------------|-------------|
-| [`docs/HANDOFF_EL_MINI_NOU.md`](./docs/HANDOFF_EL_MINI_NOU.md) | Handoff: stack, NAP, schema, checklist |
-| [`docs/MENU_CA_SOURCE.md`](./docs/MENU_CA_SOURCE.md) | Transcripció canònica de la carta |
-| [`docs/reference/`](./docs/reference/) | Captures PDF/PNG del menú |
-| **`web/`** | **Codi Astro 6** (plantilla Klip’s adaptada): home, `/ca/menu/`, `/es/menu/`, galeria, FAQ, legal |
+| Fitxer | Per a qui | Què conté |
+|---|---|---|
+| [`CONTEXT_ELMININOU.md`](./CONTEXT_ELMININOU.md) | Agents (Claude Code i altres) | Context tècnic + de producte complet: stack, pàgines, dades, decisions, deute, pendents. **Punt d'entrada obligatori abans de tocar codi.** |
+| [`ESTADO_ELMININOU.md`](./ESTADO_ELMININOU.md) | Caps, client, lectors no tècnics | Aparador del producte en llenguatge planer (què funciona, què està en curs, problemes coneguts). |
+| [`MENU_ELMININOU.md`](./MENU_ELMININOU.md) | Qui editi la carta | Font canònica de la carta del restaurant (preus, al·lèrgens, citacions golf). |
+| [`docs/reference/`](./docs/reference/) | Verificació visual | Captures físiques (PDF/PNG) del menú original del local. |
+| `web/` | Desenvolupador | Codi Astro 6 estàtic. |
 
 ## Desenvolupament local (`web/`)
 
