@@ -1,0 +1,527 @@
+# =============================================================================
+# CONTEXT FOR A4 PROPOSAL — EL MINI NOU
+# Generated for the Gemini A4 prompt that will render the printed proposal.
+# Source of truth: /home/user/elmininou/web (Astro 6 static).
+# Date of extraction: 07/05/2026
+# =============================================================================
+
+tipus_negoci:
+  vertical_principal: "Bar-restaurant amb minigolf integrat"
+  verticals_secundaris:
+    - "Cuina informal a la brasa (eix culinari fort)"
+    - "Plats combinats, tapes, entrepans, hamburgueses"
+    - "Bar amb begudes i ambient familiar"
+    - "Minigolf de 18 forats integrat al local"
+  emplacament: "Carrer Jeroni de Moragas, 13 · 08480 L'Ametlla del Vallès (Barcelona)"
+  matisos_importants:
+    es_bar_familiar_amb_cuina_o_restaurant_complet: "Bar-restaurant familiar amb cuina informal completa. NO és restaurant 'fine dining' ni bar de tapes pur. Carta extensa (50+ plats en 8 categories) i hi ha brases serioses, però el to és accessible, no aspiracional."
+    minigolf_estacional_o_permanent: "Permanent. Integrat al local i operatiu sempre que el restaurant està obert. Confirmat al text de la pàgina dedicada (`/ca/minigolf/`, `/es/minigolf/`)."
+    brasa_eix_central_o_servei: "Eix central, però compartint protagonisme amb plats combinats i tapes. La carta té una categoria 'grills' amb 6 plats (entranya, xai, xurrasco, pop, etc.) i el copy de hero diu 'Brases, menú del dia i tapes sense complicacions'. Brasa com a oferta forte, NO única. Font: web/src/components/restaurant/RestaurantHomePage.astro:36-44 i web/src/data/services.ts línies 215-288."
+  pagines_amb_tonalitat_especial:
+    - id: "minigolf"
+      ruta_ca: "/ca/minigolf/"
+      ruta_es: "/es/minigolf/"
+      tonalitat: "Familiar lúdica + diferenciador comercial número 1. Schema.org @type: Service apuntant al Restaurant principal via @id (és un servei del restaurant, no un negoci a part). El A4 hauria de tractar-la com a 'feature estrella' d'El mini nou — no és una pàgina més, és l'angle vendable més fort vs. qualsevol altre restaurant local."
+      copy_canonic_hero: "'18 forats al cor del Vallès' / '18 hoyos en el corazón del Vallès' (font: web/src/components/sections/MinigolfSection.astro:25-38)"
+      promesa_clau: "Gratis si dines aquí · 5 € si només jugues (font: web/src/data/minigolf.ts:169-192)"
+    - id: "carta"
+      ruta_ca: "/ca/menu/"
+      ruta_es: "/es/menu/"
+      tonalitat: "Editorial gastronòmic — 50+ plats amb il·lustracions IA per cada un, plats firma destacats al començament, filtres dietètics combinables (brasa, vegetarià, sense gluten, per compartir, picant). Tractada amb cura editorial, no com a llista plana."
+  res_de_celebracions_o_esdeveniments_en_la_web: "Cap pàgina dedicada a esdeveniments, celebracions ni grups grans. La FAQ (web/src/data/faq.ts) cita 'grups grans' com a tema, però sense pàgina pròpia. Pendent de validar amb el client (CONTEXT_ELMININOU.md §12.3)."
+
+# =============================================================================
+# 1. PALETA CROMÀTICA
+# Font primària: web/src/config/theme.ts (linies 46-65)
+# Font verificada en: web/src/styles/global.css (bloc @theme generat per scripts/sync-theme.mjs)
+# =============================================================================
+
+paleta:
+  background:
+    nom: "Warm paper / orange blossom"
+    oklch: "oklch(98.8% 0.014 58)"
+    hex_aproximat: "#FCF7F2"
+    us_proposat_a4: "fons del cartell — paper càlid amb un toc d'orange blossom que 'seu' al costat del taronja del logo"
+    font_repo: "web/src/config/theme.ts:49"
+  ink_primari:
+    nom: "Logo black / foreground neutral"
+    oklch: "oklch(0% 0 0)"
+    hex_aproximat: "#000000"
+    us_proposat_a4: "header bar fosc, text principal, badge total, contact card. El negre del logo és literal del logo de marca (no un brown ink suavitzat) — convé usar negre pur per coherència amb el wordmark."
+    font_repo: "web/src/config/theme.ts:52"
+  accent_principal:
+    nom: "Brand orange (FF7518) — vivid orange"
+    oklch: "oklch(68.5% 0.193 54)"
+    hex_aproximat: "#FF7518"
+    us_proposat_a4: "marcs de cards, separadors, preus, línies decoratives, badge circular d'inversió, estrella daurada de ressenyes (variant). És LA cor de la marca — equival al taronja viu del logo."
+    font_repo: "web/src/config/theme.ts:56"
+  accent_secundari:
+    nom: "Burnt orange (deeper)"
+    oklch: "oklch(42% 0.14 50)"
+    hex_aproximat: "#9C4214"
+    us_proposat_a4: "elements decoratius, icones line-art de cards, headings accentuats, motius decoratius de cantonada. Fa contrast amb el taronja viu sense saltar a un altre tó."
+    font_repo: "web/src/config/theme.ts:60"
+  colors_extra:
+    backgroundAlt:
+      oklch: "oklch(100% 0 0)"
+      hex_aproximat: "#FFFFFF"
+      us: "card surfaces, blocs alternats sobre el background warm paper"
+      font_repo: "web/src/config/theme.ts:50"
+    border:
+      oklch: "oklch(91% 0.042 58)"
+      hex_aproximat: "#F1E2D5"
+      us: "marcs subtils de cards, separadors fins"
+      font_repo: "web/src/config/theme.ts:54"
+    muted:
+      oklch: "oklch(48% 0.02 265)"
+      hex_aproximat: "#6B7280"
+      us: "text secundari, captions, eyebrows"
+      font_repo: "web/src/config/theme.ts:53"
+    primaryHover:
+      oklch: "oklch(60% 0.19 54)"
+      hex_aproximat: "#E15F0A"
+      us: "estats actius/hover (no rellevant per A4 imprès, però documentat)"
+      font_repo: "web/src/config/theme.ts:57"
+    rating:
+      oklch: "oklch(72% 0.15 74)"
+      hex_aproximat: "#D8A53F"
+      us: "estrelles daurades de ressenyes Google — IMPORTANT pel A4 perquè el card 'Reseñas Google · 5,0 ★' usa aquest tó d'or, no el taronja viu"
+      font_repo: "web/src/config/theme.ts:64"
+  observacio_critica: |
+    La paleta del repo NO encaixa exactament amb la pista que preveies ("fum/carbó/fusta envellida/cuir/brasa,
+    probablement amb tons foscos i un acent càlid"). El que hi ha és:
+      - fons CLAR (paper càlid orange blossom) — NO fons fosc
+      - tinta NEGRA pura (del logo) — sí coincideix amb la idea de carbó
+      - taronja BRASA viu (#FF7518) com a primary — sí coincideix amb foc viu
+      - burnt orange (#9C4214) com a accent — sí coincideix amb fusta envellida / cuir vell
+    El mood resultant és més 'taverna catalana lluminosa amb foc viu' que 'restaurant fosc tipus steakhouse americà'.
+    Per al A4: això vol dir que el fons del cartell ha de ser CLAR (paper càlid), amb header bar fosc, i la calidesa
+    ve de la quantitat de taronja vivido + burnt orange + dauradet de les estrelles. NO ha de ser un cartell fosc.
+
+# =============================================================================
+# 2. TIPOGRAFIES
+# Font primària: web/src/config/theme.ts:66-69 + web/astro.config.mjs:100-118
+# =============================================================================
+
+tipografia:
+  display:
+    familia: "Playfair Display SC"
+    procedencia: "Google Fonts (auto-hospedada en build via Astro Fonts API)"
+    pesos_disponibles: [400, 700]
+    estil_disponible: ["normal"]
+    us_proposat_a4: "tots els títols de secció, header bar 'PROPOSTA WEB: EL MINI NOU', headlines de blocs (INVERSIÓ, SERVEIS COMPLEMENTARIS, etc.). El 'SC' significa Small Caps — encaixa amb identitat gastronòmica/editorial."
+    font_repo: "web/astro.config.mjs:100-109 i web/src/config/theme.ts:67"
+    nota_critica: "Pairing UI/UX skill #33 'restaurant menu'. Playfair Display SC dóna un to clàssic-gastronòmic amb caps. NO confondre amb Playfair Display normal — el SC és diferent (small caps natives)."
+  body:
+    familia: "Karla"
+    procedencia: "Google Fonts (auto-hospedada en build)"
+    pesos_disponibles: [400, 500, 600, 700]
+    us_proposat_a4: "labels de cards, body de blocs opcionals, business card, copy de descripció a 8 cards, footer. Sans-serif limpia d'alta legibilitat — pair amb Playfair Display SC."
+    font_repo: "web/astro.config.mjs:110-117 i web/src/config/theme.ts:68"
+  display_alternativa_segura:
+    fallbacks: ["Playfair Display", "Georgia", "serif"]
+    font_repo: "web/src/config/theme.ts:67"
+  body_fallbacks: ["system-ui", "sans-serif"]
+  prohibides_en_projecte:
+    rao: "Cada client del cluster de Francesc té el seu propi pairing tipogràfic. Reusar tipografia entre clients trenca la coherència del portfolio del dissenyador i confón visualment al client si veu dos A4 alhora."
+    llista:
+      - "Cormorant Garamond (Klip's)"
+      - "Newsreader (Torrent de Llibres)"
+      - "Marcellus (Flors Marta Pons)"
+      - "Bricolage Grotesque (El Taronger)"
+      - "Schibsted Grotesk (El Taronger body)"
+      - "Inter (Klip's, Torrent, Flors body)"
+      - "Fraunces (Azzakriti)"
+
+# =============================================================================
+# 3. MOOD VISUAL / DIRECCIÓ ARTÍSTICA
+# Font: CLAUDE.md §3.2-3.3, CONTEXT_ELMININOU.md §1, §5, §8, web/src/components/restaurant/RestaurantHomePage.astro
+# =============================================================================
+
+mood:
+  etiqueta_curta: "Taverna catalana familiar amb foc viu i partida de minigolf"
+  descripcio_2_linies: |
+    Sopar de divendres al voltant de la brasa, sense pretensions, amb nens jugant a minigolf darrere.
+    Calidesa lluminosa de paper càlid + taronja brasa + tinta negra del logo, mai fosc d'steakhouse.
+  referencies_estil:
+    - "Cocina familiar catalana de cap de setmana — bar de pueblo evolucionat, no nostàlgic"
+    - "Brasa amb fuego viu com a teatre culinari (icon `tabler:flame` repetit a UI)"
+    - "Marca pròpia amb pilota de golf integrada al wordmark — lúdic, no infantil"
+    - "Plats combinats americans (Bogey, Grand Slam) amb noms de golf — to juganer però no friki"
+    - "Tipografia editorial (Playfair Display SC) que aspira a restaurant amb cura, no a fast food"
+  motius_decoratius_coherents:
+    - "Flama de brasa estilitzada (icon Tabler `flame` ja és present a la UI del hero)"
+    - "Pilota de minigolf amb dimples taronges sobre fons negre (DIRECTAMENT del logo del client)"
+    - "Pal de minigolf inclinat amb bola al peu (pista visible al hero del minigolf, hole-3.webp)"
+    - "Banderí petit de minigolf amb el número del forat"
+    - "Espurnes/braves de carbó incandescent (orange + burnt orange degradat)"
+    - "Tall d'entranya o xurrasco a la graella vist de costat (icon Tabler `meat` ja al codi)"
+    - "Cap d'all rostit i pebrot vermell madur (mediterrani, però sense caure en mode mercat solar)"
+    - "Got de vi negre amb reflex de brasa"
+    - "Branca petita de romaní o farigola damunt fusta de tallar"
+    - "Llenya cremant amb braves taronges (NO fum gris carregat — la paleta és lluminosa)"
+  mood_a_evitar:
+    - "Res cosmètic / spa / esmalts d'ungles / floreta delicada (territori Klip's)"
+    - "Res librari / llibreria / paper antic / segells de biblioteca (territori Torrent)"
+    - "Res floral exuberant amb peònia / olivera / eucalyptus / ramets (territori Flors)"
+    - "Res mediterrani solar tipus mercat al matí, taronges fresques, suc, cistell de fruita (territori Taronger — DIFERENCIACIÓ CRÍTICA, ambdós són gastronòmics però mood oposat)"
+    - "Res funeral / fúnebre / tons de luto"
+    - "Res steakhouse americà fosc amb cuir capitoné i daurats brillants (no és el to de la web)"
+    - "Res fine dining tipus Michelin (capucha de xef, plats minimalistes, espuma molecular, calligrafia)"
+    - "Res bar de pueblo descuidat amb cartell escrit a mà i fanals oxidats (la web és contemporània, no nostàlgica)"
+    - "Res infantil / dibuixos animats / colors saturats neon (el minigolf és familiar, no kids-only)"
+    - "Cocteleria / smoothies / palmeres / beach bar / chiringuito (fora de mood, és Vallès interior)"
+    - "Lavanda, champagne, púrpura, malva (paleta d'altres clients)"
+  font_repo: "Sintetitzat a partir de: CLAUDE.md §3.2 (paleta), CONTEXT_ELMININOU.md §5 (tema visual), web/src/components/restaurant/RestaurantHomePage.astro:36-46 (copy hero), web/src/components/sections/MinigolfSection.astro:22-48 (copy minigolf), logo en web/src/assets/images/El mini nou logo.jpg"
+
+# =============================================================================
+# 4. FEATURES DESTACABLES — SECCIÓ 1 'QUÈ INCLOU LA WEB?' (8 cards)
+# Ordenades per importància comercial; primera = més rellevant pel client.
+# =============================================================================
+
+features:
+  - id: 1
+    label_curt: "Página dedicada al minigolf 18 hoyos"
+    icona_suggerida: "tabler:golf o tabler:flag"
+    rao_comercial: "ÉS el diferenciador comercial principal del local. Cap altre restaurant del Vallès té un minigolf integrat. Cal portar-ho a primera línia. Página pròpia amb 18 forats il·lustrats, regla 'gratis si menges / 5 € si jugues' i CTA a reservar."
+    pagina_repo: "web/src/pages/ca/minigolf.astro + web/src/pages/es/minigolf.astro + web/src/components/sections/MinigolfSection.astro + web/src/data/minigolf.ts"
+  - id: 2
+    label_curt: "Carta digital con 50+ platos"
+    icona_suggerida: "tabler:bowl o tabler:tools-kitchen-2"
+    rao_comercial: "8 categories (entrants, brases, pastes, combinats, entrepans calents/freds, tapes, begudes), cada plat amb foto editorial, preu, descripció bilingüe i al·lèrgens en text. Al·lèrgens per text NO només color (accessibilitat real). Filtres dietètics combinables: brasa, vegetarià, sense gluten, per compartir, picant."
+    pagina_repo: "web/src/pages/ca/menu.astro + web/src/data/services.ts (60 plats reals)"
+  - id: 3
+    label_curt: "Brasa con fuego vivo destacado"
+    icona_suggerida: "tabler:flame"
+    rao_comercial: "Categoria 'Les brases' amb 6 plats (entranya, pollastre, xai, pop amb puré, xurrasco, cansalada). Plats firma del local. Hero de portada amb icon flame i copy 'Foc viu i producte treballat'. Brasa = teatre culinari del local, vendible visualment."
+    pagina_repo: "web/src/data/services.ts:215-288 + web/src/components/restaurant/RestaurantHomePage.astro:43"
+  - id: 4
+    label_curt: "Reseñas Google · 5,0 ★"
+    icona_suggerida: "tabler:star-filled (color rating dorat)"
+    rao_comercial: "5,0 ★ amb 11 ressenyes verificades, 8 amb text. La web inclou un bloc bento editorial amb cita destacada gran + targetes al voltant, perfil 'Local Guide' marcat quan correspon, marca 'Reseña verificada en Google'. Supera el llindar comercial 4,5 ★ + ≥5 ressenyes. Card SÍ va al A4."
+    pagina_repo: "web/src/data/reviews.ts + web/src/data/business.ts:101-106 (googleReviews snapshot 03/05/2026) + web/src/components/sections/ReviewsBentoSection.astro"
+  - id: 5
+    label_curt: "Bilingüe CA · ES espejo"
+    icona_suggerida: "tabler:world"
+    rao_comercial: "11 pàgines comercials en CA + 11 espill perfecte en ES (25 pàgines totals incloent legals). Strings tipats: una traducció faltant = error de compilació. Diferenciador real al Vallès on el client és català-castellà mixt (estiueig de Barcelona)."
+    pagina_repo: "web/src/pages/ca/* (11 fitxers) + web/src/pages/es/* (11 fitxers) + web/src/i18n/routes.ts + web/src/i18n/ui.ts"
+  - id: 6
+    label_curt: "WhatsApp + reserva telefónica"
+    icona_suggerida: "tabler:brand-whatsapp"
+    rao_comercial: "El restaurant NO usa Fresha/Treatwell ni cap reserva online. La web respecta la realitat: CTA primari 'Reserva taula' → tel:+34604927903. Botó WhatsApp flotant amb missatge pre-rellenat URL-encoded. Ocultat en pàgines legals (LSSI). Sense fricció ni sistema que el client no entén."
+    pagina_repo: "web/src/data/site.ts:128-131 (booking provider phone) + web/src/components/WhatsAppFloat.astro + web/src/components/restaurant/RestaurantHomePage.astro:104"
+  - id: 7
+    label_curt: "Galería del local + lightbox"
+    icona_suggerida: "tabler:zoom-in o tabler:sparkles"
+    rao_comercial: "12 imatges il·lustratives organitzades en 5 categories (El local, Cuina i barra, Plats, Brasa, Taules), filtre per categoria amb IntersectionObserver + lightbox fullscreen amb View Transitions API nativa, navegació per teclat. Ara són IA però la infraestructura espera la sessió fotogràfica real."
+    pagina_repo: "web/src/pages/ca/galeria.astro + web/src/data/gallery.ts + web/src/components/GalleryLightbox.astro"
+  - id: 8
+    label_curt: "SEO local + Schema Restaurant"
+    icona_suggerida: "tabler:map-pin"
+    rao_comercial: "Schema.org @type: Restaurant + additionalType FoodEstablishment, hasMenu apuntant a /menu/, aggregateRating 5,0 / 11, openingHoursSpecification real, priceRange €€, paymentAccepted Cash/Card/Bizum, geo amb coordenades GPS verificades, Schema Service per minigolf via @id. Sitemap, robots.txt, hreflang CA/ES/x-default. La web sortirà a Google amb ressenyes destacades a la SERP."
+    pagina_repo: "web/src/components/seo/SchemaLocalBusiness.astro + web/src/data/business.ts + web/astro.config.mjs:14-20"
+
+# =============================================================================
+# 5. URL DEL PREVIEW EN VIU
+# Font: web/astro.config.mjs:12 + web/src/data/site.ts:113
+# =============================================================================
+
+url_preview:
+  url_completa: "https://elmininou.pages.dev"
+  slug_canonic_es: "https://elmininou.pages.dev/es/"
+  slug_canonic_ca: "https://elmininou.pages.dev/ca/"
+  idioma_per_defecte: "ca (defaultLang a business.ts:67) — la pàgina arrel `/` redirigeix per idioma del navegador. El preview que l'usuari ha referenciat (`elmininou.pages.dev/es`) és el slug castellà directe, igualment vàlid."
+  estat_deploy: "online (auto-deploy des de rama main a Cloudflare Pages, sense branch protection)"
+  nota_si_pending: "no aplica — la web està desplegada i navegable."
+  font_repo: "web/astro.config.mjs:12 (site URL) + web/src/data/site.ts:113 (canonicalUrl) + web/src/data/business.ts:67 (defaultLang) + CONTEXT_ELMININOU.md §13.1"
+
+# =============================================================================
+# 6. DADES DEL CLIENT (NAP) + PROPIETARI/A + LOGO
+# Font: web/src/data/business.ts + CLAUDE.md §1 + CONTEXT_ELMININOU.md §1
+# =============================================================================
+
+client:
+  nom_comercial: "El mini nou"
+  propietari_probable:
+    nom: "Pendent de confirmar amb el client"
+    detall: "Titular fiscal del restaurant pendent. El propietari actual és DIFERENT del local anterior (elMini VERMUTS & GRILL) que va tancar al mateix edifici. ⚠️ REGLA ABSOLUTA: NO mencionar mai el local anterior al client — el dueño actual no vol que se li recordi l'antecedent."
+  estat_propietari: "pendingConfirmation"
+  estat_comercial: "Prospecció freda. El client encara NO ha estat contactat. Francesc va visitar el local com a client amb els seus pares i va decidir fer la web per iniciativa pròpia com a prospecció comercial."
+  direccio_completa: "Carrer Jeroni de Moragas, 13 · 08480 L'Ametlla del Vallès · Barcelona · ES"
+  coordenades_gps: "41.67069170689928, 2.254346301702218 (verificades a Google Maps per Francesc)"
+  telefon_visible: "604 92 79 03"
+  telefon_e164: "+34604927903"
+  rating_google: "5,0 ★ amb 11 ressenyes (snapshot 03/05/2026; lastUpdated a business.ts: 2026-05-03)"
+  reviews_amb_text_publicades: "8 de 11 (3 només estrella sense comentari)"
+  instagram_handle: "@elmininou"
+  instagram_url: "https://www.instagram.com/elmininou/"
+  email_rgpd_actual: "francecsvicente@gmail.com (⚠️ amb typo aparent: 'francecs' en lloc de 'francesc'; pendent de canal RGPD propi del restaurant)"
+  horari:
+    dilluns: "tancat"
+    dimarts: "tancat"
+    dimecres: "tancat"
+    dijous: "20:00 – 23:00"
+    divendres: "20:00 – 23:00"
+    dissabte: "09:00 – 23:00"
+    diumenge: "09:00 – 16:00"
+    nota: "Horari pendent de validar amb el client abans de tancar Schema.org. Possible variació estacional."
+  metodes_pagament: "Efectiu, targeta (crèdit/dèbit), Bizum"
+  diferenciadors_unics:
+    - "Restaurant + bar + minigolf 18 forats — combo poco habitual al Vallès Oriental (i probablement únic a L'Ametlla del Vallès)"
+    - "Brasa amb foc viu com a eix culinari (entranya, xurrasco, xai, pop a la brasa)"
+    - "Minigolf 18 forats GRATIS si menges al restaurant — 5 €/persona si només jugues"
+    - "Carta extensa per a tots els públics: combinats americans amb noms de golf (Bogey, Grand Slam), tapes catalanes, entrepans calents i freds"
+    - "Públic familiar (perfil de ressenyes ho confirma: nens jugant a golf, grups grans, grup d'amics, parelles)"
+    - "Local 'amagat' (literal d'una ressenya: 'Tot i estar amagat, el menjar genial') que sorprèn quan l'arribes a trobar"
+  logo_disponible:
+    path_repo: "web/src/assets/images/El mini nou logo.jpg (i còpia a web/public/brand/el-mini-nou-logo.jpg)"
+    dimensions: "1080x1080 px JPG (quadrat, fons negre, marca taronja)"
+    estat: "Definitiu — el logo és real del client, NO és placeholder. Es tracta d'una composició pròpia: cercle taronja amb dimples de pilota de golf simulant una pilota gran, text 'El mini nou' al centre amb una pilota de golf real damunt d'un tee substituint la 'o' final, i tagline 'BRASA I +' en cursiva sota."
+    descripcio_visual: "Pilota de golf gegant en silueta com a marc rodó (cercle taronja amb dimples), wordmark 'El mini nou' en sans-serif arrodonit color taronja sobre fons negre, pilota de golf 3D damunt tee al lloc de la 'o' final, lema 'BRASA I +' en script italic subtil. Mood: lúdic-gastronòmic, marca pròpia reconeixible."
+    recomanacio_us_a4: |
+      RECOMANO substituir el text 'EL MINI NOU' del header bar fosc per la versió REAL del logo (o una adaptació monocrom).
+      Raó: el client té un wordmark propi distintiu (amb la pilota de golf integrada) que cap altre client del cluster
+      té. Mostrar el logo real al header bar reforça que coneixem la seva identitat de marca i no estem fent un A4
+      genèric. Si Gemini no pot incorporar la imatge, com a alternativa sí que pot usar la tipografia del logo real
+      (sans-serif rodó taronja) com a inspiració per al header — però la millor opció és incrustar el logo.
+      OPCIONS PRÀCTIQUES:
+        Opció A (preferida): logo real al header bar, amb el text 'PROPOSTA WEB' a la dreta com a tagline.
+        Opció B: header bar amb logo a l'esquerra + text 'EL MINI NOU · PROPOSTA WEB' al centre.
+        Opció C (fallback si Gemini no incrusta imatges): mantenir text 'EL MINI NOU' en font Playfair Display SC,
+                però en taronja brand sobre fons negre, replicant la sensació del wordmark real.
+  font_repo: "web/src/data/business.ts:62-88 + web/src/data/business.ts:91-99 (horari) + web/src/data/business.ts:101-106 (rating) + CLAUDE.md §1 + CONTEXT_ELMININOU.md §1.1-1.6"
+
+# =============================================================================
+# 7. RECOMANACIONS ESPECÍFIQUES PER A AQUEST CLIENT
+# =============================================================================
+
+recomanacions_per_al_client:
+  preu_web_base:
+    valor: "1.100 €"
+    rao: "Fixat per CLAUDE.md §4 (model econòmic cerrado del projecte). Justificat per: 25 pàgines en build (no 11), carta digital amb 50+ plats, pàgina dedicada al minigolf (NO inclosa en projectes estàndard del cluster), sistema bilingüe CA/ES espejo, Schema.org Restaurant + Service, OG images per idioma. El cluster base és 750 € però aquest projecte té un servei extra (minigolf) i complexitat de carta. Total recomanat amb sessió: 1.300 €."
+    font_repo: "CLAUDE.md §4 + CONTEXT_ELMININOU.md §1.7"
+  sessio_fotografica_recomanada:
+    nivell: "EDITORIAL o COMPLETA"
+    rao_per_al_client: |
+      Producte altament fotogènic (brasa amb foc viu, plats combinats abundants, tapes per compartir, ambient familiar
+      i camp de minigolf al darrere) + DOS escenaris físics dispars (sala de restaurant + camp de minigolf exterior).
+      L'estatus actual de la web és que TOTES les imatges (54+) són IA generades amb Gemini, etiquetades honestament
+      com 'imatge il·lustrativa generada amb IA' al alt. Per pujar la web a producció amb orgull comercial, cal
+      sessió real. CLAUDE.md §4 fixa el preu base en 200 € per 15-20 fotos en 2-3 h, però per a aquest cas amb dos
+      escenaris recomano EDITORIAL (4 h, 25-30 fotos) o COMPLETA (mig dia, 35+ fotos) per cobrir bé:
+        - 6 plats firma amb foc viu visible
+        - 4-5 fotos d'ambient de sala (taula parada, barra, brasa funcionant)
+        - 4-5 fotos del minigolf (forats destacats, pal-pilota detall, vista general)
+        - 2 retrats del personal o propietari (opcional, depèn de la decisió del client)
+    font_repo: "CLAUDE.md §4 + CONTEXT_ELMININOU.md §12.1 punt 2 (cero fotografia real)"
+  pla_manteniment_recomanat:
+    nivell: "PROFESIONAL"
+    rao_per_al_client: |
+      La carta del local és canviant (50+ plats amb temporades, possibles variacions setmanals, preus actualitzables),
+      el minigolf pot tenir promocions estacionals (Sant Joan al pati, Carnaval familiar, Reis amb minigolf nocturn,
+      partides amb llum, paquets aniversari nens), i el client encara no està familiaritzat amb tenir web. Necessita
+      mà sostinguda durant el primer any. CLAUDE.md §4 fixa 240 €/any que inclou: dominio, 3 actualitzacions de carta/any,
+      2 canvis petits/any, monitorització mensual, suport WhatsApp prioritat 24-48 h. Aquest pla cobreix bé un negoci
+      gastronòmic actiu sense ser excessiu.
+    font_repo: "CLAUDE.md §4"
+  idioma_a4_recomanat:
+    valor: "castellà"
+    rao: |
+      DECISIÓ TÀCTICA — depèn del client, però si haguéssim de triar avui jo recomano CASTELLÀ pels següents motius:
+        1. El preview canonical que l'usuari ha referenciat és /es/ (web canonical en castellà del preview).
+        2. El públic d'estiueig que ve a L'Ametlla del Vallès des de Barcelona té proporció significativa de
+           castellanoparlants (Vallès Oriental amb facilitat d'accés des de C-17).
+        3. Les ressenyes són majoritàriament en castellà (5 de 8 ressenyes amb text en castellà, 3 en català).
+        4. El propietari pot ser hispanoparlant (pendent de confirmar) i el A4 ha de ser entenedor sense fricció
+           lingüística per a una primera reunió comercial freda.
+      CONTRA-ARGUMENT: Torrent, Flors i Taronger (els 3 anteriors del cluster local de Francesc) van tenir A4 en
+      català. Si vols mantenir coherència de portfolio català, opta per CATALÀ. La web té defaultLang: 'ca' al codi
+      (business.ts:67), per tant tècnicament el català és el primer idioma del producte.
+      DECISIÓ FINAL: la deixo a Francesc en funció de qui veurà l'A4 primer.
+    font_repo: "web/src/data/business.ts:67 (defaultLang) + web/src/data/reviews.ts (proporció CA/ES de ressenyes) + CONTEXT_ELMININOU.md §1.6 (estat comercial)"
+
+# =============================================================================
+# 8. ICONOGRAFIA — CORNER MOTIFS PER A LES 4 CANTONADES DEL A4
+# =============================================================================
+
+corner_motifs:
+  - "Pilota de golf taronja amb dimples sobre fons negre subtil, mig esfumada (DIRECTAMENT inspirada en el logo)"
+  - "Pal de minigolf taronja inclinat amb la pilota al peu, vista de tres quarts (igual que web/public/minigolf/hole-3.webp)"
+  - "Banderí petit de minigolf amb pal vermell/taronja brasa i tela burnt orange, número '18' brodat en negre"
+  - "Flama de brasa estilitzada amb tres llengües (taronja viu + burnt orange + amb un toc de daurat rating al cor)"
+  - "Tall d'entranya o xurrasco vist de costat damunt de graella de ferro negre, amb braves taronges al peu"
+  - "Cap d'all rostit amb pell daurada cremada, mig obert deixant veure els grans"
+  - "Pebrot vermell madur amb tija verd-fosc, brillant lleugerament com si tornés del foc"
+  - "Branqueta de farigola o romaní seca cordada amb fil natural"
+  - "Tassa de vi negre amb reflex de brasa al líquid"
+  - "Espurnes de carbó incandescent (5-7 punts taronges sobre negre, dispersos com confetti)"
+  - "Tee de minigolf amb pilota damunt (silueta neta, perfil)"
+  - "Llenya cremant amb mànec ennegrit i braves vives a l'extrem"
+nota_sobre_estil: |
+  Aquarel·la amb tonalitats fosques i càlides (paleta restringida a #000000, #FF7518, #9C4214, #D8A53F, ocasionalment
+  amb una pinzellada de #FCF7F2 per highlights de paper). Volumetria alta com a Taronger v4 (NO minimalista, NO només
+  contorn). Scattered a les 4 cantonades, NO crossing into central content. Mood 'taverna familiar amb foc viu'.
+  Els motius de minigolf (pilota, banderí, pal) són NEGOCIABLES amb la brasa: NO triïs només uns o només els altres,
+  combina'ls perquè el A4 reflecteixi els DOS pilars del local. Recomanació: 6 motius gastronòmics + 4 motius de
+  minigolf, distribuïts perquè cada cantonada toqui ambdós universos (ex: 2 motius per cantonada amb 1 gastronòmic + 1 de minigolf, o un cantonell amb mix).
+elements_a_evitar:
+  - "Eucalyptus, peònia, olivera, espigues, gerro de terracota, anèmona, cinta de lli, ramets — territori Flors"
+  - "Tisores, pinzells, esmalts, flascons d'àmbar, pintallavis, raspalls de cabells — territori Klip's"
+  - "Llibres, marca-pàgines, plomes, segells de biblioteca, rosa Sant Jordi — territori Torrent"
+  - "Taronges, suc de taronja, cistella de mercat, cafè, segell vermell 'fruita del dia', paper d'estrassa — territori Taronger"
+  - "Cocteleria, smoothies, palmeres, beach bar, parasol — fora de mood (Vallès interior, no costaner)"
+  - "Lavanda, champagne, púrpura, malva — paletes d'altres clients"
+  - "Cabassos antics, fanals oxidats, postals vintage, tipografia maquinetejant — el mood és contemporani familiar, NO nostàlgic"
+  - "Capucha de xef, plats minimalistes, espuma molecular, manteleria d'hotel — territori fine dining, NO és aquest negoci"
+  - "Cartells escrits a mà, taula de fusta tosca, bidó d'oli vermell de bar de carretera — bar de pueblo descuidat, NO és aquest mood"
+  - "Pals de golf de golf seriós tipus PGA, putters professionals, banderes verdes de golf — és MINIgolf, no golf de competició"
+  - "Pollastre rostit en estil 'asador' tradicional vermell-marró saturat — eclipsaria la paleta brasa-taronja del logo"
+
+# =============================================================================
+# 9. DIFERÈNCIES VISUALS CLAU vs KLIP'S, TORRENT, FLORS, TARONGER
+# =============================================================================
+
+diferencies_clau_vs_altres:
+  paleta:
+    klips: "aubergine + champagne + lavender paper"
+    torrent: "warm paper + warm ink + library red + brass"
+    flors: "sandstone cream + walnut + terracota + olivo"
+    taronger: "sun-bleached arena + warm ink + terracota + sea blue (Mediterrània solar matinal)"
+    el_mini_nou: "warm paper orange blossom + tinta negra del logo + taronja brasa #FF7518 + burnt orange #9C4214 + daurat de rating per estrelles. Contrast clau vs Taronger: Taronger té sea blue + terracota matinal solar; El mini nou té taronja brasa + negre logo nocturn-càlid. Mateix univers cromàtic càlid però hores del dia oposades."
+  tipografia:
+    klips: "Cormorant Garamond + Inter"
+    torrent: "Newsreader + Inter"
+    flors: "Marcellus + Inter"
+    taronger: "Bricolage Grotesque + Schibsted Grotesk"
+    el_mini_nou: "Playfair Display SC + Karla. El SC (Small Caps) és el detall que diferencia clarament d'altres serifs editorials: dóna to clàssic-gastronòmic amb caràcter, no romàntic ni librari."
+  motius:
+    klips: "tisores, pinzells, eucalyptus, esmalt, flascó d'àmbar"
+    torrent: "llibres apilats, marca-pàgines, ploma, rosa Sant Jordi, segell biblioteca"
+    flors: "olivera, peònia, eucalyptus, anèmona, espigues, gerro terracota, cinta lli"
+    taronger: "branca de taronger, got de suc, cistella de mercat, cafè, segell vermell 'fruita del dia', paper d'estrassa"
+    el_mini_nou: "pilota de golf taronja amb dimples (DEL LOGO), pal de minigolf, banderí amb '18', flama de brasa, tall d'entranya/xurrasco a la graella, cap d'all rostit, pebrot vermell, branqueta de farigola, got de vi negre, espurnes de carbó, tee amb pilota, llenya cremant. ÚNIC del cluster: barreja motius gastronòmics amb motius de minigolf."
+  mood:
+    klips: "saló de bellesa botànic premium"
+    torrent: "llibreria de poble + papereria + biblioteca municipal"
+    flors: "casa de l'àvia + taller floral artesà mediterrani"
+    taronger: "mercat de poble al matí + barra al sol oblicu + fruita madura"
+    el_mini_nou: "sopar de divendres al voltant de la brasa amb minigolf al darrere, taverna catalana familiar moderna, cap de setmana al Vallès. Diferenciació crítica vs Taronger: Taronger = MATÍ solar / mercat / fruita fresca. El mini nou = NIT càlida / brasa / partida després de sopar. Mateix sector gastronòmic, hora del dia oposada, paleta complementària però distinta."
+  geografia:
+    klips_torrent_flors_taronger: "Aiguafreda (Vallès Oriental, mateix poble per als 4 — cluster geogràfic per a portfolio del dissenyador)"
+    el_mini_nou: "L'Ametlla del Vallès (mateix Vallès Oriental, poble veí però DIFERENT). El cluster geogràfic local de Francesc ja no aplica per a aquest client. Però el cluster TIPOGRÀFIC i CROMÀTIC sí importa per a coherència visual del portfolio."
+  diferencia_visual_unica_d_aquest_client:
+    - "ÉS el primer client del cluster amb LOGO REAL i WORDMARK propi (els altres 4 s'identificaven només per tipografia)"
+    - "ÉS el primer client del cluster que vendria a la web un servei NO gastronòmic ni de bellesa: el minigolf"
+    - "ÉS el primer client amb DOS verticals dins del mateix negoci: gastronomia + lleure familiar"
+    - "ÉS el primer client amb ressenyes lo bastant fortes per a card de Reseñas Google al A4 (rating 5,0 ★ + 11 mostres)"
+
+# =============================================================================
+# 10. DADES EXTRA QUE PODEN MILLORAR LA PROPOSTA
+# =============================================================================
+
+dades_extra_rellevants:
+  - frase_canonica_marca_web: |
+      Hero canonical de la home (web/src/components/restaurant/RestaurantHomePage.astro:36-37):
+        - CA: 'Brases, menú del dia i tapes sense complicacions'
+        - ES: 'Brasa, menú del día y tapas sin complicaciones'
+      Subtítol del hero (línia 43):
+        - CA: 'Foc viu i producte treballat'
+        - ES: 'Fuego vivo y producto trabajado'
+      Aquesta frase 'Brases, menú del dia i tapes sense complicacions' és el equivalent canònic
+      del 'Som El Taronger: fruita fresca' del Taronger. Convé incloure-la al A4 com a tagline
+      del header bar o al peu del logo, perquè és literal de la web i resumeix l'oferta.
+  - minigolf_prominencia_web: |
+      El minigolf NO és només una pàgina dedicada — apareix també a la home com a SECCIÓ pròpia
+      ('MinigolfSection.astro' renderitzada entre el banner CTA i la ubicació). El client veu
+      la seva diferenciació destacada de seguida en obrir la portada. Per al A4: això reforça
+      que el minigolf té d'aparèixer com a feature independent (id 1 a la llista de 8 features),
+      no com a subnota del restaurant.
+  - promesa_gratis_si_menges: |
+      La promesa 'GRATIS si dines aquí · 5 € si només jugues' apareix renderitzada AMB DESTAQUE
+      VISUAL (label en majúscules taronges, número en gran, context en text muted) tant a
+      MinigolfSection com a la pàgina /minigolf/. Font: web/src/components/sections/MinigolfSection.astro:29-32.
+      És un CTA gratificant que fa de gancho comercial intern. Al A4 hauria de tenir presència explícita
+      (potser dins la card 'Pàgina dedicada al minigolf' o com a callout independent).
+  - logo_composicio_distintiva: |
+      El logo és REALMENT distintiu: combina pilota de golf gegant (cercle taronja amb dimples sobre fons negre)
+      + wordmark sans-serif rodó + pilota de golf 3D damunt tee substituint la 'o' final + tagline 'BRASA I +'
+      en cursiva script. Aquesta composició és gairebé impossible de confondre amb cap altre restaurant. Si Gemini
+      pot incorporar la imatge real al header bar, fes-ho. Si no, com a mínim usa la frase 'BRASA I +' com a
+      tagline subtil sota el títol del A4 — és literal del logo i el client la reconeixerà a l'instant.
+  - patro_de_resenyes_publiques: |
+      Patró fort detectat a les 8 ressenyes amb text (web/src/data/reviews.ts):
+        - 'amics' / 'grup gran': mencionat 3 vegades (Olga, Pol, Jamil)
+        - 'nens' / 'menuts' / 'família': mencionat 4 vegades (Olga, Nuria, Jamil, perfil general)
+        - 'minigolf' / 'mini golf' / 'camp de mini golf' / '18 forats': mencionat explícitament 5 de 8 vegades
+        - 'brasa' / 'carn espectacular' / 'xurrasco' / 'xai' / 'entranya' / 'costella': mencionat 5 vegades
+        - 'descobriment' / 'gran descobriment' / 'amagat': mencionat 3 vegades (sensació de 'troballa secreta')
+        - 'ambient familiar' / 'distès' / 'distendido': mencionat 4 vegades
+        - 'preu raonable' / 'bons preus': mencionat 3 vegades
+      CONCLUSIÓ: el client ja té validat pel mercat que els seus 3 angles forts són MINIGOLF, BRASA i FAMILIAR.
+      El A4 hauria de jerarquitzar amb aquests 3 angles, en aquest ordre.
+      Pull quote suggerit per al A4 (si Francesc vol incloure'n una): 'Tot i estar amagat, el menjar genial i un
+      gran descobriment en tots els sentits' — Santi Izquierdo, Març 2026 (web/src/data/reviews.ts:122-125).
+  - components_unics_d_aquest_projecte: |
+      Components que NO existien al cluster anterior i s'han creat específicament per a El mini nou:
+        - MinigolfSection.astro (home + página dedicada)
+        - MinigolfHoles.astro (presentació dels 18 forats individualment amb difficulty 1-3)
+        - ReviewsBentoSection.astro (bento editorial de ressenyes reals — primera implementació real,
+          els altres clients del cluster tenien blocs simples sense ressenyes verbatim)
+        - MenuSignatureDishes.astro (3 plats firma destacats al començament de la carta)
+        - MenuDietaryFilter.astro (filtres dietètics combinables amb 5 etiquetes)
+      Això reforça que el preu base de 1.100 € no és arbitrari: hi ha 3-4 components NOVES de codi
+      escrits específicament per aquest client, no només un re-skinnig de plantilla.
+
+# =============================================================================
+# ARXIUS CONSULTATS DEL REPO (per auditoria)
+# =============================================================================
+
+arxius_consultats:
+  - "CLAUDE.md (raíz) — contracte de treball del projecte"
+  - "CONTEXT_ELMININOU.md (raíz) — context tècnic+producte exhaustiu"
+  - "ESTADO_ELMININOU.md (raíz) — escaparate del producte"
+  - "MENU_ELMININOU.md (raíz) — fuente canónica de la carta (lectura no necessària per A4)"
+  - "web/astro.config.mjs — configuració Astro, fonts, icons"
+  - "web/src/config/theme.ts — paleta + tipografia (font primària de secció 1 i 2)"
+  - "web/src/data/business.ts — NAP del restaurant, horari, ressenyes snapshot"
+  - "web/src/data/site.ts — feature flags, businessType, canonicalUrl, analytics"
+  - "web/src/data/services.ts (923 línies) — la carta amb 60 plats reals i 6 featured"
+  - "web/src/data/minigolf.ts — highlights, stats, holes i pricing del minigolf"
+  - "web/src/data/reviews.ts — 8 ressenyes reals amb text, autoritzades"
+  - "web/src/data/highlights.ts — 3 diferenciadors editorials de la home"
+  - "web/src/data/home-gallery-preview.ts — 3 tiles de gallery preview"
+  - "web/src/data/gallery.ts — 12 imatges + 5 categories"
+  - "web/src/data/faq.ts — 14 preguntes (verificat en codi, malgrat que CONTEXT_ELMININOU.md diu 10)"
+  - "web/src/components/restaurant/RestaurantHomePage.astro — portada monolítica, copy hero canonical"
+  - "web/src/components/sections/MinigolfSection.astro — secció minigolf de la home"
+  - "web/src/pages/ca/index.astro — entrypoint CA"
+  - "web/src/pages/ca/* i web/src/pages/es/* — verificació de 10 pàgines per idioma"
+  - "web/src/assets/images/El mini nou logo.jpg — logo real del client (1080x1080)"
+  - "web/public/brand/el-mini-nou-logo.jpg — còpia per a OG image generator"
+  - "web/src/assets/images/generated/* — imatges IA generades per Gemini (54+ menu-generated, 12 generated)"
+
+# =============================================================================
+# DESCREPÀNCIES DETECTADES (per honestedat amb Francesc)
+# =============================================================================
+
+discrepancies_detectades:
+  - camp: "site.analytics.clarityProjectId"
+    expectativa_documentacio: "CLAUDE.md §2 i CONTEXT_ELMININOU.md §4.2 diuen 'no configurat / vacío'"
+    realitat_repo: "web/src/data/site.ts:133 té 'wldb054hxc' (10 caràcters base32 vàlids)"
+    impacte_a4: "Cap directe — confirma que Microsoft Clarity SÍ està configurat avui. Si Francesc vol mencionar-ho al A4 com a feature 'Analytics privada cookieless', està viu."
+  - camp: "FAQ count"
+    expectativa_documentacio: "CONTEXT_ELMININOU.md §3.7 diu '10 preguntes en acordeón'"
+    realitat_repo: "web/src/data/faq.ts té 14 entrades (`grep -c '^	{$' faq.ts` retorna 14)"
+    impacte_a4: "Cap directe — pot interessar mencionar '14 FAQs bilingües' si vols ser precís al A4."
+  - camp: "Services count"
+    expectativa_documentacio: "ESTADO_ELMININOU.md i CONTEXT_ELMININOU.md mencionen '50+ plats' i '54 imatges'"
+    realitat_repo: "web/src/data/services.ts té 60 entrades (`grep -c '^	{$' services.ts` retorna 60)"
+    impacte_a4: "Pots vendre '60 plats' o '50+ plats' segons preferència, ambdues honestes."
+  - camp: "Featured services count"
+    realitat_repo: "Exactament 6 plats `featured: true` (verificat amb `grep -c 'featured: true'`)"
+    plats_concrets: "amanida-el-mini, entranya, espaguetis, grand-slam, sandwich-botifarra, tapas-olives (línies 52, 222, 296, 395, 421, 544 de services.ts)"
+    impacte_a4: "Confirma '6 plats firma destacats' al A4 si Francesc vol ser precís."
+  - camp: "Pàgines totals"
+    expectativa_documentacio: "CLAUDE.md §5 diu '25 páginas en build'"
+    realitat_repo: "11 pàgines per idioma (CA + ES) + 404 + 3 pàgines /dev/ excluïdes del sitemap = 25 totals (sí coincideix), però 22 públiques al sitemap"
+    impacte_a4: "Mencionar '22 pàgines públiques' o '11 pàgines per idioma' és més honest que '25 pàgines'."
